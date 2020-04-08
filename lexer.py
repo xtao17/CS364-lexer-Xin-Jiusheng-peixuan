@@ -32,22 +32,27 @@ class Lexer:
         split_patt = re.compile(
             # changes for a,b,c,d
             r"""             # Split on 
-               ^(\d+)$    |                            #integer
+               \b(?<!\.)\d+(?!\.)\b    |                            #integer
                ((\d+)(\.[0-9]+)?)(e(\+|-)?(\d+))?    |   # real number(scientific notation)
                #TODO real include integer?? +,- sign before??
-
                ([0-9]+\.?_?e?(\+|-)?)    |   # integers and floats with underscores  TODO - check 1._23
                ([_a-zA-Z][_\w]*) | # ID
                (^[ \t]*".*")  |   # TODO - check \"
                (^[ \t]*//.*$) |    # comments start with a //
-               
+
                (bool|else |if |print| false |true |int| main| while| char| float) 
-               
+
                (\|\| | && | == | != |  < | <= |> |>= |\+ |\- |\* |\/ |\% |\! ) |
-               
+
                \; |\, |\{ |\} |\( |\)
-               
-               
+               (\+) |        #  plus and capture
+               (\*) |        #  times and capture
+               (-)  |        #  minus and capture, minus not special unless in []
+               \s   |        #  whitespace
+               (\() |        #  left paren and capture
+               (\))          #  right paren and capture
+
+
             """,
             re.VERBOSE
         )
