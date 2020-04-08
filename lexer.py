@@ -34,14 +34,14 @@ class Lexer:
         split_patt = re.compile(
             # changes for a,b,c,d
             r"""             # Split on 
-               
                (^[ \t]*".*")  |                         #string literal   #TODO /
-                   # comments start with a //
+                   
                (\b(?<!\.)(?<!(e[+-]))\d+((?!\.)\b)) |   #integer
-               (\b(?<!\.)(?<!(e[+-]))\d+_*\d+((?!\.)\b)) |  # integer with underscore
+              
+               ([0-9]+(\.[0-9]+)?(_?[0-9]+)*) |  # number with underscore
                
                \s     |                                 #space 
-               ^[ \t]*//.*$                         |    #comment
+               ^[ \t]*//.*$                         |   # comments start with a //
                (bool|else |if |print| false |true |int| main| while| char| float)   | 
 
                (\|\|) | 
