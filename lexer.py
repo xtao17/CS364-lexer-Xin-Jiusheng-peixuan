@@ -36,10 +36,10 @@ class Lexer:
         split_patt = re.compile(
             # changes for a,b,c,d
             r"""             # Split on 
-               (^[ \t]*".*")                                |                         #string literal   #TODO /
+               (^[ \t]*".*")                               |                         #string literal   #TODO /
                (\b(?<![\._])(?<!(e[+-])){d}+(?![\._])\b)    |   #integer
-               (\d+\.(\d)+\b | \b\d+(.\d+)?e[-+]?\d+ \b) | #real number
-       
+  
+               (\d+\.\d(_\d|\d)*\b| \b\d+(.\d+)?e[-+]?\d+ \b)   |
                \s     |                                 #space 
                ^[ \t]*//.*$                         |   # comments start with a //
                (bool|else |if |print| false |true |int| main| while| char| float)   | 
