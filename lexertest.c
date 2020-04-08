@@ -6,7 +6,7 @@ a=1.3
   	bool else if print false true int main while char float   // this is a comment
 
 	// the tokens && is one token as are <=, >=, ==, !=, ||
-  	123 < 34.567 && true <=    >= < >  ==    =  || [] / * !=  , {}
+  	123< 34.567 && true <=    >= < >  ==    =  || [] / * !=  , {}
    =  =   <
   	int a,b;   // five tokens
 

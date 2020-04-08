@@ -45,6 +45,12 @@ class Lexer:
                (\|\| | && | == | != |  < | <= |> |>= |\+ |\- |\* |\/ |\% |\! ) |
 
                \; |\, |\{ |\} |\( |\)
+               (\+) |        #  plus and capture
+               (\*) |        #  times and capture
+               (-)  |        #  minus and capture, minus not special unless in []
+               \s   |        #  whitespace
+               (\() |        #  left paren and capture
+               (\))          #  right paren and capture
 
 
             """,
