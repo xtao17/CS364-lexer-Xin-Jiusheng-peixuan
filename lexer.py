@@ -31,17 +31,15 @@ class Lexer:
         # TEST TEST TEST try and break your code
         # SOLID
 
+        digit = "[0-9_?]"
+
         split_patt = re.compile(
             # changes for a,b,c,d
             r"""             # Split on 
-               (^[ \t]*".*")  |                         #string literal   #TODO /
-
-               (\b(?<!\.)(?<!(e[+-]))\d+((?!\.)\b)) |   #integer
-               
-               (\d)+\.(\d)+\b | \b\d+(.\d+)?e[-+]?\d+ \b | #real number
-
-               ([0-9]+(\.[0-9]+)?(_?[0-9]+)*) |  # number with underscore
-
+               (^[ \t]*".*")                                |                         #string literal   #TODO /
+               (\b(?<![\._])(?<!(e[+-])){d}+(?![\._])\b)    |   #integer
+               (\d+\.(\d)+\b | \b\d+(.\d+)?e[-+]?\d+ \b) | #real number
+       
                \s     |                                 #space 
                ^[ \t]*//.*$                         |   # comments start with a //
                (bool|else |if |print| false |true |int| main| while| char| float)   | 
@@ -50,9 +48,8 @@ class Lexer:
                (==) | 
                (!=) | (<) | (<=) |(>) |(>=) |(\+) |(\-) |(\*) |(\/) |(\%) |
                (\! ) |
-               (\; |\, |\{ |\} |\( |\)) |
-               ([_a-zA-Z][_\w]*) | # ID
-            """,
+               (\; |\, |{{ |}} |\( |\)) 
+            """.format(d=digit),
             re.VERBOSE
         )
 
