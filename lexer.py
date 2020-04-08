@@ -37,6 +37,8 @@ class Lexer:
                (^[ \t]*".*")  |                         #string literal   #TODO /
 
                (\b(?<!\.)(?<!(e[+-]))\d+((?!\.)\b)) |   #integer
+               
+               (\d)+\.(\d)+\b | \b\d+(.\d+)?e[-+]?\d+ \b | #real number
 
                ([0-9]+(\.[0-9]+)?(_?[0-9]+)*) |  # number with underscore
 
