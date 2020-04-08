@@ -13,7 +13,7 @@ class Lexer:
     RPAREN = 4  # 4) Class to represent a token
     EOF = 5  # TODO return special end-of-file token
     MULT = 6
-    INT=7
+    INT = 7
 
     def __init__(self, fn: str):
         try:
@@ -35,32 +35,21 @@ class Lexer:
             # changes for a,b,c,d
             r"""             # Split on 
                (^[ \t]*".*")  |                         #string literal   #TODO /
-                   
+
                (\b(?<!\.)(?<!(e[+-]))\d+((?!\.)\b)) |   #integer
-              
+
                ([0-9]+(\.[0-9]+)?(_?[0-9]+)*) |  # number with underscore
-               
+
                \s     |                                 #space 
                ^[ \t]*//.*$                         |   # comments start with a //
                (bool|else |if |print| false |true |int| main| while| char| float)   | 
-
                (\|\|) | 
                (&&) | 
                (==) | 
                (!=) | (<) | (<=) |(>) |(>=) |(\+) |(\-) |(\*) |(\/) |(\%) |
                (\! ) |
-
                (\; |\, |\{ |\} |\( |\)) |
                ([_a-zA-Z][_\w]*) | # ID
-               
-
-               
-               (\+) |        #  plus and capture
-               (\*) |        #  times and capture
-               (-)  |        #  minus and capture, minus not special unless in []
-               \s   |        #  whitespace
-               (\() |        #  left paren and capture
-               (\))          #  right paren and capture
             """,
             re.VERBOSE
         )
