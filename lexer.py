@@ -32,8 +32,13 @@ class Lexer:
             # changes for a,b,c,d
             r"""             # Split on 
                (\+|-)?(\d+)    |                            #integer
-               ((\+|-)?(\d+)(\.[0-9]+)?)(e(\+|-)?(\d+))?    # real number(scientific notation)
+               ((\+|-)?(\d+)(\.[0-9]+)?)(e(\+|-)?(\d+))?    |   # real number(scientific notation)
                #TODO real include integer?? +,- sign before??
+               
+               ([0-9]+.*_*[0-9]+)    |   # integers and floats with underscores  TODO - check 1._23
+               ([_a-zA-Z][_a-zA-Z0-9]*) | # ID
+               ("[\w\s]*"$)  |   # TODO - check \"
+               (//\w*)     # comments start with a //
             """,
             re.VERBOSE
         )
