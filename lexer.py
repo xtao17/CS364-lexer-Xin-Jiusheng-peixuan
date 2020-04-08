@@ -31,8 +31,8 @@ class Lexer:
         split_patt = re.compile(
             # changes for a,b,c,d
             r"""             # Split on 
-               (\+|-)?(\d+)    |                            #integer
-               ((\+|-)?(\d+)(\.[0-9]+)?)(e(\+|-)?(\d+))?    |   # real number(scientific notation)
+               ^(\d+)$    |                            #integer
+               ((\d+)(\.[0-9]+)?)(e(\+|-)?(\d+))?    |   # real number(scientific notation)
                #TODO real include integer?? +,- sign before??
                
                ([0-9]+.*_*[0-9]+)    |   # integers and floats with underscores  TODO - check 1._23
@@ -69,7 +69,7 @@ class Lexer:
 
 if __name__ == "__main__":
 
-    lex = Lexer("test.sluc")  # use command line arguments
+    lex = Lexer("test.txt")  # use command line arguments
 
     g = lex.token_generator()
 
