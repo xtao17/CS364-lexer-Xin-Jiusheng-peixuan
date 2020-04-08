@@ -1,5 +1,5 @@
 ;)  ( 12345    // the tokens ; ) 12345
-
+a=1.3
   	fred zoo    		identifier   // three identifiers
 
     // all keywords

@@ -1,17 +1,18 @@
 import sys
 from typing import Generator, Tuple
 import re
-class Lexer:
 
+
+class Lexer:
     # class variables that represent a code for a "kind" of token.
     # TODO Clean this up so it is much shorter
-    INTLIT = 0        # 1) setattr builtin function
-    PLUS   = 1        # 2) namedtuple
-    ID     = 2        # 3) named tuples are not typed Typed Named Tuple in
-    LPAREN = 3        #     the typehints doc in Python
-    RPAREN = 4        # 4) Class to represent a token
-    EOF    = 5 # TODO return special end-of-file token
-    MULT   = 6
+    INTLIT = 0  # 1) setattr builtin function
+    PLUS = 1  # 2) namedtuple
+    ID = 2  # 3) named tuples are not typed Typed Named Tuple in
+    LPAREN = 3  # the typehints doc in Python
+    RPAREN = 4  # 4) Class to represent a token
+    EOF = 5  # TODO return special end-of-file token
+    MULT = 6
 
     def __init__(self, fn: str):
         try:
@@ -31,14 +32,21 @@ class Lexer:
         split_patt = re.compile(
             # changes for a,b,c,d
             r"""             # Split on 
-               ^(\d+)$    |                            #integer
+               \b(?<!\.)\d+(?!\.)\b    |                            #integer
                ((\d+)(\.[0-9]+)?)(e(\+|-)?(\d+))?    |   # real number(scientific notation)
                #TODO real include integer?? +,- sign before??
-               
-               ([0-9]+.*_*[0-9]+)    |   # integers and floats with underscores  TODO - check 1._23
+               ([0-9]+\.?_?e?(\+|-)?)    |   # integers and floats with underscores  TODO - check 1._23
                ([_a-zA-Z][_\w]*) | # ID
-               ("[\w\s]*"$)  |   # TODO - check \"
-               (//\w*)     # comments start with a //
+               (^[ \t]*".*")  |   # TODO - check \"
+               (^[ \t]*//.*$) |    # comments start with a //
+
+               (bool|else |if |print| false |true |int| main| while| char| float) 
+
+               (\|\| | && | == | != |  < | <= |> |>= |\+ |\- |\* |\/ |\% |\! ) |
+
+               \; |\, |\{ |\} |\( |\)
+
+
             """,
             re.VERBOSE
         )
@@ -56,7 +64,7 @@ class Lexer:
             for t in tokens:
                 # TODO replace with a dictionary
                 if t == '+':
-                    yield (Lexer.PLUS, t)   # singleton
+                    yield (Lexer.PLUS, t)  # singleton
                 elif t == '*':
                     yield (Lexer.MULT, t)
                 elif t == '(':
@@ -64,7 +72,7 @@ class Lexer:
                 elif t == ')':
                     yield (Lexer.RPAREN, t)
                 else:
-                    yield (Lexer.ID, t)    # singleton?
+                    yield (Lexer.ID, t)  # singleton?
 
 
 if __name__ == "__main__":
