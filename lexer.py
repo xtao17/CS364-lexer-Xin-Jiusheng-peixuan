@@ -37,8 +37,8 @@ class Lexer:
                
                ([0-9]+\.?_?e?(\+|-)?)    |   # integers and floats with underscores  TODO - check 1._23
                ([_a-zA-Z][_\w]*) | # ID
-               ("[\w\s]*"$)  |   # TODO - check \"
-               (//\w*)     # comments start with a //
+               (^[ \t]*".*")  |   # TODO - check \"
+               (^[ \t]*//.*$)     # comments start with a //
             """,
             re.VERBOSE
         )
