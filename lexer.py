@@ -29,6 +29,7 @@ class Lexer:
         # TEST TEST TEST try and break your code
         # SOLID
         split_patt = re.compile(
+            # changes for a,b,c,d
             r"""             # Split on 
                (\+|-)?(\d+)    |                            #integer
                ((\+|-)?(\d+)(\.[0-9]+)?)(e(\+|-)?(\d+))?    # real number(scientific notation)
