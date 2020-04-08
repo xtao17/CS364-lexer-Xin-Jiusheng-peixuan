@@ -30,12 +30,9 @@ class Lexer:
         # SOLID
         split_patt = re.compile(
             r"""             # Split on 
-               (\+) |        #  plus and capture
-               (\*) |        #  times and capture
-               (-)  |        #  minus and capture, minus not special unless in []
-               \s   |        #  whitespace
-               (\() |        #  left paren and capture
-               (\))          #  right paren and capture
+               (\+|-)?(\d+)    |                            #integer
+               ((\+|-)?(\d+)(\.[0-9]+)?)(e(\+|-)?(\d+))?    # real number(scientific notation)
+               #TODO real include integer?? +,- sign before??
             """,
             re.VERBOSE
         )
