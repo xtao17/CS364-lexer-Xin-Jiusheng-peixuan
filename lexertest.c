@@ -43,7 +43,6 @@ a=1.3
 	// python allows underscores in numbers for legibility. The
 	// token below are legitimate
 	123_456_789 and 3.141_592_653_589_793
-
 	// scientific notation
 	3e-9  // 3 times ten to the minus 9
 	-2.34e9  // two tokens! - and 2.34e9

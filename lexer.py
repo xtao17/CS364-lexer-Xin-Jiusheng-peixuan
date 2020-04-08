@@ -13,6 +13,7 @@ class Lexer:
     RPAREN = 4  # 4) Class to represent a token
     EOF = 5  # TODO return special end-of-file token
     MULT = 6
+    INT=7
 
     def __init__(self, fn: str):
         try:
@@ -29,30 +30,37 @@ class Lexer:
         # Don't forget about ^ and $
         # TEST TEST TEST try and break your code
         # SOLID
+
         split_patt = re.compile(
             # changes for a,b,c,d
             r"""             # Split on 
-               \b(?<!\.)\d+(?!\.)\b    |                            #integer
-               ((\d+)(\.[0-9]+)?)(e(\+|-)?(\d+))?    |   # real number(scientific notation)
-               #TODO real include integer?? +,- sign before??
-               ([0-9]+\.?_?e?(\+|-)?)    |   # integers and floats with underscores  TODO - check 1._23
+               
+               (^[ \t]*".*")  |                         #string literal   #TODO /
+                   # comments start with a //
+               (\b(?<!\.)(?<!(e[+-]))\d+((?!\.)\b)) |   #integer
+               (\b(?<!\.)(?<!(e[+-]))\d+_*\d+((?!\.)\b)) |  # integer with underscore
+               
+               \s     |                                 #space 
+               ^[ \t]*//.*$                         |    #comment
+               (bool|else |if |print| false |true |int| main| while| char| float)   | 
+
+               (\|\|) | 
+               (&&) | 
+               (==) | 
+               (!=) | (<) | (<=) |(>) |(>=) |(\+) |(\-) |(\*) |(\/) |(\%) |
+               (\! ) |
+
+               (\; |\, |\{ |\} |\( |\)) |
                ([_a-zA-Z][_\w]*) | # ID
-               (^[ \t]*".*")  |   # TODO - check \"
-               (^[ \t]*//.*$) |    # comments start with a //
+               
 
-               (bool|else |if |print| false |true |int| main| while| char| float) 
-
-               (\|\| | && | == | != |  < | <= |> |>= |\+ |\- |\* |\/ |\% |\! ) |
-
-               \; |\, |\{ |\} |\( |\)
+               
                (\+) |        #  plus and capture
                (\*) |        #  times and capture
                (-)  |        #  minus and capture, minus not special unless in []
                \s   |        #  whitespace
                (\() |        #  left paren and capture
                (\))          #  right paren and capture
-
-
             """,
             re.VERBOSE
         )
@@ -77,13 +85,15 @@ class Lexer:
                     yield (Lexer.LPAREN, t)
                 elif t == ')':
                     yield (Lexer.RPAREN, t)
+                elif type(t) == int:
+                    yield (Lexer.INIT, t)
                 else:
                     yield (Lexer.ID, t)  # singleton?
 
 
 if __name__ == "__main__":
 
-    lex = Lexer("test.txt")  # use command line arguments
+    lex = Lexer("runtest.c")  # use command line arguments
 
     g = lex.token_generator()
 
