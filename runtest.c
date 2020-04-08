@@ -1,7 +1,6 @@
 // zhangjiusheng "wode"  100
 "taoxin"
 10
-0b12345
 1.03
 123_456
 1.23_456_78
