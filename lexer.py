@@ -3,6 +3,10 @@ from typing import Generator, Tuple
 import re
 
 
+def find_matches(d, item):
+    for k in d:
+        if re.match(k, item):
+            return d[k]
 
 
 class Lexer:
@@ -28,44 +32,42 @@ class Lexer:
             print("Exiting")
             sys.exit(1)  # can't go on
 
+
     def token_generator(self) -> Generator[Tuple[int, str], None, None]:
-
-        token_dict = {
-            ')': Lexer.RPAREN,
-            '(': Lexer.LPAREN,
-
-        }
-
         # TODO Can we make this more readable by putting this elsewhere?
         # check out the documentation on |
         # Don't forget about ^ and $
         # TEST TEST TEST try and break your code
         # SOLID
 
-        digit = "[0-9_?]"
+        integer = "(?<![\._])\d(?![\._])"
+        real = "(\d(_\d|\d)*\.\d(_\d|\d)*|\d(_\d|\d)*(.\d(_\d|\d)*)?e[-\+]?\d(_\d|\d)*)"
+        keyword = "(bool)|(else)|(if)|(print)|(false)|(true)|(int)|(main)|(while)|(char)|(float)"
+        string = '^[ \t]*".*"'
+
+        token_dict = {
+            integer: "int",
+            real: "real",
+            string: "String",
+            keyword: "Keyword"
+
+        }
 
         split_patt = re.compile(
             # changes for a,b,c,d
             r"""             # Split on 
-         
-               (^[ \t]*".*")                              |                         #string literal   #TODO /
-               (\b(?<![\._])(?<!(e[\+-])){d}+(?![\._])\b)    |   #integer
-            # TODO 4e10 4e-1
-               (\d(_\d|\d)*\.\d(_\d|\d)*\b|
-                \b\d(_\d|\d)*(.\d(_\d|\d)*)?e[-\+]?\d(_\d|\d)*\b)  |
-               
-               
-               
-               \s     |                                 #space 
-               ^[ \t]*//.*$                         |   # comments start with a //
-               (bool|else |if |print| false |true |int| main| while| char| float)   | 
-               (\|\|) | 
-               (&&) | 
-               (==) | 
-               (!=) | (<) | (<=) |(>) |(>=) |(\+) |(\-) |(\*) |(\/) |(\%) |
+               \s           |                                 #space 
+               ^[ \t]*//.*$ |   # comments start with a //
+               (\|\|)       | 
+               (&&)         | 
+               (==)         |  
+               (!=) | (<) | (<=) |(>) |(>=) |
+               ((?<!e)\+)   |
+               ((?<!e)-)    |
+               (\*) |(\/) |(\%) |
                (\! ) |
                (\; |\, |{{ |}} |\( |\)) 
-            """.format(d=digit),
+            """,
             re.VERBOSE
         )
 
@@ -81,7 +83,9 @@ class Lexer:
 
             tokens = (t for t in split_patt.split(line) if t)
             for t in tokens:
-                # TODO replace with a dictionary
+                yield (find_matches(token_dict, t), t, "Line {}".format(index))
+
+                """# TODO replace with a dictionary
                 if t == '+':
                     yield (Lexer.PLUS, t, "Line {}".format(index))  # singleton
                 elif t == '*':
@@ -93,7 +97,7 @@ class Lexer:
                 elif type(t) == int:
                     yield (Lexer.INTLIT, t, "Line {}".format(index))
                 else:
-                    yield (Lexer.ID, t, "Line {}".format(index))  # singleton?
+                    yield (Lexer.ID, t, "Line {}".format(index))  # singleton?"""
 
 
 if __name__ == "__main__":
