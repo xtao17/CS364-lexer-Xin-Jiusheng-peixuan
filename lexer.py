@@ -13,16 +13,8 @@ class Lexer:
 
 
     # class variables that represent a code for a "kind" of token.
-    # TODO Clean this up so it is much shorter
 
-    INTLIT = 0  # 1) setattr builtin function
-    PLUS = 1  # 2) namedtuple
-    ID = 2  # 3) named tuples are not typed Typed Named Tuple in
-    LPAREN = 3  # the typehints doc in Python
-    RPAREN = 4  # 4) Class to represent a token
-    EOF = 5  # TODO return special end-of-file token
-    MULT = 6
-    INT = 7
+
 
     def __init__(self, fn: str):
         try:
@@ -44,6 +36,7 @@ class Lexer:
 
         keyword = "(bool)|(else)|(if)|(print)|(false)|(true)|(int)|(main)|(while)|(char)|(float)"
         string = '^[ \t]*".*"'
+        illegrealToken = ""
 
         # Operators || && == != < <= > >= + - * / % !
         plus = "(?<!e)\+"
@@ -65,11 +58,19 @@ class Lexer:
         rparen = "\)"
         lbracket = "\["
         rbracket = "\]"
+        mod = "%"
+        negate = "!"
+        mul = "\*"
+        div = "\/"
+        arrayAccess = "\[\]"
+
+
 
         id = "[_a-zA-Z][_a-zA-Z0-9]*"
-        # 3. .4
+        # 3. .4 .4 3.3.3 4ee5 e4e5 4.e5 1._e
         illegreal="(\d)*.$|^.(\d)*"
         token_dict = {
+
             integer: "int",
             real: "real",
             string: "String",
@@ -93,15 +94,26 @@ class Lexer:
             rparen: "right-paren",
             lbracket: "left-bracket",
             rbracket: "right-bracket",
-            id: "ID"
+            id: "ID",
+            mod: "mod",
+            negate: "negate",
+            mul: "multiply",
+            div: "divide",
+            arrayAccess:"arrayAccess"
+
+        }
+        error_message_dict={
+            illegreal: "illegal-realnumber"
 
         }
 
         split_patt = re.compile(
             # changes for a,b,c,d
             r"""             # Split on 
-               ("\"*.\"*")|\s           |                                 #space 
+              (\"([^\\\"]|\\.)*\")|   #string
+              \s           |                                 #space 
                [ \t]*//.*$ |   # comments start with a //
+               #operators
                (\|\|)       | 
                (&&)         | 
                (==)         |  
@@ -110,6 +122,7 @@ class Lexer:
                ((?<!e)-)    |
                (\*) |(\/) |(\%) |
                (\! ) |
+               #puncuation
                (\; |\, |\{ |\} |\( |\)) 
             """,
             re.VERBOSE
@@ -127,21 +140,12 @@ class Lexer:
 
             tokens = (t for t in split_patt.split(line) if t)
             for t in tokens:
-                yield (find_matches(token_dict, t), t, "Line {}".format(index))
+                if (find_matches(token_dict, t) == None):
+                    yield (find_matches(error_message_dict, t),t, "Line {}".format(index))
 
-                """# TODO replace with a dictionary
-                if t == '+':
-                    yield (Lexer.PLUS, t, "Line {}".format(index))  # singleton
-                elif t == '*':
-                    yield (Lexer.MULT, t, "Line {}".format(index))
-                elif t == '(':
-                    yield (Lexer.LPAREN, t, "Line {}".format(index))
-                elif t == ')':
-                    yield (Lexer.RPAREN, t, "Line {}".format(index))
-                elif type(t) == int:
-                    yield (Lexer.INTLIT, t, "Line {}".format(index))
                 else:
-                    yield (Lexer.ID, t, "Line {}".format(index))  # singleton?"""
+                    yield (find_matches(token_dict, t), t, "Line {}".format(index))
+
 
 
 if __name__ == "__main__":
