@@ -56,7 +56,7 @@ class Lexer:
         split_patt = re.compile(
             # changes for a,b,c,d
             r"""             # Split on 
-               \s           |                                 #space 
+               (^[ \t]*".*")|\s           |                                 #space 
                ^[ \t]*//.*$ |   # comments start with a //
                (\|\|)       | 
                (&&)         | 

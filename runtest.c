@@ -1,4 +1,4 @@
-// zhangjiusheng "wode"  100
+//  zhangjiusheng "wode"  100
 "taoxin"
 10
 1.03
@@ -28,6 +28,7 @@
 4.03
 4.
 _123_56
+3..0
 3.14159
 -3.14159
 // zhangjiusheng "wode" 100
