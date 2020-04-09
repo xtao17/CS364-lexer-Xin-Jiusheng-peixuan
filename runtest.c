@@ -33,6 +33,7 @@ _123_56
 -3.14159
 // zhangjiusheng "wode" 100
 "he said \"GO\""
+"this is a // string"
 1+1.2+3.4=5.9
  _9ident = -3.14159
 if(a==2) else {bool && int};)(><=)

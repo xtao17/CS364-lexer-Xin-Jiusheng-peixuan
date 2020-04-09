@@ -44,6 +44,7 @@ class Lexer:
 
         keyword = "(bool)|(else)|(if)|(print)|(false)|(true)|(int)|(main)|(while)|(char)|(float)"
         string = '^[ \t]*".*"'
+        id = ""
 
         token_dict = {
             integer: "int",
