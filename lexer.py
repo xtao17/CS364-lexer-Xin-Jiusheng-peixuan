@@ -44,6 +44,28 @@ class Lexer:
 
         keyword = "(bool)|(else)|(if)|(print)|(false)|(true)|(int)|(main)|(while)|(char)|(float)"
         string = '^[ \t]*".*"'
+
+        # Operators || && == != < <= > >= + - * / % !
+        plus = "(?<!e)\+"
+        minus = "(?<!e)-"
+        Or = "(\|\|)"
+        And = "&&"
+        equi = "(==)"
+        neq = "(!=)"
+        les = "(<)"
+        leq = "(<=)"
+        gre = "(>)"
+        geq = "(>=)"
+        ass = "(=)"
+        semico = ";"
+        comma = ","
+        lbrace = "\{"
+        rbrace = "\}"
+        lparen = "\("
+        rparen = "\)"
+        lbracket = "\["
+        rbracket = "\]"
+
         id = "[_a-zA-Z][_a-zA-Z0-9]*"
         # 3. .4
         illegreal="(\d)*.$|^.(\d)*"
@@ -51,15 +73,35 @@ class Lexer:
             integer: "int",
             real: "real",
             string: "String",
-            keyword: "Keyword"
+            keyword: "Keyword",
+            plus: "plus",
+            minus: "minus",
+            Or: "or",
+            And: "and",
+            equi: "equal-equal",
+            neq: "not-equal",
+            les: "less-than",
+            leq: "less-equal",
+            gre: "greater-than",
+            geq: "greater-equal",
+            ass: "assignment",
+            semico: "semicolon",
+            comma: "comma",
+            lbrace: "left-brace",
+            rbrace: "right-brace",
+            lparen: "left-paren",
+            rparen: "right-paren",
+            lbracket: "left-bracket",
+            rbracket: "right-bracket",
+            id: "ID"
 
         }
 
         split_patt = re.compile(
             # changes for a,b,c,d
             r"""             # Split on 
-               (^[ \t]*".*")|\s           |                                 #space 
-               ^[ \t]*//.*$ |   # comments start with a //
+               ("\"*.\"*")|\s           |                                 #space 
+               [ \t]*//.*$ |   # comments start with a //
                (\|\|)       | 
                (&&)         | 
                (==)         |  
@@ -104,7 +146,7 @@ class Lexer:
 
 if __name__ == "__main__":
 
-    lex = Lexer("runtest.c")  # use command line arguments
+    lex = Lexer("test.sluc")  # use command line arguments
 
     g = lex.token_generator()
 
