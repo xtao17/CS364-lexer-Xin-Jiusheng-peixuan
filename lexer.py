@@ -11,14 +11,14 @@ class Lexer:
     # class variables that represent a code for a "kind" of token.
     # TODO Clean this up so it is much shorter
 
-    INTLIT = next(attr)  # 1) setattr builtin function
-    PLUS = next(attr)  # 2) namedtuple
-    ID = next(attr)  # 3) named tuples are not typed Typed Named Tuple in
-    LPAREN = next(attr)  # the typehints doc in Python
-    RPAREN = next(attr)  # 4) Class to represent a token
-    EOF = next(attr)  # TODO return special end-of-file token
-    MULT = next(attr)
-    INT = next(attr)
+    INTLIT = 0  # 1) setattr builtin function
+    PLUS = 1  # 2) namedtuple
+    ID = 2  # 3) named tuples are not typed Typed Named Tuple in
+    LPAREN = 3  # the typehints doc in Python
+    RPAREN = 4  # 4) Class to represent a token
+    EOF = 5  # TODO return special end-of-file token
+    MULT = 6
+    INT = 7
 
     def __init__(self, fn: str):
         try:
