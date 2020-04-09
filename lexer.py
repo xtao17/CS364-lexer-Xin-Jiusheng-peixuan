@@ -61,8 +61,9 @@ class Lexer:
         # regular expression for an ID
         # regular expression for an integer literal
 
+        index = 0
         for line in self.f:
-
+            index += 1
             # save recognizing string literals and comments
             # until the end (do these last). Try and recognize
             # these *before* you split the line
@@ -71,17 +72,17 @@ class Lexer:
             for t in tokens:
                 # TODO replace with a dictionary
                 if t == '+':
-                    yield (Lexer.PLUS, t)  # singleton
+                    yield (Lexer.PLUS, t, "Line {}".format(index))  # singleton
                 elif t == '*':
-                    yield (Lexer.MULT, t)
+                    yield (Lexer.MULT, t, "Line {}".format(index))
                 elif t == '(':
-                    yield (Lexer.LPAREN, t)
+                    yield (Lexer.LPAREN, t, "Line {}".format(index))
                 elif t == ')':
-                    yield (Lexer.RPAREN, t)
+                    yield (Lexer.RPAREN, t, "Line {}".format(index))
                 elif type(t) == int:
-                    yield (Lexer.INIT, t)
+                    yield (Lexer.INIT, t, "Line {}".format(index))
                 else:
-                    yield (Lexer.ID, t)  # singleton?
+                    yield (Lexer.ID, t, "Line {}".format(index))  # singleton?
 
 
 if __name__ == "__main__":
