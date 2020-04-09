@@ -5,7 +5,7 @@ import re
 
 def find_matches(d, item):
     for k in d:
-        if re.match(k, item):
+        if re.fullmatch(k, item):
             return d[k]
 
 
@@ -39,9 +39,9 @@ class Lexer:
         # Don't forget about ^ and $
         # TEST TEST TEST try and break your code
         # SOLID
-
-        integer = "(?<![\._])\d(?![\._])"
         real = "(\d(_\d|\d)*\.\d(_\d|\d)*|\d(_\d|\d)*(.\d(_\d|\d)*)?e[-\+]?\d(_\d|\d)*)"
+        integer = "\d+[\d_]*\d+|\d+"
+
         keyword = "(bool)|(else)|(if)|(print)|(false)|(true)|(int)|(main)|(while)|(char)|(float)"
         string = '^[ \t]*".*"'
 
