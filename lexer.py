@@ -44,8 +44,9 @@ class Lexer:
 
         keyword = "(bool)|(else)|(if)|(print)|(false)|(true)|(int)|(main)|(while)|(char)|(float)"
         string = '^[ \t]*".*"'
-        id = ""
-
+        id = "[_a-zA-Z][_a-zA-Z0-9]*"
+        # 3. .4
+        illegreal="(\d)*.$|^.(\d)*"
         token_dict = {
             integer: "int",
             real: "real",
