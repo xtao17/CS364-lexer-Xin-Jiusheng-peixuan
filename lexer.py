@@ -141,22 +141,25 @@ class Lexer:
             tokens = (t for t in split_patt.split(line) if t)
             for t in tokens:
                 if (find_matches(token_dict, t) == None):
-                    yield (find_matches(error_message_dict, t),t, "Line {}".format(index))
+                    yield (find_matches(error_message_dict, t),t, index)
 
                 else:
-                    yield (find_matches(token_dict, t), t, "Line {}".format(index))
+                    yield (find_matches(token_dict, t), t, index)
 
 
 
 if __name__ == "__main__":
 
-    lex = Lexer("test.sluc")  # use command line arguments
+    lex = Lexer("runtest.c")  # use command line arguments
 
     g = lex.token_generator()
-
+    print("%-30s %-30s %s" % ("Token","Name","Line Number"))
+    print("----------------------------------------------------------------------------------------")
     while True:
         try:
-            print(next(g))
+            temp=next(g)
+            print("%-30s %-30s %s" % (temp[0],temp[1],temp[2]))
+
         except StopIteration:
             print("Done")
             break
