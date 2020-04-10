@@ -1,3 +1,7 @@
+'''
+Lexer Project
+Peixuan,Xin,Jiusheng
+'''
 import sys
 from typing import Generator, Tuple
 import re
