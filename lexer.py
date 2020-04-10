@@ -13,7 +13,7 @@ class Token:
     real = "(\d(_\d|\d)*\.\d(_\d|\d)*|\d(_\d|\d)*(.\d(_\d|\d)*)?e[-\+]?\d(_\d|\d)*)"
     integer = "\d+[\d_]*\d+|\d+"
     keyword = "(bool)|(else)|(if)|(print)|(false)|(true)|(int)|(main)|(while)|(char)|(float)"
-    string = '^[ \t]*".*"'
+    string = '".*"'
     plus = "(?<!e)\+"
     minus = "(?<!e)-"
     Or = "(\|\|)"
@@ -71,8 +71,12 @@ class Token:
         div: "divide",
         arrayAccess: "arrayAccess"
     }
-    #  constructor
-    def __init__(self, t, loc):
+    '''
+    constructor take the token and the location
+    precondition for t: t must be a string
+    precondition for loc: loc must be a integer
+    '''
+    def __init__(self, t:str, loc:int):
         if self.find_matches(Token.token_dict, t):
             self.kind = self.find_matches(Token.token_dict, t)
         else:
@@ -80,7 +84,11 @@ class Token:
         self.name = t
         self.loc = loc
 
-    # match the kind of token in the d
+
+    '''
+    match the kind of token in the dictionary
+    d represents a dictionary
+    '''
     def find_matches(self, d, item):
         for k in d:
             if re.fullmatch(k, item):
@@ -92,7 +100,7 @@ class Lexer:
     Lexer class to reads a file, splits and generates tokens
     """
 
-    # constructor that takes a file name and split them into tokens
+    #  constructor that takes a file name and split them into tokens
     def __init__(self, fn: str):
         try:
             self.f = open(fn)
@@ -101,7 +109,7 @@ class Lexer:
             print("Exiting")
             sys.exit(1)  # can't go on
 
-    # generate tokens
+    # method for generate tokens
     def token_generator(self) -> Generator[Tuple[str, str, int], None, None]:
         split_patt = re.compile(
             r"""             # Split on 
@@ -133,14 +141,14 @@ if __name__ == "__main__":
 
     lex = Lexer("lexertest.c")
     g = lex.token_generator()
-    # formatted print the token table
 
-    print("%-30s %-30s %s" % ("Token", "Name", "Line Number"))
-    print("----------------------------------------------------------------------------------------")
+    # formatted print the token table
+    print("%-30s %-70s %s" % ("Token", "Name", "Line Number"))
+    print("----------------------------------------------------------------------------------------------------------------")
     while True:
         try:
             temp = next(g)
-            print("%-30s %-30s %s" % (temp.kind, temp.name, temp.loc))
+            print("%-30s %-70s %s" % (temp.kind, temp.name, temp.loc))
 
         except StopIteration:
             print("Done")
