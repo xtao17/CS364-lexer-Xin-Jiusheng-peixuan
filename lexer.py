@@ -38,6 +38,8 @@ class Token:
     mul = "\*"
     div = "\/"
     arrayAccess = "\[\]"
+    leftShift = "<<"
+    rightShift = ">>"
     id = "[_a-zA-Z][_a-zA-Z0-9]*"
     # label the tokens
     token_dict = {
@@ -69,7 +71,9 @@ class Token:
         negate: "negate",
         mul: "multiply",
         div: "divide",
-        arrayAccess: "arrayAccess"
+        arrayAccess: "arrayAccess",
+        leftShift: "shift left",
+        rightShift: "shift right"
     }
     '''
     constructor take the token and the location
@@ -119,7 +123,8 @@ class Lexer:
                (\|\|)       |         # and operators
                (&&)         | 
                (==)         |  
-               (!=) | (<) | (<=) |(>) |(>=) |(=)|
+               (!=) | ((?<!<)<(?![<=]))  | (<=) |((?<!>)>(?![>=]))  |   (<<)    |
+               (>>)|(>=) |(=)|
                ((?<!e)\+)   |
                ((?<!e)-)    |
                (\*) |(\/) |(\%) |
