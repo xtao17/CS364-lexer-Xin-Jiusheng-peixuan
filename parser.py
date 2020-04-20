@@ -1,4 +1,4 @@
-from lexer import Lexer
+from lexer import Lexer, Token
 from ast import Expr, AddExpr, MultExpr, UnaryMinus, IDExpr, IntLitExpr
 
 """
@@ -72,7 +72,7 @@ class Parser:
 
         left = self.term()
 
-        while self.currtok[0] in {Lexer.PLUS, Lexer.MINUS}:
+        while self.currtok.kind in {"plus", "minus"}:
             self.currtok = next(self.tg)  # advance to the next token
             # because we matched a +
             right = self.term()
@@ -86,7 +86,7 @@ class Parser:
         """
         left = self.fact()
 
-        while self.currtok[0] in {Lexer.MULT, Lexer.DIVIDE}:
+        while self.currtok.kind in {"multiply", "divide"}:
             self.currtok = next(self.tg)
             right = self.fact()
             left = MultExpr(left, right)
@@ -100,7 +100,7 @@ class Parser:
         """
 
         # only advance to the next token on a successful match.
-        if self.currtok[0] == Lexer.MINUS:
+        if self.currtok.kind == "minus":
             self.currtok = next(self.tg)
             tree = self.primary()
             return UnaryMinus(tree)
@@ -115,23 +115,23 @@ class Parser:
         # TODO Add real literals
 
         # parse an ID
-        if self.currtok[0] == Lexer.ID:  # using ID in expression
+        if self.currtok.kind == "ID":  # using ID in expression
             tmp = self.currtok
             # TODO check to make sure ID is declared (in the dictionary)
             self.currtok = next(self.tg)
-            return IDExpr(tmp[1])
+            return IDExpr(tmp.name)
 
         # parse an integer literal
-        if self.currtok[0] == Lexer.INTLIT:
+        if self.currtok.kind == "integer":
             tmp = self.currtok
             self.currtok = next(self.tg)
-            return IntLitExpr(tmp[1])
+            return IntLitExpr(tmp.name)
 
         # parse a parenthesized expression
-        if self.currtok[0] == Lexer.LPAREN:
+        if self.currtok.kind == "left-paren":
             self.currtok = next(self.tg)
             tree = self.addition()  # TODO Keeps changing!
-            if self.currtok[0] == Lexer.RPAREN:
+            if self.currtok.kind == "right-paren":
                 self.currtok = next(self.tg)
                 return tree
             else:
@@ -139,7 +139,7 @@ class Parser:
                 raise SLUCSyntaxError("ERROR: Missing right paren on line {0}".format(-1))
 
         # what if we get here we have a problem
-        raise SLUCSyntaxError("ERROR: Unexpected token {0} on line {1}".format(self.currtok[1], -1))
+        raise SLUCSyntaxError("ERROR: Unexpected token {0} on line {1}".format(self.currtok.name, self.currtok.loc))
 
 
 # create our own exception by inheriting
