@@ -227,6 +227,27 @@ class IntLitExpr(Expr):
         #return IntegerType
         return int
 
+class FloatLitExpr(Expr):
+
+    def __init__(self, floatlit: str):
+        self.floatlit = float(floatlit)
+
+    def __str__(self):
+        return str(self.floatlit)
+
+    def scheme(self):
+        return str(self.floatlit)
+
+    def eval(self):
+        return self.floatlit   # base case
+
+    #def typeof(self) -> Type:
+    # representing SLU-C types using Python types
+    def typeof(self) -> type:
+
+        #return FloatType
+        return float
+
 if __name__ == '__main__':
     """
     Represent a + b + c * d

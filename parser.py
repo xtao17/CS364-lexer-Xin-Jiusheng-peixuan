@@ -1,5 +1,5 @@
 from lexer import Lexer, Token
-from ast import Expr, AddExpr, MultExpr, UnaryMinus, IDExpr, IntLitExpr
+from ast import Expr, AddExpr, MultExpr, UnaryMinus, IDExpr, IntLitExpr, FloatLitExpr
 
 """
   Program         →  { FunctionDef }
@@ -112,12 +112,15 @@ class Parser:
         Primary  → ID | INTLIT | ( Expr )
         """
 
-        # TODO Add real literals
+        # parse a real literal
+        if self.currtok.kind == "real":
+            tmp = self.currtok
+            self.currtok = next(self.tg)
+            return FloatLitExpr(tmp.name)
 
         # parse an ID
         if self.currtok.kind == "ID":  # using ID in expression
             tmp = self.currtok
-            # TODO check to make sure ID is declared (in the dictionary)
             self.currtok = next(self.tg)
             return IDExpr(tmp.name)
 
