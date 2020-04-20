@@ -122,7 +122,7 @@ class Parser:
             return IDExpr(tmp.name)
 
         # parse an integer literal
-        if self.currtok.kind == "integer":
+        if self.currtok.kind == "int":
             tmp = self.currtok
             self.currtok = next(self.tg)
             return IntLitExpr(tmp.name)
@@ -136,7 +136,7 @@ class Parser:
                 return tree
             else:
                 # use the line number from your token object
-                raise SLUCSyntaxError("ERROR: Missing right paren on line {0}".format(-1))
+                raise SLUCSyntaxError("ERROR: Missing right paren on line {0}".format(self.currtok.loc))
 
         # what if we get here we have a problem
         raise SLUCSyntaxError("ERROR: Unexpected token {0} on line {1}".format(self.currtok.name, self.currtok.loc))
