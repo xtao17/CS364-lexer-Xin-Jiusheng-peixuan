@@ -1,5 +1,5 @@
 from lexer import Lexer, Token
-from ast import Expr, AddExpr, MultExpr, UnaryMinus, IDExpr, IntLitExpr, FloatLitExpr, RelatExpr,EqExpr
+from ast import *
 
 """
   Program         →  { FunctionDef }
@@ -58,8 +58,18 @@ class Parser:
         """
             Program         →  { FunctionDef }
         """
+    def conjunction(self)->Expr:
+        left = self.equality()
 
-    def equality(self):  # a == b      3*z != 99
+        while self.currtok.kind=="and":
+            print(1)
+            self.currtok = next(self.tg)
+            right = self.equality()
+            left = ConjExpr(left, right)
+        return left
+
+
+    def equality(self) ->Expr:  # a == b      3*z != 99
         left = self.relation()
 
         while self.currtok.kind in {"equal-equal","not-equal"}:
@@ -180,6 +190,6 @@ class SLUCSyntaxError(Exception):
 
 if __name__ == '__main__':
     p = Parser('simple.c')
-    t = p.equality()
+    t = p.conjunction()
     print(t)
     print(t.scheme())
