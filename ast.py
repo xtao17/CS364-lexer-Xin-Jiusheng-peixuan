@@ -143,19 +143,19 @@ class AddExpr(Expr):
         return self.left.eval() +  self.right.eval()
 
 class EqExpr(Expr):
-    def __init__(self, left: Expr, right: Expr):
+    def __init__(self, left: Expr, right: Expr,Eqlop):
         self.left = left
         self.right = right
-
+        self.Eqlop = Eqlop
     def __str__(self):
-        return "({0} = {1})".format(str(self.left), str(self.right))
+        return "({0} {1} {2})".format(str(self.left), str(self.Eqlop), str(self.right))
 
     def scheme(self) -> str:
         """
         Return a string that represents the expression in Scheme syntax.
         e.g.,  (a + b)   -> (+ a b)
         """
-        return "(= {0} {1})".format(self.left.scheme(), self.right.scheme())
+        return "(== {0} {1})".format(self.left.scheme(), self.right.scheme())
 
 
 class RelatExpr(Expr):

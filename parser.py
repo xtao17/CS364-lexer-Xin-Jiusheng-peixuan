@@ -1,5 +1,5 @@
 from lexer import Lexer, Token
-from ast import Expr, AddExpr, MultExpr, UnaryMinus, IDExpr, IntLitExpr, FloatLitExpr, RelatExpr
+from ast import Expr, AddExpr, MultExpr, UnaryMinus, IDExpr, IntLitExpr, FloatLitExpr, RelatExpr,EqExpr
 
 """
   Program         →  { FunctionDef }
@@ -62,10 +62,12 @@ class Parser:
     def equality(self):  # a == b      3*z != 99
         left = self.relation()
 
-        while self.currtok.kind in {"ass","neq"}:
+        while self.currtok.kind in {"equal-equal","not-equal"}:
+            equop=self.currtok.name
             self.currtok=next(self.tg)
             right=self.relation()
-            left=EqExpr(left,right)
+            left=EqExpr(left,right,equop)
+        return left
 
 
 
@@ -178,6 +180,6 @@ class SLUCSyntaxError(Exception):
 
 if __name__ == '__main__':
     p = Parser('simple.c')
-    t = p.relation()
+    t = p.equality()
     print(t)
     print(t.scheme())
