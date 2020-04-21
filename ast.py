@@ -36,6 +36,7 @@ class BoolType(Type):
     pass
 
 
+
 class FunctionDef:
     def __init__(self, t, id:str, params, decls, stmts):
         # provide type hints for all of the parameters
@@ -147,6 +148,21 @@ class AddExpr(Expr):
         # TODO environment
         return self.left.eval() +  self.right.eval()
 
+class ConjExpr(Expr):
+    def __init__(self, left: Expr, right: Expr):
+        self.left = left
+        self.right = right
+
+    def __str__(self):
+        return "({0}&&{1})".format(str(self.left), str(self.right))
+
+    def scheme(self) -> str:
+        """
+        Return a string that represents the expression in Scheme syntax.
+        e.g.,  (a + b)   -> (+ a b)
+        """
+        return "(&& {0} {1})".format(self.left.scheme(), self.right.scheme())
+
 class EqExpr(Expr):
     def __init__(self, left: Expr, right: Expr,Eqlop):
         self.left = left
@@ -161,6 +177,7 @@ class EqExpr(Expr):
         e.g.,  (a + b)   -> (+ a b)
         """
         return "(== {0} {1})".format(self.left.scheme(), self.right.scheme())
+
 
 
 class RelatExpr(Expr):
