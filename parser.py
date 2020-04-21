@@ -58,7 +58,8 @@ class Parser:
         """
             Program         →  { FunctionDef }
         """
-
+    # push
+    # changes
     def equality(self):  # a == b      3*z != 99
         left = self.relation()
 
