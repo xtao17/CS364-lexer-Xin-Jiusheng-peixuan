@@ -60,7 +60,14 @@ class Parser:
         """
 
     def equality(self):  # a == b      3*z != 99
-        pass
+        left = self.relation()
+
+        while self.currtok.kind in {"ass","neq"}:
+            self.currtok=next(self.tg)
+            right=self.relation()
+            left=EqExpr(left,right)
+
+
 
     def relation(self) -> Expr:  # a < b
         print("rel0")
@@ -149,6 +156,10 @@ class Parser:
             else:
                 # use the line number from your token object
                 raise SLUCSyntaxError("ERROR: Missing right paren on line {0}".format(self.currtok.loc))
+        if self.currtok.name in ["true","false"]:
+            tmp = self.currtok
+            self.currtok = next(self.tg)
+            return Expr(tmp.name)
 
         # what if we get here we have a problem
         raise SLUCSyntaxError("ERROR: Unexpected token {0} on line {1}".format(self.currtok.name, self.currtok.loc))

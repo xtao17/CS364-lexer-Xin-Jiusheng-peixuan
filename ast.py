@@ -142,6 +142,22 @@ class AddExpr(Expr):
         # TODO environment
         return self.left.eval() +  self.right.eval()
 
+class EqExpr(Expr):
+    def __init__(self, left: Expr, right: Expr):
+        self.left = left
+        self.right = right
+
+    def __str__(self):
+        return "({0} = {1})".format(str(self.left), str(self.right))
+
+    def scheme(self) -> str:
+        """
+        Return a string that represents the expression in Scheme syntax.
+        e.g.,  (a + b)   -> (+ a b)
+        """
+        return "(= {0} {1})".format(self.left.scheme(), self.right.scheme())
+
+
 class RelatExpr(Expr):
     def __init__(self, left: Expr, right: Expr, relop):
         self.left = left
