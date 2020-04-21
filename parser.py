@@ -56,6 +56,17 @@ class Parser:
 
         """
 
+    def printArg(self)->Expr:
+        ##left = self.expression()
+
+        if self.currtok.kind == "String":  # using ID in expression
+            tmp = self.currtok
+            self.currtok = next(self.tg)
+            return StrLitExpr(tmp.name)
+
+        left = self.expression()
+        return left
+
     def expression(self) -> Expr:
         left = self.conjunction()
 
@@ -65,13 +76,6 @@ class Parser:
             left = Expr(left, right)
         return left
 
-    def printArg(self)->Expr:
-        left = self.expression()
-
-        if self.currtok.kind == "String":  # using ID in expression
-            tmp = self.currtok
-            self.currtok = next(self.tg)
-        return StrLitExpr(tmp.name)
 
 
 
