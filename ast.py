@@ -16,7 +16,15 @@ class Expr:
     """
     Base class for expressions
     """
-    pass
+    def __init__(self, left, right):
+        self.left = left
+        self.right = right
+
+    def __str__(self):
+        return "{} || {}".format(self.left, self.right)
+
+    def scheme(self) -> str:
+        return "(|| {0} {1})".format(self.left.scheme(), self.right.scheme())
 
 class Type:
     pass
