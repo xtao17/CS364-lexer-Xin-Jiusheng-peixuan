@@ -130,12 +130,14 @@ class Parser:
         return left
 
     def printArg(self)->Expr:
-        left = self.expression()
+        ##left = self.expression()
+
         if self.currtok.kind == "String":  # using ID in expression
-            print("printArg")
             tmp = self.currtok
             self.currtok = next(self.tg)
-            left = PrintArgExpr(left, tmp.name)
+            return StrLitExpr(tmp.name)
+
+        left = self.expression()
         return left
 
     def expression(self) -> Expr:

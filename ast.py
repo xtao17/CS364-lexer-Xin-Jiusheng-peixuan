@@ -393,27 +393,24 @@ class IntLitExpr(Expr):
         #return IntegerType
         return int
 
-class PrintArgExpr(Expr):
+class StrLitExpr(Expr):
 
-    def __init__(self, left: Expr, right: str):
-        self.left = left
-        self.right = right
+    def __init__(self,strLit:str):
+        self.strlit = strLit
 
     def __str__(self):
-        return "({} | {})".format(str(self.left), str(self.right))
+        return str(self.strlit)
 
-    def scheme(self) -> str:
-        """
-        Return a string that represents the expression in Scheme syntax.
-        e.g.,  (a + b)   -> (+ a b)
-        """
-        return "(+ {0})".format(self.left.scheme())
+    def scheme(self):
+        return str(self.strlit)
 
-    def eval(self) -> Union[int, float]:
-        # TODO environment
-        return self.left.eval() + self.right.eval()
+    def eval(self):
+        return self.strlit
 
+    def typeof(self) -> type:
 
+        #retrurn String type
+        return str
 
 class FloatLitExpr(Expr):
 
