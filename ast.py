@@ -16,12 +16,7 @@ class Expr:
     """
     Base class for expressions
     """
-    def __init__(self, left, right):
-        self.left = left
-        self.right = right
-
-    def __str__(self):
-        return "{} {}".format(self.left, self.right)
+    pass
 
 class Type:
     pass
@@ -34,7 +29,6 @@ class FloatType(Type):
 
 class BoolType(Type):
     pass
-
 
 
 class FunctionDef:
@@ -163,6 +157,7 @@ class ConjExpr(Expr):
         """
         return "(&& {0} {1})".format(self.left.scheme(), self.right.scheme())
 
+
 class EqExpr(Expr):
     def __init__(self, left: Expr, right: Expr,Eqlop):
         self.left = left
@@ -177,7 +172,6 @@ class EqExpr(Expr):
         e.g.,  (a + b)   -> (+ a b)
         """
         return "(== {0} {1})".format(self.left.scheme(), self.right.scheme())
-
 
 
 class RelatExpr(Expr):

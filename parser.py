@@ -15,13 +15,11 @@ from ast import Expr, AddExpr, MultExpr, UnaryMinus, IDExpr, IntLitExpr, FloatLi
   Block           →  { Statements }
   Assignment      →  id = Expression ;
   IfStatement     →  if ( Expression ) Statement [ else Statement ]
-
   WhileStatement  →  while ( Expression ) Statement  
   PrintStmt       →  print(PrintArg { , PrintArg })
   PrintArg        →  Expression | stringlit
   Expression      →  Conjunction { || Conjunction }
   Conjunction     →  Equality { && Equality }
-
   Equality        →  Relation [ EquOp Relation ]
   Relation        →  Addition [ RelOp Addition ]
   Addition        →  Term { AddOp Term }
@@ -46,10 +44,8 @@ class Parser:
         Term  → Fact { (* | / | %) Fact }
         Fact  → [ - ] Primary
         Primary  → ID | INTLIT | ( Expr )
-
         Recursive descent parser. Each non-terminal corresponds 
         to a function.
-
         -7  -(7 * 5)  -b   unary minus
     """
 
@@ -57,9 +53,20 @@ class Parser:
     def program(self):
         """
             Program         →  { FunctionDef }
+
         """
-    # push
-    # changes
+
+    def conjunction(self)->Expr:
+        left = self.equality()
+
+        while self.currtok.kind=="and":
+            print(1)
+            self.currtok = next(self.tg)
+            right = self.equality()
+            left = ConjExpr(left, right)
+        return left
+
+
     def equality(self):  # a == b      3*z != 99
         left = self.relation()
 
