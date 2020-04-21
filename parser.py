@@ -65,6 +65,15 @@ class Parser:
             left = Expr(left, right)
         return left
 
+    def printArg(self)->Expr:
+        left = self.expression()
+
+        if self.currtok.kind == "String":  # using ID in expression
+            tmp = self.currtok
+            self.currtok = next(self.tg)
+        return StrLitExpr(tmp.name)
+
+
 
     def conjunction(self)->Expr:
         left = self.equality()
@@ -198,6 +207,6 @@ class SLUCSyntaxError(Exception):
 
 if __name__ == '__main__':
     p = Parser('simple.c')
-    t = p.expression()
+    t = p.printArg()
     print(t)
     print(t.scheme())

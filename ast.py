@@ -16,6 +16,10 @@ class Expr:
     """
     Base class for expressions
     """
+    """
+      Base class for expressions
+      """
+
     def __init__(self, left, right):
         self.left = left
         self.right = right
@@ -286,6 +290,27 @@ class IntLitExpr(Expr):
 
         #return IntegerType
         return int
+
+class StrLitExpr(Expr):
+
+    def __init__(self,strLit:str):
+        self.strlit = strLit
+
+    def __str__(self):
+        return str(self.strlit)
+
+    def scheme(self):
+        return str(self.strlit)
+
+    def eval(self):
+        return self.strlit
+
+    def typeof(self) -> type:
+
+        #retrurn String type
+        return str
+
+
 
 class FloatLitExpr(Expr):
 
