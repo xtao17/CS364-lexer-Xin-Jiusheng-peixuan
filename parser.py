@@ -59,6 +59,14 @@ class Parser:
             Program         →  { FunctionDef }
         """
 
+    def expression(self) -> Expr:
+        left = self.conjunction()
+        while self.currtok.kind == "or":
+            self.currtok = next(self.tg)
+            right = self.conjunction()
+            left = Expr(left, right)
+        return left
+
     def equality(self):  # a == b      3*z != 99
         left = self.relation()
 
@@ -72,11 +80,8 @@ class Parser:
 
 
     def relation(self) -> Expr:  # a < b
-        print("rel0")
         left = self.addition()
-        print("rel")
         while self.currtok.kind in {"less-than", "less-equal", "greater-than", "greater-equal"}:
-            print("relop")
             relop = self.currtok.name
             self.currtok = next(self.tg)
             right = self.addition()
