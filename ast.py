@@ -61,6 +61,19 @@ class FunctionDef:
         for s in self.stmts:
             s.eval(env)  # TODO define environment
 
+
+class params:
+    def __init__(self,left:Expr, right:Expr):
+        self.left=left
+        self.right=right
+
+    def __str__(self):
+        return "{0} {1}".format(str(self.left), str(self.right))
+
+    def scheme(self) -> str:
+        pass
+
+
 class Stmt:
     pass
 
@@ -167,7 +180,7 @@ class DecExpr(Expr):
         self.left = left
         self.right = right
     def __str__(self):
-        return "{0} {1};".format(str(self.left), str(self.right))
+        return "{0} {1}".format(str(self.left), str(self.right))
 
     def scheme(self) -> str:
         pass

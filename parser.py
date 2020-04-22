@@ -5,17 +5,17 @@ from ast import *
   Program         →  { FunctionDef }
   FunctionDef     →  Type id ( Params ) { Declarations Statements }
   Params          →  Type id { , Type id } | ε
-  Declarations    →  { Dechttps://github.com/xtao17/CS364-lexer-Xin-Jiusheng-peixuanlaration }
+  Declarations    →  { Declaration }
   Declaration     →  Type  id  ;
   Type            →  int | bool | float
   Statements      →  { Statement }
-  Statement       →  ; | Block | Assignment | IfStatement |     
+  Statement       →  ; | Block | Assignment | IfStatement |
                      WhileStatement |  PrintStmt | ReturnStmt
   ReturnStmt      →  return Expression ;
   Block           →  { Statements }
   Assignment      →  id = Expression ;
   IfStatement     →  if ( Expression ) Statement [ else Statement ]
-  WhileStatement  →  while ( Expression ) Statement  
+  WhileStatement  →  while ( Expression ) Statement
   PrintStmt       →  print(PrintArg { , PrintArg })
   PrintArg        →  Expression | stringlit
   Expression      →  Conjunction { || Conjunction }
@@ -27,7 +27,7 @@ from ast import *
   Factor          →  [ UnaryOp ] Primary
   UnaryOp         →  - | !
   Primary         →  id | intlit | floatlit | ( Expression )
-  RelOp           →  < | <= | > | >=   AddOp           →  + | -  MulOp           →  * | / | %  EquOp           →  == | != 
+  RelOp           →  < | <= | > | >=   AddOp           →  + | -  MulOp           →  * | / | %  EquOp           →  == | !=
 """
 
 
@@ -44,7 +44,7 @@ class Parser:
         Term  → Fact { (* | / | %) Fact }
         Fact  → [ - ] Primary
         Primary  → ID | INTLIT | ( Expr )
-        Recursive descent parser. Each non-terminal corresponds 
+        Recursive descent parser. Each non-terminal corresponds
         to a function.
         -7  -(7 * 5)  -b   unary minus
     """
@@ -53,36 +53,60 @@ class Parser:
     def program(self):
         """
             Program         →  { FunctionDef }
-
         """
 
+    Type = ["int", "bool", "float"]
+    def params(self):
+        if self.currtok.kind == "Keyword" and self.currtok.name in{"int", "bool", "float","string"}:
+            left = self.currtok.name
+
+            self.currtok = next(self.tg)
+
+            if self.currtok.kind == "ID":
+                tmp = self.currtok.name
+                left = params(left, tmp)
+                self.currtok = next(self.tg)
+        while (self.currtok.kind == "comma"):
+            self.currtok = next(self.tg)
+            tmp = self.currtok.name
+            self.currtok = next(self.tg)
+            right = self.currtok.name
+            tmp = params(tmp, right)
+            left = params(left, tmp)
+        return left
+
+    def declarations(self):
+        left=self.declaration()
+        while (next(self.tg))
+            
+
     def declaration(self):
-        if self.currtok.kind == "Keyword" and self.currtok.name in {"int","bool","float"}:
-            left=self.currtok.name
+        if self.currtok.kind == "Keyword" and self.currtok.name in Type:
+            left = self.currtok.name
             self.currtok = next(self.tg)
             if self.currtok.kind == "ID":
                 right = self.currtok.name
                 return DecExpr(left, right)
 
-    def statement(self)->Expr:
+    def statement(self) -> Expr:
         if self.currtok.kind == "semicolon":  # using ID in expression
             tmp = self.currtok
             self.currtok = next(self.tg)
             return StmtExpr(tmp.name)
-        if self.currtok.kind =="left-brace":
+        if self.currtok.kind == "left-brace":
             return self.block()
         if self.currtok.kind == "Keyword" and self.currtok.name == "if":
             return self.ifstatement()
         if self.currtok.kind == "Keyword" and self.currtok.name == "while":
             return self.whilestatement()
-        if self.currtok.kind=="Keyword" and self.currtok.name == "print":
+        if self.currtok.kind == "Keyword" and self.currtok.name == "print":
             return self.printstmt()
         if self.currtok.kind == "Keyword" and self.currtok.name == "return":
             return self.returnstmt()
         if self.currtok.kind == "ID":
             return self.assignment()
 
-    def returnstmt(self)->Expr:
+    def returnstmt(self) -> Expr:
         if self.currtok.kind == "Keyword" and self.currtok.name == "return":
             self.currtok = next(self.tg)
             expr = self.expression()
@@ -168,7 +192,7 @@ class Parser:
             left = PrintStmtExpr(prtarg, prtargs)
         return left
 
-    def printarg(self)->Expr:
+    def printarg(self) -> Expr:
         if self.currtok.kind == "String":
             print("string")
             tmp = self.currtok
@@ -186,10 +210,10 @@ class Parser:
             left = Expr(left, right)
         return left
 
-    def conjunction(self)->Expr:
+    def conjunction(self) -> Expr:
         left = self.equality()
 
-        while self.currtok.kind=="and":
+        while self.currtok.kind == "and":
             print("conjunction")
             self.currtok = next(self.tg)
             right = self.equality()
@@ -199,12 +223,12 @@ class Parser:
     def equality(self):  # a == b      3*z != 99
         left = self.relation()
 
-        if self.currtok.kind in {"equal-equal","not-equal"}:
+        while self.currtok.kind in {"equal-equal", "not-equal"}:
             print("equality")
-            equop=self.currtok.name
-            self.currtok=next(self.tg)
-            right=self.relation()
-            left=EqExpr(left,right,equop)
+            equop = self.currtok.name
+            self.currtok = next(self.tg)
+            right = self.relation()
+            left = EqExpr(left, right, equop)
         return left
 
     def relation(self) -> Expr:  # a < b
@@ -296,7 +320,7 @@ class Parser:
             else:
                 # use the line number from your token object
                 raise SLUCSyntaxError("ERROR: Missing right paren on line {0}".format(self.currtok.loc))
-        if self.currtok.name in ["true","false"]:
+        if self.currtok.name in ["true", "false"]:
             tmp = self.currtok
             self.currtok = next(self.tg)
             return Expr(tmp.name)
@@ -318,5 +342,5 @@ class SLUCSyntaxError(Exception):
 
 if __name__ == '__main__':
     p = Parser('simple.c')
-    t = p.declaration()
+    t = p.params()
     print(t)
