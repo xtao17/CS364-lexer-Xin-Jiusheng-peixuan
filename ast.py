@@ -28,25 +28,33 @@ class Expr:
         return "{} || {}".format(self.left, self.right)
 
 
-class FunctionDef:
-    def __init__(self, t, id:str, params, decls, stmts):
+class FunctionDefExpr:
+    def __init__(self, t, id, params, decls, stmts):
         # provide type hints for all of the parameters
         # Decls should be a dictionary
         # Key: id
         # Value: Type
         pass
+        self.type = t
+        self.id = str(id)
+        self.params = params
+        self.dec_dict = {
+            decls.left:decls.right
+        }
+        self.stmts = stmts
+
+
 
     def __str__(self):
         pass
+        if self.stmts:
+            stmArgs =""
+            for arg in self.stmts:
+                stmArgs+="\n"+str(arg)
 
-    def eval(self) -> Union[int, float, bool]:
-        # an environment maps identifiers to values
-        # parameters or local variables
-        # to evaluate a function you evaluate all of the statements
-        # within the environment
-        env = {}   # TODO Fix this
-        for s in self.stmts:
-            s.eval(env)  # TODO define environment
+
+        return "{0} {1} ({2}) {{{4}{5}}}".format(str(self.type), self.id,str(self.params),str(self.dec_dict),str(self.stmArgs))
+
 
 
 class ParamExpr(Expr):
@@ -85,12 +93,12 @@ class IfStmt(Stmt):
 
 class Declaration:
     pass
-
+'''
 class Program:
 
     def __init__(self, funcs: Sequence[FunctionDef]):
         self.funcs = funcs
-
+'''
 
 
 # TODO Don't just cut-and-paste new operations, abstract!

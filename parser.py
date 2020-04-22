@@ -49,6 +49,34 @@ class Parser:
         -7  -(7 * 5)  -b   unary minus
     """
 
+    def FunctionDef(self):
+        stms = []
+        decs = []
+        if self.currtok.kind == "Keyword" and self.currtok.name in {"int", "bool", "float", "string"}:
+            type = self.currtok.name
+
+            self.currtok = next(self.tg)
+            if self.currtok.kind == "ID":
+                id = self.currtok.name
+                self.currtok = next(self.tg)
+                if self.currtok.kind == "left-paren":
+                    print("left-paren")
+                    self.currtok = next(self.tg)
+                    parm = self.params()
+                    if self.currtok.kind == "right-paren":
+                        print("right-paren")
+                        self.currtok = next(self.tg)
+                    if self.currtok.kind == "left-brace":
+                        self.currtok = next(self.tg)
+                        while(self.currtok.name not in {"int", "bool", "float", "string"}):
+                            decs.append(self.declaration())
+                            self.currtok=next(self.tg)
+                            stms.append(self.statement())
+                            self.currtok=next(self.tg)
+
+                        if self.currtok.kind == "right-brace":
+                            return FunctionDefExpr(self, type, id, parm, decs, stms)
+        raise SLUCSyntaxError("ERROR: Invalid function definition on line {}".format(self.currtok))
     # top-level function that will be called
     def program(self):
         """
