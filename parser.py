@@ -55,34 +55,34 @@ class Parser:
             Program         →  { FunctionDef }
         """
 
-    Type = ["int", "bool", "float"]
-    def params(self):
-        if self.currtok.kind == "Keyword" and self.currtok.name in{"int", "bool", "float","string"}:
+    def params(self) -> Expr:
+        args =[]
+        if self.currtok.kind == "Keyword" and self.currtok.name in{"int", "bool", "float"}:
             left = self.currtok.name
-
             self.currtok = next(self.tg)
-
             if self.currtok.kind == "ID":
-                tmp = self.currtok.name
-                left = params(left, tmp)
-                self.currtok = next(self.tg)
-        while (self.currtok.kind == "comma"):
-            self.currtok = next(self.tg)
-            tmp = self.currtok.name
-            self.currtok = next(self.tg)
-            right = self.currtok.name
-            tmp = params(tmp, right)
-            left = params(left, tmp)
-        return left
-            
+                right = self.primary()
+            else:
+                raise SLUCSyntaxError("ERROR: Invalid param on line {}".format(self.currtok.loc))
 
-    def declaration(self):
-        if self.currtok.kind == "Keyword" and self.currtok.name in Type:
+            while (self.currtok.kind == "comma"):
+                self.currtok = next(self.tg)
+                args.append(self.currtok.name)
+                self.currtok = next(self.tg)
+                args.append(self.primary())
+
+            return ParamExpr(left, right, args)
+
+    def declaration(self) -> Expr:
+        if self.currtok.kind == "Keyword" and self.currtok.name in {"int", "bool", "float"}:
             left = self.currtok.name
             self.currtok = next(self.tg)
             if self.currtok.kind == "ID":
                 right = self.currtok.name
+                self.currtok = next(self.tg)
                 return DecExpr(left, right)
+        raise SLUCSyntaxError("ERROR: Invalid declaration on line {}".format(self.currtok))
+
 
     def statement(self) -> Expr:
         if self.currtok.kind == "semicolon":  # using ID in expression
@@ -119,12 +119,12 @@ class Parser:
             stmt = self.statement()
             while self.currtok.kind != "right-brace":
                 stmts.append(self.statement())
+            self.currtok = next(self.tg)
             return BlockExpr(stmt, stmts)
 
     def assignment(self) -> Expr:
         if self.currtok.kind == "ID":
             id = self.primary()
-            self.currtok = next(self.tg)
             if self.currtok.kind == "assignment":
                 self.currtok = next(self.tg)
                 expr = self.expression()
