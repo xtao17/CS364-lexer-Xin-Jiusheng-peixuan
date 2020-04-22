@@ -52,9 +52,8 @@ class Parser:
     def FunctionDef(self):
         stms = []
         decs = []
-        if self.currtok.kind == "Keyword" and self.currtok.name in {"int", "bool", "float", "string"}:
+        if self.currtok.kind == "Keyword" and self.currtok.name in {"int", "bool", "float"}:
             type = self.currtok.name
-
             self.currtok = next(self.tg)
             if self.currtok.kind == "ID":
                 id = self.currtok.name
@@ -68,7 +67,7 @@ class Parser:
                         self.currtok = next(self.tg)
                     if self.currtok.kind == "left-brace":
                         self.currtok = next(self.tg)
-                        while(self.currtok.name not in {"int", "bool", "float", "string"}):
+                        while(self.currtok.name not in {"int", "bool", "float"}):
                             decs.append(self.declaration())
                             self.currtok=next(self.tg)
                             stms.append(self.statement())
