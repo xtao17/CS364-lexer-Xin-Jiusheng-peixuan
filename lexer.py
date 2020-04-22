@@ -16,7 +16,7 @@ class Token:
 
     real = "(\d(_\d|\d)*\.\d(_\d|\d)*|\d(_\d|\d)*(.\d(_\d|\d)*)?e[-\+]?\d(_\d|\d)*)"
     integer = "\d+[\d_]*\d+|\d+"
-    keyword = "(bool)|(else)|(if)|(print)|(false)|(true)|(int)|(main)|(while)|(char)|(float)"
+    keyword = "(bool)|(else)|(if)|(print)|(false)|(true)|(int)|(main)|(while)|(char)|(float)|(return)"
     string = '".*"'
     plus = "(?<!e)\+"
     minus = "(?<!e)-"

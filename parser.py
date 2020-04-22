@@ -5,7 +5,7 @@ from ast import *
   Program         →  { FunctionDef }
   FunctionDef     →  Type id ( Params ) { Declarations Statements }
   Params          →  Type id { , Type id } | ε
-  Declarations    →  { Declaration }
+  Declarations    →  { Dechttps://github.com/xtao17/CS364-lexer-Xin-Jiusheng-peixuanlaration }
   Declaration     →  Type  id  ;
   Type            →  int | bool | float
   Statements      →  { Statement }
@@ -56,6 +56,44 @@ class Parser:
 
         """
 
+    Type=[int,bool,float]
+    def declaration(self):
+        if self.currtok.kind == "Keyword" and self.currtok.name in Type:
+            self.currtok = next(self.tg)
+            left=self.currtok.name
+    def statement(self)->Expr:
+        if self.currtok.kind == "semicolon":  # using ID in expression
+            tmp = self.currtok
+            self.currtok = next(self.tg)
+            return tmp.name
+        if self.currtok.kind =="left-brace":
+            return self.block()
+        if self.currtok.kind=="ID":
+            return self.assignment()
+        if self.currtok.kind == "Keyword" and self.currtok.name == "if":
+            return self.ifStatement()
+        if self.currtok.kind == "Keyword" and self.currtok.name == "while":
+            return self.whileStatement()
+        if self.currtok.kind=="Keyword" and self.currtok.name == "print":
+            return self.printStmt()
+        if self.currtok.kind == "Keyword" and self.currtok.name == "return":
+            return self.printStmt()
+
+        # parse an integer literal
+        if self.currtok.kind == "int":
+            print("intlit")
+            tmp = self.currtok
+            self.currtok = next(self.tg)
+            return IntLitExpr(tmp.name)
+
+    def returnstmt(self)->Expr:
+        if self.currtok.name == "return":
+            self.currtok = next(self.tg)
+            exp=self.expression()
+            if self.currtok.kind == "semicolon":
+                return exp
+        raise SLUCSyntaxError("ERROR: Missing ; on line {}".format(self.currtok.loc))
+
     def block(self) -> Expr:
         if self.currtok.kind == "left-brace":
             self.currtok = next(self.tg)
@@ -99,7 +137,7 @@ class Parser:
 
 
     def whileStatement(self) -> Expr:
-        if (self.currtok.kind == "Keyword") & (self.currtok.name == "while"):
+        if self.currtok.kind == "Keyword" and self.currtok.name == "while":
             print("whileStatement")
             self.currtok = next(self.tg)
         if self.currtok.kind == "left-paren":
@@ -281,6 +319,6 @@ class SLUCSyntaxError(Exception):
 
 if __name__ == '__main__':
     p = Parser('simple.c')
-    t = p.whileStatement()
+    t = p.equality()
     print(t)
     print(t.scheme())
