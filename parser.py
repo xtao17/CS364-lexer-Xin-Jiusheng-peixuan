@@ -106,6 +106,7 @@ class Parser:
             if self.currtok.kind == "ID":
                 right = self.currtok.name
                 self.currtok = next(self.tg)
+            if self.currtok.kind=="semicolon":
                 return DecExpr(left, right)
         raise SLUCSyntaxError("ERROR: Invalid declaration on line {}".format(self.currtok))
 
