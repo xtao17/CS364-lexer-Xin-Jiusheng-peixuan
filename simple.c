@@ -6,6 +6,3 @@
 return a;
 return b;
 }
-
-
-a!=b

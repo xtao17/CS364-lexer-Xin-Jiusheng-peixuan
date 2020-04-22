@@ -288,12 +288,18 @@ class AssignmentExpr(Expr):
         return self.left.eval() +  self.right.eval()
 
 class BlockExpr(Expr):
-    def __init__(self, left: Expr, right: Expr):
-        self.left = left
-        self.right = right
+    def __init__(self, stmt: Expr, args: Expr):
+        self.stmt = stmt
+        self.args = args
 
     def __str__(self):
-        return "{{{0} {1} }}".format(str(self.left), str(self.right))
+        if self.args:
+            stmtargs = ""
+            for arg in self.args:
+                stmtargs += "\n" + str(arg)
+            return "{{{0} {1}}}".format(str(self.stmt), stmtargs)
+
+        return "{{{0}}}".format(str(self.stmt))
 
 
 class ReturnExpr(Expr):

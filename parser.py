@@ -72,8 +72,6 @@ class Parser:
             return StmtExpr(tmp.name)
         if self.currtok.kind =="left-brace":
             return self.block()
-        if self.currtok.kind=="ID":
-            return self.assignment()
         if self.currtok.kind == "Keyword" and self.currtok.name == "if":
             return self.ifstatement()
         if self.currtok.kind == "Keyword" and self.currtok.name == "while":
@@ -82,6 +80,8 @@ class Parser:
             return self.printstmt()
         if self.currtok.kind == "Keyword" and self.currtok.name == "return":
             return self.returnstmt()
+        if self.currtok.kind == "ID":
+            return self.assignment()
 
     def returnstmt(self)->Expr:
         if self.currtok.kind == "Keyword" and self.currtok.name == "return":
@@ -89,30 +89,31 @@ class Parser:
             expr = self.expression()
             if self.currtok.kind == "semicolon":
                 print("returnstmt")
+                self.currtok = next(self.tg)
                 return ReturnExpr(expr)
         raise SLUCSyntaxError("ERROR: Missing ; on line {}".format(self.currtok.loc))
 
     def block(self) -> Expr:
+        stmts = []
         if self.currtok.kind == "left-brace":
             self.currtok = next(self.tg)
-            left = self.statement()
+            stmt = self.statement()
             while self.currtok.kind != "right-brace":
-                self.currtok = next(self.tg)
-                right = self.statement()
-                left = BlockExpr(left, right)
-            return left
+                stmts.append(self.statement())
+            return BlockExpr(stmt, stmts)
 
     def assignment(self) -> Expr:
         if self.currtok.kind == "ID":
-            tmp = self.currtok.name
+            id = self.primary()
             self.currtok = next(self.tg)
             if self.currtok.kind == "assignment":
                 self.currtok = next(self.tg)
-                right = self.expression()
+                expr = self.expression()
                 if self.currtok.kind == "semicolon":
                     print("assigment")
-                    left = AssignmentExpr(tmp, right)
-                    return left
+                    self.currtok = next(self.tg)
+                    assign = AssignmentExpr(id, expr)
+                    return assign
         raise SLUCSyntaxError("ERROR: Missing ; on line {}".format(self.currtok.loc))
 
     def ifstatement(self) -> Expr:
