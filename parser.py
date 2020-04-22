@@ -223,7 +223,7 @@ class Parser:
     def equality(self):  # a == b      3*z != 99
         left = self.relation()
 
-        while self.currtok.kind in {"equal-equal", "not-equal"}:
+        if self.currtok.kind in {"equal-equal", "not-equal"}:
             print("equality")
             equop = self.currtok.name
             self.currtok = next(self.tg)
