@@ -40,17 +40,44 @@ class FloatType(Type):
 class BoolType(Type):
     pass
 
+"""class BlockExpr(Expr):
+    def __init__(self, stmt: Expr, args: Expr):
+        self.stmt = stmt
+        self.args = args
 
-class FunctionDef:
-    def __init__(self, t, id:str, params, decls, stmts):
+    def __str__(self):
+        if self.args:
+            stmtargs = ""
+            for arg in self.args:
+                stmtargs += "\n" + str(arg)
+            return "{{{0} {1}}}".format(str(self.stmt), stmtargs)
+
+        return "{{{0}}}".format(str(self.stmt))"""
+class FunctionDefExpr:
+    def __init__(self, t, id, params, decls, stmts):
         # provide type hints for all of the parameters
         # Decls should be a dictionary
         # Key: id
         # Value: Type
-        pass
+        self.type = t
+        self.id = str(id)
+        self.params = params
+        self.dec_dict = {
+            decls.left:decls.right
+        }
+        self.stmts = stmts
+
+
 
     def __str__(self):
-        pass
+        if self.stmts:
+            stmArgs =""
+            for arg in self.stmts:
+                stmArgs+="\n"+str(arg)
+
+
+        return "{0} {1} ({2}) {{{4}{5}}}".format(str(self.type), self.id,str(self.params),str(self.dec_dict),str(self.stmArgs))
+
 
     def eval(self) -> Union[int, float, bool]:
         # an environment maps identifiers to values
@@ -94,7 +121,7 @@ class Declaration:
 
 class Program:
 
-    def __init__(self, funcs: Sequence[FunctionDef]):
+    def __init__(self, funcs: Sequence[FunctionDefExpr]):
         self.funcs = funcs
 
 

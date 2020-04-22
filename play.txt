@@ -56,24 +56,12 @@ class Parser:
 
 
         """
-    #FunctionDef     →  Type id ( Params ) { Declarations Statements }
-    """    def block(self) -> Expr:
-        stmts = []
-        if self.currtok.kind == "left-brace":
-            self.currtok = next(self.tg)
-            stmt = self.statement()
-            while self.currtok.kind != "right-brace":
-                stmts.append(self.statement())
-            return BlockExpr(stmt, stmts)"""
     def FunctionDef(self):
-        stms=[]
-        decs=[]
-        if self.currtok.kind == "Keyword" and self.currtok.name in {"int", "bool", "float", "string"}:
+        if self.currtok.kind == "Keyword" and self.currtok.name in{"int", "bool", "float","string"}:
             left = self.currtok.name
 
             self.currtok = next(self.tg)
             if self.currtok.kind == "ID":
-                id=self.currtok.name
                 self.currtok = next(self.tg)
                 if self.currtok.kind == "left-paren":
                     print("left-paren")
@@ -82,22 +70,13 @@ class Parser:
                     if self.currtok.kind == "right-paren":
                         print("right-paren")
                         self.currtok = next(self.tg)
-                    if self.currtok.kind == "left-brace":
-                        self.currtok = next(self.tg)
-                        dec = self.declaration()
-                        self.currtok = next(self.tg)
                         stmt = self.statement()
-                        self.currtok = next(self.tg)
-                        while self.currtok.kind != "right-brace":
-                            decs.append(dec)
-                            stms.append(stmt)
+                        return WhileExpr(expr, stmt)
 
-                        return FunctionDefExpr(self, left, id, parm, decs, stms)
 
     Type = ["int", "bool", "float"]
-
     def params(self):
-        if self.currtok.kind == "Keyword" and self.currtok.name in {"int", "bool", "float", "string"}:
+        if self.currtok.kind == "Keyword" and self.currtok.name in{"int", "bool", "float","string"}:
             left = self.currtok.name
 
             self.currtok = next(self.tg)
@@ -114,6 +93,7 @@ class Parser:
             tmp = params(tmp, right)
             left = params(left, tmp)
         return left
+
 
     def declaration(self):
         if self.currtok.kind == "Keyword" and self.currtok.name in Type:
@@ -377,5 +357,5 @@ class SLUCSyntaxError(Exception):
 
 if __name__ == '__main__':
     p = Parser('simple.c')
-    t = p.FunctionDef()
+    t = p.params()
     print(t)
