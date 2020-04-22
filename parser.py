@@ -67,12 +67,10 @@ class Parser:
                         self.currtok = next(self.tg)
                     if self.currtok.kind == "left-brace":
                         self.currtok = next(self.tg)
-                        while(self.currtok.name not in {"int", "bool", "float"}):
+                        while(self.currtok.name in {"int", "bool", "float"}):
                             decs.append(self.declaration())
-                            self.currtok=next(self.tg)
                         while(self.currtok.name != "}"):
                             stms.append(self.statement())
-                            self.currtok=next(self.tg)
 
 
                         if self.currtok.kind == "right-brace":
