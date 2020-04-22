@@ -56,9 +56,8 @@ class Parser:
 
         """
 
-    Type=["int","bool","float"]
     def declaration(self):
-        if self.currtok.kind == "Keyword" and self.currtok.name in Type:
+        if self.currtok.kind == "Keyword" and self.currtok.name in {"int","bool","float"}:
             left=self.currtok.name
             self.currtok = next(self.tg)
             if self.currtok.kind == "ID":
@@ -319,5 +318,5 @@ class SLUCSyntaxError(Exception):
 
 if __name__ == '__main__':
     p = Parser('simple.c')
-    t = p.statement()
+    t = p.declaration()
     print(t)
