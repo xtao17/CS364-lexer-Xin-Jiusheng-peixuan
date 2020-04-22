@@ -3,8 +3,11 @@
 //print((a + b), "a", "b")
 //a + b * d * (z + w) + -(a + b * c * (d + e))
 int test1(int a,int b) {
-    int a;
-    int b;
-    int a=a+b;
+    a=a+b;
+    while(a!=0){
+        a=a+1;
+    }
+    if(a==b){a=a+1;}
+    a=a+1;
     print(a);
 }
