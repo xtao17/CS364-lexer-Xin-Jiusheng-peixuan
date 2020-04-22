@@ -29,29 +29,23 @@ class Expr:
 
 
 class FunctionDefExpr:
-    def __init__(self, type, id, params, decls, stmts):
-        # provide type hints for all of the parameters
-        # Decls should be a dictionary
-        # Key: id
-        # Value: Type
+    def __init__(self, type: str, id: str, params: Expr, decls: Expr, stmts: Expr):
         self.type = type
-        self.id = str(id)
+        self.id = id
         self.params = params
-        self.dec_dict = {}
-        #todo
+        self.decls = decls
         self.stmts = stmts
 
 
 
     def __str__(self):
-
-        if self.stmts:
-            stmArgs =""
-            for arg in self.stmts:
-                stmArgs+="\n"+str(arg)
-
-
-        return "{0} {1} ({2}) {{{4}{5}}}".format(str(self.type), self.id,str(self.params),str(self.dec_dict),str(self.stmArgs))
+        declstr =""
+        stmtstr = ""
+        for d in self.decls:
+            declstr += str(d)
+        for s in self.stmts:
+            stmtstr += str(s)
+        return "{} {} ({}) {{{}{}}}".format(self.type, self.id,str(self.params),declstr,stmtstr)
 
 
 
