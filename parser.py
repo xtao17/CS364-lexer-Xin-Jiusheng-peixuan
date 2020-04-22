@@ -74,10 +74,6 @@ class Parser:
             tmp = params(tmp, right)
             left = params(left, tmp)
         return left
-
-    def declarations(self):
-        left=self.declaration()
-        while (next(self.tg))
             
 
     def declaration(self):
