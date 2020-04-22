@@ -49,23 +49,16 @@ class FunctionDef:
             s.eval(env)  # TODO define environment
 
 
-class ParamExpr(Expr):
-    def __init__(self, left:str, right:Expr, args = None):
+class params:
+    def __init__(self,left:Expr, right:Expr):
         self.left=left
         self.right=right
-        self.args = args
 
     def __str__(self):
-        if self.args:
-            params =""
-            for arg in self.args:
-                if type(arg) == str:
-                    params += ", " + str(arg)
-                else:
-                    params += " " + str(arg)
-
-            return "{0} {1}{2}".format((str(self.left)), str(self.right), params)
         return "{0} {1}".format(str(self.left), str(self.right))
+
+    def scheme(self) -> str:
+        pass
 
 
 class Stmt:
@@ -170,12 +163,14 @@ class ConjExpr(Expr):
 
 
 class DecExpr(Expr):
-    def __init__(self, left: str, right: str):
+    def __init__(self, left: Expr, right: Expr):
         self.left = left
         self.right = right
     def __str__(self):
-        return "{0} {1};".format(self.left, self.right)
+        return "{0} {1}".format(str(self.left), str(self.right))
 
+    def scheme(self) -> str:
+        pass
 
 
 class EqExpr(Expr):
@@ -230,16 +225,28 @@ class PrintStmtExpr(Expr):
 
 
 class WhileExpr(Expr):
-    def __init__(self, left: Expr, right: Expr):
-        self.left = left
-        self.right = right
+    def __init__(self, expr: Expr, stmt: Expr):
+        self.expr = expr
+        self.stmt = stmt
 
     def __str__(self):
-        return "while( {} ) {}".format(str(self.left), str(self.right))
+        return "while( {} ) {}".format(str(self.expr), str(self.stmt))
+
+
+    def scheme(self) -> str:
+        """
+        Return a string that represents the expression in Scheme syntax.
+        e.g.,  (a + b)   -> (+ a b)
+        """
+        pass
+
+    def eval(self) -> Union[int,float]:
+        # TODO environment
+        return self.left.eval() +  self.right.eval()
 
 
 class IfExpr(Expr):
-    def __init__(self, expr: Expr, stmt: Expr, elsestmt: Expr = None):
+    def __init__(self, expr: Expr, stmt: Expr, *elsestmt: Expr):
         self.expr = expr
         self.stmt = stmt
         self.elsestmt = elsestmt
@@ -249,6 +256,17 @@ class IfExpr(Expr):
         return "if({0}) {1}".format(str(self.expr), str(self.stmt))
 
 
+    def scheme(self) -> str:
+        """
+        Return a string that represents the expression in Scheme syntax.
+        e.g.,  (a + b)   -> (+ a b)
+        """
+        pass
+
+    def eval(self) -> Union[int,float]:
+        # TODO environment
+        return self.left.eval() +  self.right.eval()
+
 class AssignmentExpr(Expr):
     def __init__(self, left: Expr, right: Expr):
         self.left = left
@@ -257,6 +275,17 @@ class AssignmentExpr(Expr):
     def __str__(self):
         return "{} = {};".format(str(self.left), str(self.right))
 
+
+    def scheme(self) -> str:
+        """
+        Return a string that represents the expression in Scheme syntax.
+        e.g.,  (a + b)   -> (+ a b)
+        """
+        pass
+
+    def eval(self) -> Union[int,float]:
+        # TODO environment
+        return self.left.eval() +  self.right.eval()
 
 class BlockExpr(Expr):
     def __init__(self, stmt: Expr, args: Expr):
@@ -341,6 +370,12 @@ class IDExpr(Expr):
     def eval(self, env):  # a + 7
         # lookup the value of self.id. Look up where?
         # env is a dictionary
+        pass
+
+    def typeof(self, decls) -> Type:
+        # TODO type decls appropriately as a dictionary type
+        # look up the variable type in the declaration dictoinary
+        # from the function definition (FunctionDef)
         pass
 
 class IntLitExpr(Expr):
