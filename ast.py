@@ -27,8 +27,6 @@ class Expr:
     def __str__(self):
         return "{} || {}".format(self.left, self.right)
 
-    def scheme(self) -> str:
-        return "(|| {0} {1})".format(self.left.scheme(), self.right.scheme())
 
 class Type:
     pass
@@ -154,20 +152,25 @@ class AddExpr(Expr):
         # TODO environment
         return self.left.eval() +  self.right.eval()
 
+
 class ConjExpr(Expr):
     def __init__(self, left: Expr, right: Expr):
         self.left = left
         self.right = right
 
     def __str__(self):
-        return "({0}&&{1})".format(str(self.left), str(self.right))
+        return "({0} && {1})".format(str(self.left), str(self.right))
+
+
+class DecExpr(Expr):
+    def __init__(self, left: Expr, right: Expr):
+        self.left = left
+        self.right = right
+    def __str__(self):
+        return "{0} {1}".format(str(self.left), str(self.right))
 
     def scheme(self) -> str:
-        """
-        Return a string that represents the expression in Scheme syntax.
-        e.g.,  (a + b)   -> (+ a b)
-        """
-        return "(&& {0} {1})".format(self.left.scheme(), self.right.scheme())
+        pass
 
 
 class EqExpr(Expr):
@@ -208,33 +211,26 @@ class RelatExpr(Expr):
 
 
 class PrintStmtExpr(Expr):
-    def __init__(self, left: Expr, right: Expr):
-        self.left = left
-        self.right = right
+    def __init__(self, prtarg: Expr, prtargs: Expr):
+        self.prtarg = prtarg
+        self.prtargs = prtargs
 
     def __str__(self):
-        if self.right:
-            return "print( {}, {})".format(str(self.left), str(self.right))
-        return "print( {})".format(str(self.left))
+        if self.prtargs:
+            args = ""
+            for arg in self.prtargs:
+                args += ", " + str(arg)
+            return "print({} {})".format(str(self.prtarg), args)
+        return "print({})".format(str(self.prtarg))
 
-    def scheme(self) -> str:
-        """
-        Return a string that represents the expression in Scheme syntax.
-        e.g.,  (a + b)   -> (+ a b)
-        """
-        pass
-
-    def eval(self) -> Union[int,float]:
-        # TODO environment
-        return self.left.eval() +  self.right.eval()
 
 class WhileExpr(Expr):
-    def __init__(self, left: Expr, right: Expr):
-        self.left = left
-        self.right = right
+    def __init__(self, expr: Expr, stmt: Expr):
+        self.expr = expr
+        self.stmt = stmt
 
     def __str__(self):
-        return "while( {} ) {}".format(str(self.left), str(self.right))
+        return "while( {} ) {}".format(str(self.expr), str(self.stmt))
 
 
     def scheme(self) -> str:
@@ -250,12 +246,14 @@ class WhileExpr(Expr):
 
 
 class IfExpr(Expr):
-    def __init__(self, left: Expr, right: Expr):
-        self.left = left
-        self.right = right
-
+    def __init__(self, expr: Expr, stmt: Expr, *elsestmt: Expr):
+        self.expr = expr
+        self.stmt = stmt
+        self.elsestmt = elsestmt
     def __str__(self):
-        return "if( {} ) {}".format(str(self.left), str(self.right))
+        if self.elsestmt :
+            return "if ({0}) {1} else {2}".format(str(self.expr), str(self.stmt), str(self.elsestmt))
+        return "if({0}) {1}".format(str(self.expr), str(self.stmt))
 
 
     def scheme(self) -> str:
@@ -275,7 +273,7 @@ class AssignmentExpr(Expr):
         self.right = right
 
     def __str__(self):
-        return " {} = {}".format(str(self.left), str(self.right))
+        return "{} = {};".format(str(self.left), str(self.right))
 
 
     def scheme(self) -> str:
@@ -298,17 +296,19 @@ class BlockExpr(Expr):
         return "{{{0} {1} }}".format(str(self.left), str(self.right))
 
 
-    def scheme(self) -> str:
-        """
-        Return a string that represents the expression in Scheme syntax.
-        e.g.,  (a + b)   -> (+ a b)
-        """
-        pass
+class ReturnExpr(Expr):
+    def __init__(self, expr: Expr):
+        self.expr = expr
 
-    def eval(self) -> Union[int,float]:
-        # TODO environment
-        return self.left.eval() +  self.right.eval()
+    def __str__(self):
+        return "return {};".format(str(self.expr))
 
+class StmtExpr(Expr):
+    def __init__(self, stmt):
+        self.stmt = stmt
+
+    def __str__(self):
+        return "{}".format(str(self.stmt))
 
 
 class MultExpr(Expr):
@@ -395,7 +395,7 @@ class IntLitExpr(Expr):
 
 class StrLitExpr(Expr):
 
-    def __init__(self,strLit:str):
+    def __init__(self,strLit:[str, Expr]):
         self.strlit = strLit
 
     def __str__(self):

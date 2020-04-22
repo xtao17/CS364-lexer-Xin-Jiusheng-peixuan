@@ -56,51 +56,49 @@ class Parser:
 
         """
 
-    Type=[int,bool,float]
+    Type=["int","bool","float"]
     def declaration(self):
         if self.currtok.kind == "Keyword" and self.currtok.name in Type:
-            self.currtok = next(self.tg)
             left=self.currtok.name
+            self.currtok = next(self.tg)
+            if self.currtok.kind == "ID":
+                right = self.currtok.name
+                return DecExpr(left, right)
+
     def statement(self)->Expr:
         if self.currtok.kind == "semicolon":  # using ID in expression
             tmp = self.currtok
             self.currtok = next(self.tg)
-            return tmp.name
+            return StmtExpr(tmp.name)
         if self.currtok.kind =="left-brace":
             return self.block()
         if self.currtok.kind=="ID":
             return self.assignment()
         if self.currtok.kind == "Keyword" and self.currtok.name == "if":
-            return self.ifStatement()
+            return self.ifstatement()
         if self.currtok.kind == "Keyword" and self.currtok.name == "while":
-            return self.whileStatement()
+            return self.whilestatement()
         if self.currtok.kind=="Keyword" and self.currtok.name == "print":
-            return self.printStmt()
+            return self.printstmt()
         if self.currtok.kind == "Keyword" and self.currtok.name == "return":
-            return self.printStmt()
-
-        # parse an integer literal
-        if self.currtok.kind == "int":
-            print("intlit")
-            tmp = self.currtok
-            self.currtok = next(self.tg)
-            return IntLitExpr(tmp.name)
+            return self.returnstmt()
 
     def returnstmt(self)->Expr:
-        if self.currtok.name == "return":
+        if self.currtok.kind == "Keyword" and self.currtok.name == "return":
             self.currtok = next(self.tg)
-            exp=self.expression()
+            expr = self.expression()
             if self.currtok.kind == "semicolon":
-                return exp
+                print("returnstmt")
+                return ReturnExpr(expr)
         raise SLUCSyntaxError("ERROR: Missing ; on line {}".format(self.currtok.loc))
 
     def block(self) -> Expr:
         if self.currtok.kind == "left-brace":
             self.currtok = next(self.tg)
-            left = self.expression()
+            left = self.statement()
             while self.currtok.kind != "right-brace":
                 self.currtok = next(self.tg)
-                right = self.expression()
+                right = self.statement()
                 left = BlockExpr(left, right)
             return left
 
@@ -112,75 +110,75 @@ class Parser:
                 self.currtok = next(self.tg)
                 right = self.expression()
                 if self.currtok.kind == "semicolon":
+                    print("assigment")
                     left = AssignmentExpr(tmp, right)
                     return left
         raise SLUCSyntaxError("ERROR: Missing ; on line {}".format(self.currtok.loc))
 
-    def ifStatement(self) -> Expr:
-        if (self.currtok.kind == "Keyword") & (self.currtok.name == "if"):
-            print("IfStatement")
+    def ifstatement(self) -> Expr:
+        if self.currtok.kind == "Keyword" and self.currtok.name == "if":
+            print("ifstatement")
             self.currtok = next(self.tg)
-        if self.currtok.kind == "left-paren":
-            print("left-paren")
-            self.currtok = next(self.tg)
-            left = self.expression()
-        if self.currtok.kind == "right-paren":
-            self.currtok = next(self.tg)
-            right = self.statement()
-            left = IfExpr(left, right)
-        if (self.currtok.kind == "Keyword") & (self.currtok.name == "if"):
-            print("elseStatement")
-            self.currtok = next(self.tg)
-            right = self.statement()
-            left = IfExpr(left, right)
-        return left
+            if self.currtok.kind == "left-paren":
+                print("left-paren")
+                self.currtok = next(self.tg)
+                expr = self.expression()
+                if self.currtok.kind == "right-paren":
+                    print("right-paren")
+                    self.currtok = next(self.tg)
+                    stmt = self.statement()
 
+                    if self.currtok.kind == "Keyword" and self.currtok.name == "else":
+                        print("elseStatement")
+                        self.currtok = next(self.tg)
+                        elsestmt = self.statement()
+                        return IfExpr(expr, stmt, elsestmt)
 
-    def whileStatement(self) -> Expr:
+                    return IfExpr(expr, stmt)
+
+    def whilestatement(self) -> Expr:
         if self.currtok.kind == "Keyword" and self.currtok.name == "while":
             print("whileStatement")
             self.currtok = next(self.tg)
-        if self.currtok.kind == "left-paren":
-            print("left-paren")
-            self.currtok = next(self.tg)
-            left = self.expression()
-        if self.currtok.kind == "right-paren":
-            self.currtok = next(self.tg)
-            right = self.statement()
-        left = WhileExpr(left, right)
-        return left
+            if self.currtok.kind == "left-paren":
+                print("left-paren")
+                self.currtok = next(self.tg)
+                expr = self.expression()
+                if self.currtok.kind == "right-paren":
+                    print("right-paren")
+                    self.currtok = next(self.tg)
+                    stmt = self.statement()
+                    return WhileExpr(expr, stmt)
 
-    def printStmt(self) -> Expr:
-        if (self.currtok.kind == "Keyword") & (self.currtok.name == "print"):
+    def printstmt(self) -> Expr:
+        prtargs = []
+        left = Expr(None, None)
+        if self.currtok.kind == "Keyword" and self.currtok.name == "print":
             print("printStmt")
             self.currtok = next(self.tg)
-        if self.currtok.kind == "left-paren":
-            print("left-paren")
-            self.currtok = next(self.tg)
-            left = self.printArg()
+            if self.currtok.kind == "left-paren":
+                print("left-paren")
+                self.currtok = next(self.tg)
+                prtarg = self.printarg()
         while (self.currtok.kind == "comma"):
             self.currtok = next(self.tg)
-            right = self.printArg()
-            left = PrintStmtExpr(left, right)
+            prtargs.append(self.printarg())
         if self.currtok.kind == "right-paren":
             self.currtok = next(self.tg)
-            left = PrintStmtExpr(left, None)
+            left = PrintStmtExpr(prtarg, prtargs)
         return left
 
-    def printArg(self)->Expr:
-        ##left = self.expression()
-
-        if self.currtok.kind == "String":  # using ID in expression
+    def printarg(self)->Expr:
+        if self.currtok.kind == "String":
+            print("string")
             tmp = self.currtok
             self.currtok = next(self.tg)
             return StrLitExpr(tmp.name)
-
-        left = self.expression()
-        return left
+        print("printExpr")
+        return StrLitExpr(self.expression())
 
     def expression(self) -> Expr:
         left = self.conjunction()
-
         while self.currtok.kind == "or":
             print("expression ")
             self.currtok = next(self.tg)
@@ -290,7 +288,8 @@ class Parser:
         # parse a parenthesized expression
         if self.currtok.kind == "left-paren":
             self.currtok = next(self.tg)
-            tree = self.addition()  # TODO Keeps changing!
+            print("expr")
+            tree = self.expression()  # TODO Keeps changing!
             if self.currtok.kind == "right-paren":
                 self.currtok = next(self.tg)
                 return tree
@@ -319,6 +318,5 @@ class SLUCSyntaxError(Exception):
 
 if __name__ == '__main__':
     p = Parser('simple.c')
-    t = p.equality()
+    t = p.statement()
     print(t)
-    print(t.scheme())
