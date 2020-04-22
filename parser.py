@@ -49,15 +49,19 @@ class Parser:
         -7  -(7 * 5)  -b   unary minus
     """
 
-    def functiondef(self):
+    def program(self):
+        left = self.functiondef()
+
+
+
+    def functiondef(self) -> Expr:
         stms = []
         decs = []
         if self.currtok.kind == "Keyword" and self.currtok.name in {"int", "bool", "float"}:
             type = self.currtok.name
             self.currtok = next(self.tg)
             if self.currtok.kind == "ID":
-                id = self.currtok.name
-                self.currtok = next(self.tg)
+                id = self.primary()
                 if self.currtok.kind == "left-paren":
                     print("left-paren")
                     self.currtok = next(self.tg)
@@ -73,8 +77,8 @@ class Parser:
                             stms.append(self.statement())
 
                         if self.currtok.kind == "right-brace":
-                            return FunctionDefExpr(type, id, parm, decs, stms)
-        raise SLUCSyntaxError("ERROR: Invalid function definition on line {}".format(self.currtok))
+                            return FunctionDef(type, id, parm, decs, stms)
+        raise SLUCSyntaxError("ERROR: Invalid function definition on line {}".format(self.currtok.loc))
     # top-level function that will be called
     def program(self):
         """
@@ -104,8 +108,7 @@ class Parser:
             left = self.currtok.name
             self.currtok = next(self.tg)
             if self.currtok.kind == "ID":
-                right = self.currtok.name
-                self.currtok = next(self.tg)
+                right = self.primary()
             if self.currtok.kind=="semicolon":
                 return DecExpr(left, right)
         raise SLUCSyntaxError("ERROR: Invalid declaration on line {}".format(self.currtok))
@@ -285,10 +288,11 @@ class Parser:
         """
         left = self.fact()
 
-        while self.currtok.kind in {"multiply", "divide"}:
+        while self.currtok.kind in {"multiply", "divide", "mod"}:
+            op = self.currtok.name
             self.currtok = next(self.tg)
             right = self.fact()
-            left = MultExpr(left, right)
+            left = MultExpr(left, right, op)
 
         return left
 

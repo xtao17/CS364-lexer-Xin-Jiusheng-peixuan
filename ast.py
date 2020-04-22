@@ -28,8 +28,8 @@ class Expr:
         return "{} || {}".format(self.left, self.right)
 
 
-class FunctionDefExpr:
-    def __init__(self, type: str, id: str, params: Expr, decls: Expr, stmts: Expr):
+class FunctionDef:
+    def __init__(self, type: str, id: Expr, params: Expr, decls: Expr, stmts: Expr):
         self.type = type
         self.id = id
         self.params = params
@@ -45,7 +45,7 @@ class FunctionDefExpr:
             declstr += str(d)
         for s in self.stmts:
             stmtstr += str(s)
-        return "{} {} ({}) {{{}{}}}".format(self.type, self.id,str(self.params),declstr,stmtstr)
+        return "{} {} ({}) {{{}{}}}".format(self.type, str(self.id),str(self.params),declstr,stmtstr)
 
 
 
@@ -67,31 +67,12 @@ class ParamExpr(Expr):
             return "{0} {1}{2}".format((str(self.left)), str(self.right), params)
         return "{0} {1}".format(str(self.left), str(self.right))
 
-
-class Stmt:
-    pass
-
-class IfStmt(Stmt):
-    def __init__(self, cond: Expr, truepart: Stmt, falsepart : Optional[Stmt]):
-        pass
-
-    def eval(self, env):
-
-        if self.cond.eval():
-            self.truepart.eval(env)
-        elif self.falsepart is not None:
-            self.falsepart.eval(env)
-
-
-class Declaration:
-    pass
 '''
 class Program:
 
     def __init__(self, funcs: Sequence[FunctionDef]):
         self.funcs = funcs
 '''
-
 
 # TODO Don't just cut-and-paste new operations, abstract!
 
@@ -170,11 +151,11 @@ class ConjExpr(Expr):
 
 
 class DecExpr(Expr):
-    def __init__(self, left: str, right: str):
+    def __init__(self, left: str, right: Expr):
         self.left = left
         self.right = right
     def __str__(self):
-        return "{0} {1};".format(self.left, self.right)
+        return "{0} {1};".format(self.left, str(self.right))
 
 
 
@@ -245,7 +226,7 @@ class IfExpr(Expr):
         self.elsestmt = elsestmt
     def __str__(self):
         if self.elsestmt :
-            return "if ({0}) {1} else {2}".format(str(self.expr), str(self.stmt), str(self.elsestmt))
+            return "if ({0}) {1} \n else {2}".format(str(self.expr), str(self.stmt), str(self.elsestmt))
         return "if({0}) {1}".format(str(self.expr), str(self.stmt))
 
 
@@ -289,29 +270,13 @@ class StmtExpr(Expr):
 
 
 class MultExpr(Expr):
-    def __init__(self, left: Expr, right: Expr):
+    def __init__(self, left: Expr, right: Expr, op: str):
         self.left = left
         self.right = right
+        self.op = op
 
     def __str__(self):
-        return "({0} * {1})".format(str(self.left), str(self.right))
-
-    def scheme(self):
-        """
-        Return a string that represents the expression in Scheme syntax.
-        e.g.,  (a * b)   -> (* a b)
-        """
-        return "(* {0} {1})".format(self.left.scheme(), self.right.scheme())
-
-    def eval(self) -> Union[int,float]:
-        # TODO environment
-        # Implementing SLU-C multiplication using Python's multiplication
-        # implmented * using mul instruction
-
-        # If we checked type when running eval we have a "dynamically typed"
-        # language
-
-        return self.left.eval() *  self.right.eval()
+        return "({0} {1} {2})".format(str(self.left), self.op, str(self.right))
 
 
 class UnaryMinus(Expr):
