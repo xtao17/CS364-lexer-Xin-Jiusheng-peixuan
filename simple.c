@@ -11,3 +11,13 @@ int test1(int a,int b) {
     a=a+1;
     print(a)
 }
+
+int test1(int a,int b) {
+    a=a+b;
+    while(a!=0){
+        a=a+1;
+    }
+    if(a==b){a=a1;}
+    a=a+1;
+    print(a)
+}

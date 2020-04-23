@@ -51,7 +51,7 @@ class Parser:
 
     def program(self) -> Program:
         funcdefs =[]
-        while self.currtok != None and self.currtok.kind != "right-brace":
+        while self.currtok != None and self.currtok.name != "EOF":
             funcdefs.append(self.functiondef())
 
         return Program(funcdefs)
@@ -79,6 +79,7 @@ class Parser:
                             stms.append(self.statement())
 
                         if self.currtok.kind == "right-brace":
+                            self.currtok = next(self.tg)
                             return FunctionDef(type, id, parm, decs, stms)
 
         raise SLUCSyntaxError("ERROR: Invalid function definition on line {}".format(self.currtok.loc))
