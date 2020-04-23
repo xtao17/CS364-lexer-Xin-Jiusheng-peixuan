@@ -99,8 +99,13 @@ class Parser:
                 args.append(self.currtok.name)
                 self.currtok = next(self.tg)
                 args.append(self.primary())
-
             return ParamExpr(left, right, args)
+
+        elif self.currtok.kind == "right-paren":
+            self.currtok = next(self.tg)
+            return ParamExpr(None, None)
+
+        raise SLUCSyntaxError("ERROR: Invalid param on line {}".format(self.currtok.loc))
 
     def declaration(self) -> Expr:
         if self.currtok.kind == "Keyword" and self.currtok.name in {"int", "bool", "float"}:

@@ -54,6 +54,9 @@ class ParamExpr(Expr):
         self.args = args
 
     def __str__(self):
+        if not self.left:
+            return ""
+
         if self.args:
             params =""
             for arg in self.args:
