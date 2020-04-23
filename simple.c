@@ -3,11 +3,13 @@
 //print((a + b), "a", "b")
 //a + b * d * (z + w) + -(a + b * c * (d + e))
 int sum(int n,int a) {
+
  int sum;
  int i;
+
  a=1;
  if(a==1)
-    print{n};
+    print(n);
  sum = 0;
  i = 0;
  while (i < n) {
