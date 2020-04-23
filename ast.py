@@ -36,8 +36,6 @@ class FunctionDef:
         self.decls = decls
         self.stmts = stmts
 
-
-
     def __str__(self):
         declstr =""
         stmtstr = ""
@@ -67,12 +65,18 @@ class ParamExpr(Expr):
             return "{0} {1}{2}".format((str(self.left)), str(self.right), params)
         return "{0} {1}".format(str(self.left), str(self.right))
 
-'''
+
 class Program:
 
     def __init__(self, funcs: Sequence[FunctionDef]):
         self.funcs = funcs
-'''
+
+    def __str__(self):
+        alist = list(map(str, self.funcs))
+        strs = ""
+        for f in alist:
+            strs += f
+        return "{}".format(strs)
 
 # TODO Don't just cut-and-paste new operations, abstract!
 

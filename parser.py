@@ -49,12 +49,14 @@ class Parser:
         -7  -(7 * 5)  -b   unary minus
     """
 
-    def program(self):
-        left = self.functiondef()
+    def program(self) -> Program:
+        funcdefs =[]
+        while self.currtok != None and self.currtok.kind != "right-brace":
+            funcdefs.append(self.functiondef())
 
+        return Program(funcdefs)
 
-
-    def functiondef(self) -> Expr:
+    def functiondef(self) -> FunctionDef:
         stms = []
         decs = []
         if self.currtok.kind == "Keyword" and self.currtok.name in {"int", "bool", "float"}:
@@ -78,12 +80,8 @@ class Parser:
 
                         if self.currtok.kind == "right-brace":
                             return FunctionDef(type, id, parm, decs, stms)
+
         raise SLUCSyntaxError("ERROR: Invalid function definition on line {}".format(self.currtok.loc))
-    # top-level function that will be called
-    def program(self):
-        """
-            Program         →  { FunctionDef }
-        """
 
     def params(self) -> Expr:
         args =[]
@@ -369,5 +367,5 @@ class SLUCSyntaxError(Exception):
 
 if __name__ == '__main__':
     p = Parser('simple.c')
-    t = p.functiondef()
+    t = p.program()
     print(t)

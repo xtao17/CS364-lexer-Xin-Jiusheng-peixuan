@@ -7,7 +7,7 @@ int test1(int a,int b) {
     while(a!=0){
         a=a+1;
     }
-    if(a==b){a=a+1;}
+    if(a==b){a=a1;}
     a=a+1;
-    print(a);
+    print(a)
 }
