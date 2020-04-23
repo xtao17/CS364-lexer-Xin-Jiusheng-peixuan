@@ -11,15 +11,9 @@ design patterns - catalog of best practices in software design
 """
 from typing import Sequence, Union, Optional
 
+
 # Use a class hierarchy to represent types.
 class Expr:
-    """
-    Base class for expressions
-    """
-    """
-      Base class for expressions
-      """
-
     def __init__(self, left, right):
         self.left = left
         self.right = right
@@ -40,14 +34,16 @@ class FunctionDef:
         declstr =""
         stmtstr = ""
         for d in self.decls:
-            declstr += str(d)
-        for s in self.stmts:
-            stmtstr += str(s)
-        return "{0} {1} ({2}) {{\n{3}{4}}}\n\n".format(self.type, str(self.id),str(self.params),declstr,stmtstr)
+            declstr += str(d) + "\t"
+        for i in range(0, len(self.stmts)):
+            if i == len(self.stmts) - 1:
+                stmtstr += str(self.stmts[i])
+            else:
+                stmtstr += str(self.stmts[i]) + "\t"
+        return "{0} {1} ({2}) {{\n\t{3}{4}}}".format(self.type, str(self.id),str(self.params),declstr,stmtstr)
 
 
-
-class ParamExpr(Expr):
+class ParamExpr:
     def __init__(self, left:str, right:Expr, args = None):
         self.left=left
         self.right=right
@@ -69,8 +65,7 @@ class ParamExpr(Expr):
         return "{0} {1}".format(str(self.left), str(self.right))
 
 
-class Program:
-
+class Program(FunctionDef):
     def __init__(self, funcs: Sequence[FunctionDef]):
         self.funcs = funcs
 
@@ -78,13 +73,13 @@ class Program:
         alist = list(map(str, self.funcs))
         strs = ""
         for f in alist:
-            strs += f
+            strs += f +"\n\n"
         return "{}".format(strs)
 
-# TODO Don't just cut-and-paste new operations, abstract!
 
 class BinaryExpr(Expr):
     pass
+
 
 class AndExpr(Expr):
     def __init__(self, left: Expr, right: Expr):
@@ -95,31 +90,6 @@ class AndExpr(Expr):
         return "({0} && {1})".format(str(self.left), str(self.right))
 
 
-    # def typeof(self) -> str: # where string is 'int' or 'float' or 'bool' or 'error'
-    # strings are not abstract "INT" "int" "fred"
-    # Expressions have types
-    #def typeof(self) -> Type:
-    def typeof(self) -> Union[int, bool, float]:   #
-        """
-        Return the type of the expression.
-        1) 4 + 4 is an int
-        2) 2 * 3.14 is a float
-        3) True && False is a bool
-        4) True && 3.14 type error
-        Static type checking: type check the program *before* we evaluate it.
-        Scheme is dynamically type checked. Type errors checked at run time.
-        Java - statically type checked.
-        C - static
-        Python - dynamic, checked at run time
-                 mypy - static type checker for Python
-        """
-        if self.left.typeof() == BoolType and self.right.typeof() == BoolType:
-            return BoolType
-        else:
-            # type error
-            raise SLUCTypeError(
-                "type error on line {0}, expected two booleans got a {1} and a {2}".format(0))
-
 class SLUCTypeError(Exception):
     def __init__(self, message: str):
         Exception.__init__(self)
@@ -127,6 +97,7 @@ class SLUCTypeError(Exception):
 
     def __str__(self):
         return self.message
+
 
 class AddExpr(Expr):
     def __init__(self, left: Expr, right: Expr):
@@ -163,7 +134,6 @@ class DecExpr(Expr):
         self.right = right
     def __str__(self):
         return "{0} {1};\n".format(self.left, str(self.right))
-
 
 
 class EqExpr(Expr):
@@ -213,8 +183,8 @@ class PrintStmtExpr(Expr):
             args = ""
             for arg in self.prtargs:
                 args += ", " + str(arg)
-            return "print({} {})\n".format(str(self.prtarg), args)
-        return "print({})\n".format(str(self.prtarg))
+            return "print({} {})".format(str(self.prtarg), args)
+        return "print({})".format(str(self.prtarg))
 
 
 class WhileExpr(Expr):
@@ -223,7 +193,7 @@ class WhileExpr(Expr):
         self.right = right
 
     def __str__(self):
-        return "while( {} ) {}".format(str(self.left), str(self.right))
+        return "while {} {}".format(str(self.left), str(self.right))
 
 
 class IfExpr(Expr):
@@ -233,7 +203,7 @@ class IfExpr(Expr):
         self.elsestmt = elsestmt
     def __str__(self):
         if self.elsestmt :
-            return "if ({0}) \n {1} else \n{2}".format(str(self.expr), str(self.stmt), str(self.elsestmt))
+            return "if ({0}) \n\t {1} else \n\t{2}".format(str(self.expr), str(self.stmt), str(self.elsestmt))
         return "if({0}) {1}".format(str(self.expr), str(self.stmt))
 
 
@@ -273,7 +243,9 @@ class StmtExpr(Expr):
         self.stmt = stmt
 
     def __str__(self):
-        return "{}".format(str(self.stmt))
+        if self.stmt == ";":
+            return ";\n"
+        return "{}\n".format(str(self.stmt))
 
 
 class MultExpr(Expr):
@@ -307,13 +279,6 @@ class IDExpr(Expr):
     def __str__(self):
         return self.id
 
-    def scheme(self):
-        return self.id
-
-    def eval(self, env):  # a + 7
-        # lookup the value of self.id. Look up where?
-        # env is a dictionary
-        pass
 
 class IntLitExpr(Expr):
 
@@ -323,18 +288,6 @@ class IntLitExpr(Expr):
     def __str__(self):
         return str(self.intlit)
 
-    def scheme(self):
-        return str(self.intlit)
-
-    def eval(self):
-        return self.intlit   # base case
-
-    #def typeof(self) -> Type:
-    # representing SLU-C types using Python types
-    def typeof(self) -> type:
-
-        #return IntegerType
-        return int
 
 class StrLitExpr(Expr):
 
@@ -344,16 +297,6 @@ class StrLitExpr(Expr):
     def __str__(self):
         return str(self.strlit)
 
-    def scheme(self):
-        return str(self.strlit)
-
-    def eval(self):
-        return self.strlit
-
-    def typeof(self) -> type:
-
-        #retrurn String type
-        return str
 
 class FloatLitExpr(Expr):
 
@@ -363,18 +306,8 @@ class FloatLitExpr(Expr):
     def __str__(self):
         return str(self.floatlit)
 
-    def scheme(self):
-        return str(self.floatlit)
 
-    def eval(self):
-        return self.floatlit   # base case
 
-    #def typeof(self) -> Type:
-    # representing SLU-C types using Python types
-    def typeof(self) -> type:
-
-        #return FloatType
-        return float
 
 if __name__ == '__main__':
     """
