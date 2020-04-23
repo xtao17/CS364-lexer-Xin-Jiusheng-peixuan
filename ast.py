@@ -233,7 +233,7 @@ class IfExpr(Expr):
         self.elsestmt = elsestmt
     def __str__(self):
         if self.elsestmt :
-            return "if ({0}) \n {1} \n else \n{2}".format(str(self.expr), str(self.stmt), str(self.elsestmt))
+            return "if ({0}) \n {1} else \n{2}".format(str(self.expr), str(self.stmt), str(self.elsestmt))
         return "if({0}) {1}".format(str(self.expr), str(self.stmt))
 
 
