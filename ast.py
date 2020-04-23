@@ -213,8 +213,8 @@ class PrintStmtExpr(Expr):
             args = ""
             for arg in self.prtargs:
                 args += ", " + str(arg)
-            return "print({} {})".format(str(self.prtarg), args)
-        return "print({})".format(str(self.prtarg))
+            return "print({} {})\n".format(str(self.prtarg), args)
+        return "print({})\n".format(str(self.prtarg))
 
 
 class WhileExpr(Expr):
@@ -243,7 +243,7 @@ class AssignmentExpr(Expr):
         self.right = right
 
     def __str__(self):
-        return "{} = {};".format(str(self.left), str(self.right))
+        return "{} = {};\n".format(str(self.left), str(self.right))
 
 
 class BlockExpr(Expr):
@@ -256,9 +256,9 @@ class BlockExpr(Expr):
             stmtargs = ""
             for arg in self.args:
                 stmtargs += "\n" + str(arg)
-            return "{{{0} {1}}}".format(str(self.stmt), stmtargs)
+            return "{{\n{0} {1}}}".format(str(self.stmt), stmtargs)
 
-        return "{{{0}}}".format(str(self.stmt))
+        return "{{\n{0}}}\n".format(str(self.stmt))
 
 
 class ReturnExpr(Expr):
