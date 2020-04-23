@@ -34,7 +34,6 @@ from ast import *
 class Parser:
     def __init__(self, fn: str):
         self.var_id=[]
-        self.param_id=[]
         self.lex = Lexer(fn)
         self.tg = self.lex.token_generator()
         self.currtok = next(self.tg)
@@ -48,8 +47,8 @@ class Parser:
         to a function.
         -7  -(7 * 5)  -b   unary minus
     """
-    def check_id_exist(self,var_name,id_list):
-        if var_name not in id_list:
+    def check_id_exist(self,var_name):
+        if var_name not in self.var_id:
             raise SLUCSyntaxError("ERROR: variable {} undefine".format(var_name))
     def program(self) -> Program:
 
@@ -62,13 +61,13 @@ class Parser:
     def functiondef(self) -> FunctionDef:
         stms = []
         decs = []
+        self.var_id.clear()
         if self.currtok.kind == "Keyword" and self.currtok.name in {"int", "bool", "float"}:
             type = self.currtok.name
             self.currtok = next(self.tg)
             if self.currtok.kind == "ID":
                 id=IDExpr(self.currtok.name)
                 # add id to parameter list
-                self.param_id.append(self.currtok.name)
                 self.currtok = next(self.tg)
                 if self.currtok.kind == "left-paren":
                     print("left-paren")
@@ -82,13 +81,17 @@ class Parser:
                         self.currtok = next(self.tg)
                         while(self.currtok.name in {"int", "bool", "float"}):
                             print("dec")
+                            print(self.currtok.name)
+
                             decs.append(self.declaration())
+                            print(self.currtok.name)
                         while(self.currtok.kind != "right-brace"):
                             stms.append(self.statement())
+                            if self.currtok.name in  {"int", "bool", "float"}:
+                                raise SLUCSyntaxError("ERROR: declarations must be written before statements on line {}".format(self.currtok.loc))
 
-                        if self.currtok.kind == "right-brace":
-                            self.currtok = next(self.tg)
-                            return FunctionDef(type, id, parm, decs, stms)
+                        self.currtok = next(self.tg)
+                        return FunctionDef(type, id, parm, decs, stms)
 
         raise SLUCSyntaxError("ERROR: Invalid function definition on line {}".format(self.currtok.loc))
 
@@ -98,7 +101,7 @@ class Parser:
             left = self.currtok.name
             self.currtok = next(self.tg)
             if self.currtok.kind == "ID":
-                self.param_id.append(self.currtok.name)
+                self.var_id.append(self.currtok.name)
                 right = IDExpr(self.currtok.name)
                 self.currtok = next(self.tg)
             else:
@@ -109,6 +112,7 @@ class Parser:
                 args.append(self.currtok.name)
                 self.currtok = next(self.tg)
                 args.append(IDExpr(self.currtok.name))
+                self.var_id.append(self.currtok.name)
                 self.currtok = next(self.tg)
             return ParamExpr(left, right, args)
 
@@ -173,7 +177,7 @@ class Parser:
 
     def assignment(self) -> Expr:
         if self.currtok.kind == "ID":
-            self.check_id_exist(self.currtok.name, self.var_id)
+            self.check_id_exist(self.currtok.name)
             id = IDExpr(self.currtok.name)
             self.currtok = next(self.tg)
             if self.currtok.kind == "assignment":
@@ -346,6 +350,7 @@ class Parser:
         # parse an ID
         if self.currtok.kind == "ID":  # using ID in expression
             print("id")
+            self.check_id_exist(self.currtok.name)
             tmp = self.currtok
             self.currtok = next(self.tg)
             return IDExpr(tmp.name)
