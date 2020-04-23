@@ -32,9 +32,8 @@ from ast import *
 
 
 class Parser:
-
     def __init__(self, fn: str):
-
+        self.var_id=[]
         self.lex = Lexer(fn)
         self.tg = self.lex.token_generator()
         self.currtok = next(self.tg)
@@ -48,7 +47,9 @@ class Parser:
         to a function.
         -7  -(7 * 5)  -b   unary minus
     """
-
+    def check_id_exist(self,var_name):
+        if var_name not in self.var_id:
+            raise SLUCSyntaxError("ERROR: variable {} undefine".format(var_name))
     def program(self) -> Program:
         funcdefs =[]
         while self.currtok != None and self.currtok.name != "EOF":
@@ -90,6 +91,7 @@ class Parser:
             left = self.currtok.name
             self.currtok = next(self.tg)
             if self.currtok.kind == "ID":
+
                 right = self.primary()
             else:
                 raise SLUCSyntaxError("ERROR: Invalid param on line {}".format(self.currtok.loc))
@@ -112,6 +114,8 @@ class Parser:
             left = self.currtok.name
             self.currtok = next(self.tg)
             if self.currtok.kind == "ID":
+                #  add id
+                self.var_id.append(self.currtok.name)
                 right = self.primary()
             if self.currtok.kind=="semicolon":
                 return DecExpr(left, right)
@@ -158,6 +162,7 @@ class Parser:
 
     def assignment(self) -> Expr:
         if self.currtok.kind == "ID":
+            self.check_id_exist(self.currtok.name)
             id = self.primary()
             if self.currtok.kind == "assignment":
                 self.currtok = next(self.tg)
@@ -329,6 +334,7 @@ class Parser:
         # parse an ID
         if self.currtok.kind == "ID":  # using ID in expression
             print("id")
+            self.check_id_exist(self.currtok.name)
             tmp = self.currtok
             self.currtok = next(self.tg)
             return IDExpr(tmp.name)
