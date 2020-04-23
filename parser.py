@@ -41,25 +41,15 @@ class Parser:
         self.ex_dict={
             "ID":(lambda x: IDExpr(x)),
             "real":(lambda x:FloatLitExpr(x)),
-            "int":(lambda x:IntLitExpr(x)),
+            "int":(lambda x:IntLitExpr(x))
         }
         self.stmt_dict = {
-            "if":(lambda x: ifstatement()),
-            "while":(lambda x: whilestatement()),
-            "print":(lambda x: printstmt()),
-            "return":(lambda x:returnstmt()),
-            "ID":(lambda x:assignment())
+            "if":(lambda x: self.ifstatement()),
+            "while":(lambda x: self.whilestatement()),
+            "print":(lambda x: self.printstmt()),
+            "return":(lambda x:self.returnstmt()),
+            "ID":(lambda x:self.assignment())
          }
-
-    """
-        Expr  →  Term { (+ | -) Term }
-        Term  → Fact { (* | / | %) Fact }
-        Fact  → [ - ] Primary
-        Primary  → ID | INTLIT | ( Expr )
-        Recursive descent parser. Each non-terminal corresponds
-        to a function.
-        -7  -(7 * 5)  -b   unary minus
-    """
 
     def check_id_exist(self,var_name,id_list):
         if var_name not in id_list:
@@ -163,97 +153,89 @@ class Parser:
         if self.currtok.kind == "left-brace":
             print(self.currtok.name)
             return self.block()
-        if self.currtok.kind == "Keyword" and self.currtok.name in self.stmt_dict.keys():
 
-            return self.stmt_dict[self.currtok.name]
-        """if self.currtok.kind == "Keyword" and self.currtok.name == "while":
-            return self.whilestatement()
-        if self.currtok.kind == "Keyword" and self.currtok.name == "print":
-            return self.printstmt()
-        if self.currtok.kind == "Keyword" and self.currtok.name == "return":
-            return self.returnstmt()
+        if self.currtok.kind == "Keyword":
+            item=self.stmt_dict[self.currtok.name](self)
+            return item
+
         if self.currtok.kind == "ID":
-            return self.assignment()"""
+            item=self.stmt_dict[self.currtok.kind](self)
+            return item
+
         raise SLUCSyntaxError("ERROR: Invalid statement {} on line {}".format(self.currtok.name, self.currtok.loc))
 
-    """        if self.currtok.kind in self.ex_dict.keys():
-            if(self.currtok.kind=="ID"):
-                self.check_id_exist(self.currtok.name, self.var_id)
-            tmp=self.currtok
-            self.currtok=next(self.tg)
-            return self.ex_dict[tmp.kind](tmp.name)"""
-
     def returnstmt(self) -> Expr:
-        if self.currtok.kind == "Keyword" and self.currtok.name == "return":
+        currentline = self.currtok.loc
+        self.currtok = next(self.tg)
+        expr = self.expression()
+        if self.currtok.kind == "semicolon":
+            print("returnstmt")
             self.currtok = next(self.tg)
-            expr = self.expression()
-            if self.currtok.kind == "semicolon":
-                print("returnstmt")
-                self.currtok = next(self.tg)
-                return ReturnExpr(expr)
-        raise SLUCSyntaxError("ERROR: Missing ; on line {}".format(self.currtok.loc))
+            return ReturnExpr(expr)
+        raise SLUCSyntaxError("ERROR: Missing ; on line {}".format(currentline))
 
     def block(self) -> Expr:
         stmts = []
-        if self.currtok.kind == "left-brace":
-            self.currtok = next(self.tg)
-            stmt = self.statement()
-            while self.currtok.kind != "right-brace":
-                stmts.append(self.statement())
-            self.currtok = next(self.tg)
-            return BlockExpr(stmt, stmts)
+        self.currtok = next(self.tg)
+        stmt = self.statement()
+        while self.currtok.kind != "right-brace":
+            stmts.append(self.statement())
+        self.currtok = next(self.tg)
+        return BlockExpr(stmt, stmts)
 
     def assignment(self) -> Expr:
-        if self.currtok.kind == "ID":
-            self.check_id_exist(self.currtok.name,self.var_id)
-            id = IDExpr(self.currtok.name)
+        currentline = self.currtok.loc
+        self.check_id_exist(self.currtok.name,self.var_id)
+        id = IDExpr(self.currtok.name)
+        self.currtok = next(self.tg)
+        if self.currtok.kind == "assignment":
             self.currtok = next(self.tg)
-            if self.currtok.kind == "assignment":
+            expr = self.expression()
+            if self.currtok.kind == "semicolon":
+                print("assigment")
                 self.currtok = next(self.tg)
-                expr = self.expression()
-                if self.currtok.kind == "semicolon":
-                    print("assigment")
-                    self.currtok = next(self.tg)
-                    assign = AssignmentExpr(id, expr)
-                    return assign
-        raise SLUCSyntaxError("ERROR: Missing ; on line {}".format(self.currtok.loc))
+                assign = AssignmentExpr(id, expr)
+                return assign
+        raise SLUCSyntaxError("ERROR: Missing ; on line {}".format(currentline))
 
     def ifstatement(self) -> Expr:
-        if self.currtok.kind == "Keyword" and self.currtok.name == "if":
-            print("ifstatement")
+        currentline = self.currtok.loc
+        self.currtok = next(self.tg)
+        if self.currtok.kind == "left-paren":
+            print("left-paren")
             self.currtok = next(self.tg)
-            if self.currtok.kind == "left-paren":
-                print("left-paren")
+            expr = self.expression()
+            if self.currtok.kind == "right-paren":
+                print("right-paren")
                 self.currtok = next(self.tg)
-                expr = self.expression()
-                if self.currtok.kind == "right-paren":
-                    print("right-paren")
+                stmt = self.statement()
+
+                if self.currtok.kind == "Keyword" and self.currtok.name == "else":
+                    print("elseStatement")
                     self.currtok = next(self.tg)
-                    stmt = self.statement()
+                    elsestmt = self.statement()
+                    return IfExpr(expr, stmt, elsestmt)
 
-                    if self.currtok.kind == "Keyword" and self.currtok.name == "else":
-                        print("elseStatement")
-                        self.currtok = next(self.tg)
-                        elsestmt = self.statement()
-                        return IfExpr(expr, stmt, elsestmt)
+                return IfExpr(expr, stmt)
 
-                    return IfExpr(expr, stmt)
+        raise SLUCSyntaxError("ERROR: Invalid ifstatement on line {}".format(currentline))
 
     def whilestatement(self) -> Expr:
-        if self.currtok.kind == "Keyword" and self.currtok.name == "while":
-            print("whileStatement")
+        currentline = self.currtok.loc
+        self.currtok = next(self.tg)
+        if self.currtok.kind == "left-paren":
+            print("left-paren")
             self.currtok = next(self.tg)
-            if self.currtok.kind == "left-paren":
-                print("left-paren")
+            expr = self.expression()
+            if self.currtok.kind == "right-paren":
+                print("right-paren")
                 self.currtok = next(self.tg)
-                expr = self.expression()
-                if self.currtok.kind == "right-paren":
-                    print("right-paren")
-                    self.currtok = next(self.tg)
-                    stmt = self.statement()
-                    return WhileExpr(expr, stmt)
+                stmt = self.statement()
+                return WhileExpr(expr, stmt)
+        raise SLUCSyntaxError("ERROR: Invalid whilestatement on line {}".format(currentline))
 
     def printstmt(self) -> Expr:
+        currentline = self.currtok.loc
         prtargs = []
 
         if self.currtok.kind == "Keyword" and self.currtok.name == "print":
@@ -270,7 +252,7 @@ class Parser:
             self.currtok = next(self.tg)
             left = PrintStmtExpr(prtarg, prtargs)
             return left
-        raise SLUCSyntaxError("ERROR: Invalid print statement on line {}".format(self.currtok.loc))
+        raise SLUCSyntaxError("ERROR: Invalid print statement on line {}".format(currentline))
 
     def printarg(self) -> Expr:
         if self.currtok.kind == "String":
