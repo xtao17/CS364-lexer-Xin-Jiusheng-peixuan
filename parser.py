@@ -154,6 +154,7 @@ class Parser:
             return self.returnstmt()
         if self.currtok.kind == "ID":
             return self.assignment()
+        raise SLUCSyntaxError("ERROR: Invalid statement {} on line {}".format(self.currtok.name, self.currtok.loc))
 
     def returnstmt(self) -> Expr:
         if self.currtok.kind == "Keyword" and self.currtok.name == "return":
@@ -227,7 +228,7 @@ class Parser:
 
     def printstmt(self) -> Expr:
         prtargs = []
-        left = Expr(None, None)
+
         if self.currtok.kind == "Keyword" and self.currtok.name == "print":
             print("printStmt")
             self.currtok = next(self.tg)
@@ -241,7 +242,8 @@ class Parser:
         if self.currtok.kind == "right-paren":
             self.currtok = next(self.tg)
             left = PrintStmtExpr(prtarg, prtargs)
-        return left
+            return left
+        raise SLUCSyntaxError("ERROR: Invalid print statement on line {}".format(self.currtok.loc))
 
     def printarg(self) -> Expr:
         if self.currtok.kind == "String":

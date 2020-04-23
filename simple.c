@@ -7,7 +7,7 @@ int sum(int n,int a) {
  int i;
  a=1;
  if(a==1)
-    print(n);
+    print{n};
  sum = 0;
  i = 0;
  while (i < n) {
@@ -17,7 +17,7 @@ int sum(int n,int a) {
  i = i + 1;
  }
  return sum;
-]
+}
 
 int sum(int n) {
  int sum;
