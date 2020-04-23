@@ -69,6 +69,7 @@ class Parser:
                 id=IDExpr(self.currtok.name)
                 # add id to parameter list
                 self.param_id.append(self.currtok.name)
+                self.currtok = next(self.tg)
                 if self.currtok.kind == "left-paren":
                     print("left-paren")
                     self.currtok = next(self.tg)
@@ -77,8 +78,10 @@ class Parser:
                         print("right-paren")
                         self.currtok = next(self.tg)
                     if self.currtok.kind == "left-brace":
+                        print("leftbrace")
                         self.currtok = next(self.tg)
                         while(self.currtok.name in {"int", "bool", "float"}):
+                            print("dec")
                             decs.append(self.declaration())
                         while(self.currtok.kind != "right-brace"):
                             stms.append(self.statement())
@@ -96,7 +99,8 @@ class Parser:
             self.currtok = next(self.tg)
             if self.currtok.kind == "ID":
                 self.param_id.append(self.currtok.name)
-                right = self.primary()
+                right = IDExpr(self.currtok.name)
+                self.currtok = next(self.tg)
             else:
                 raise SLUCSyntaxError("ERROR: Invalid param on line {}".format(self.currtok.loc))
 
@@ -104,7 +108,8 @@ class Parser:
                 self.currtok = next(self.tg)
                 args.append(self.currtok.name)
                 self.currtok = next(self.tg)
-                args.append(self.primary())
+                args.append(IDExpr(self.currtok.name))
+                self.currtok = next(self.tg)
             return ParamExpr(left, right, args)
 
         elif self.currtok.kind == "right-paren":
@@ -120,8 +125,10 @@ class Parser:
             if self.currtok.kind == "ID":
                 #  add id
                 self.var_id.append(self.currtok.name)
-                right = self.primary()
+                right = IDExpr(self.currtok.name)
+                self.currtok = next(self.tg)
             if self.currtok.kind=="semicolon":
+                self.currtok = next(self.tg)
                 return DecExpr(left, right)
         raise SLUCSyntaxError("ERROR: Invalid declaration on line {}".format(self.currtok))
 
@@ -166,8 +173,9 @@ class Parser:
 
     def assignment(self) -> Expr:
         if self.currtok.kind == "ID":
-            self.check_id_exist(self.currtok.name)
-            id = self.primary()
+            self.check_id_exist(self.currtok.name, self.var_id)
+            id = IDExpr(self.currtok.name)
+            self.currtok = next(self.tg)
             if self.currtok.kind == "assignment":
                 self.currtok = next(self.tg)
                 expr = self.expression()
