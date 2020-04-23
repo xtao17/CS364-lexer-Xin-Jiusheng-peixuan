@@ -41,8 +41,16 @@ class Parser:
         self.ex_dict={
             "ID":(lambda x: IDExpr(x)),
             "real":(lambda x:FloatLitExpr(x)),
-            "int":(lambda x:IntLitExpr(x))
+            "int":(lambda x:IntLitExpr(x)),
         }
+        self.stmt_dict = {
+            "if":(lambda x: ifstatement()),
+            "while":(lambda x: whilestatement()),
+            "print":(lambda x: printstmt()),
+            "return":(lambda x:returnstmt()),
+            "ID":(lambda x:assignment())
+         }
+
     """
         Expr  →  Term { (+ | -) Term }
         Term  → Fact { (* | / | %) Fact }
@@ -153,18 +161,27 @@ class Parser:
             self.currtok = next(self.tg)
             return StmtExpr(tmp.name)
         if self.currtok.kind == "left-brace":
+            print(self.currtok.name)
             return self.block()
-        if self.currtok.kind == "Keyword" and self.currtok.name == "if":
-            return self.ifstatement()
-        if self.currtok.kind == "Keyword" and self.currtok.name == "while":
+        if self.currtok.kind == "Keyword" and self.currtok.name in self.stmt_dict.keys():
+
+            return self.stmt_dict[self.currtok.name]
+        """if self.currtok.kind == "Keyword" and self.currtok.name == "while":
             return self.whilestatement()
         if self.currtok.kind == "Keyword" and self.currtok.name == "print":
             return self.printstmt()
         if self.currtok.kind == "Keyword" and self.currtok.name == "return":
             return self.returnstmt()
         if self.currtok.kind == "ID":
-            return self.assignment()
+            return self.assignment()"""
         raise SLUCSyntaxError("ERROR: Invalid statement {} on line {}".format(self.currtok.name, self.currtok.loc))
+
+    """        if self.currtok.kind in self.ex_dict.keys():
+            if(self.currtok.kind=="ID"):
+                self.check_id_exist(self.currtok.name, self.var_id)
+            tmp=self.currtok
+            self.currtok=next(self.tg)
+            return self.ex_dict[tmp.kind](tmp.name)"""
 
     def returnstmt(self) -> Expr:
         if self.currtok.kind == "Keyword" and self.currtok.name == "return":
