@@ -9,7 +9,21 @@ int sum(int n) {
  i = 0;
  while (i < n) {
  if (i % 3 == 0 || i % 5 == 0)
- sum = sum + i;
+    sum = sum + i;
+
+ i = i + 1;
+ }
+ return sum;
+}
+
+int sum(int n) {
+ int sum;
+ int i;
+ sum = 0;
+ i = 0;
+ while (i < n) {
+ if (i % 3 == 0 || i % 5 == 0)
+    sum = sum + i;
 
  i = i + 1;
  }

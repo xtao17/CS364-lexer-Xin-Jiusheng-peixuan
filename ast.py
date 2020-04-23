@@ -43,7 +43,7 @@ class FunctionDef:
             declstr += str(d)
         for s in self.stmts:
             stmtstr += str(s)
-        return "{} {} ({}) {{\n{}{}\n}}".format(self.type, str(self.id),str(self.params),declstr,stmtstr)
+        return "{0} {1} ({2}) {{\n{3}{4}}}\n\n".format(self.type, str(self.id),str(self.params),declstr,stmtstr)
 
 
 
@@ -233,7 +233,7 @@ class IfExpr(Expr):
         self.elsestmt = elsestmt
     def __str__(self):
         if self.elsestmt :
-            return "if ({0}) \n {1} \n else {2}".format(str(self.expr), str(self.stmt), str(self.elsestmt))
+            return "if ({0}) \n {1} \n else \n{2}".format(str(self.expr), str(self.stmt), str(self.elsestmt))
         return "if({0}) {1}".format(str(self.expr), str(self.stmt))
 
 
@@ -258,7 +258,7 @@ class BlockExpr(Expr):
                 stmtargs += "\n" + str(arg)
             return "{{\n{0} {1}}}\n".format(str(self.stmt), stmtargs)
 
-        return "{{\n{0}\n}}\n".format(str(self.stmt))
+        return "{{\n{0}}}\n".format(str(self.stmt))
 
 
 class ReturnExpr(Expr):
@@ -266,7 +266,7 @@ class ReturnExpr(Expr):
         self.expr = expr
 
     def __str__(self):
-        return "return {};".format(str(self.expr))
+        return "return {};\n".format(str(self.expr))
 
 class StmtExpr(Expr):
     def __init__(self, stmt):
