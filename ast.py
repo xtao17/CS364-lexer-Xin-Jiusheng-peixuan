@@ -193,6 +193,8 @@ class WhileExpr(Expr):
         self.right = right
 
     def __str__(self):
+        if type(self.right) == BlockExpr:
+            print ("block111111111111")
         return "while {} {}".format(str(self.left), str(self.right))
 
 
