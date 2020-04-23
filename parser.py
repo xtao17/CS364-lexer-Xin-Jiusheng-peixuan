@@ -38,7 +38,11 @@ class Parser:
         self.lex = Lexer(fn)
         self.tg = self.lex.token_generator()
         self.currtok = next(self.tg)
-
+        self.ex_dict={
+            "ID":(lambda x: IDExpr(x)),
+            "real":(lambda x:FloatLitExpr(x)),
+            "int":(lambda x:IntLitExpr(x))
+        }
     """
         Expr  →  Term { (+ | -) Term }
         Term  → Fact { (* | / | %) Fact }
@@ -348,27 +352,12 @@ class Parser:
         Primary  → ID | INTLIT | ( Expr )
         """
 
-        # parse a real literal
-        if self.currtok.kind == "real":
-            print("floatlit")
-            tmp = self.currtok
-            self.currtok = next(self.tg)
-            return FloatLitExpr(tmp.name)
-
-        # parse an ID
-        if self.currtok.kind == "ID":  # using ID in expression
-            print("id")
-            self.check_id_exist(self.currtok.name,self.var_id)
-            tmp = self.currtok
-            self.currtok = next(self.tg)
-            return IDExpr(tmp.name)
-
-        # parse an integer literal
-        if self.currtok.kind == "int":
-            print("intlit")
-            tmp = self.currtok
-            self.currtok = next(self.tg)
-            return IntLitExpr(tmp.name)
+        if self.currtok.kind in self.ex_dict.keys():
+            if(self.currtok.kind=="ID"):
+                self.check_id_exist(self.currtok.name, self.var_id)
+            tmp=self.currtok
+            self.currtok=next(self.tg)
+            return self.ex_dict[tmp.kind](tmp.name)
 
         # parse a parenthesized expression
         if self.currtok.kind == "left-paren":
