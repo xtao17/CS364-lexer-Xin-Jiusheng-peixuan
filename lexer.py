@@ -145,8 +145,7 @@ class Lexer:
             for t in tokens:
                 yield Token(t, index)
 
-        while (True):  # cheating
-            yield Token("EOF", -1)
+        yield Token("EOF", -1)
 
 
 if __name__ == "__main__":
