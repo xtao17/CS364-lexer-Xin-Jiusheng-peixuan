@@ -314,7 +314,7 @@ class Parser:
 
     def term(self) -> Expr:
         """
-        Term  → Fact { MulOp Fact }
+        Term  → Exp { MulOp Exp }
         """
         left = self.fact()
         while self.currtok.kind in {"multiply", "divide", "mod"}:
@@ -326,27 +326,31 @@ class Parser:
 
     def fact(self) -> Expr:
         """
-        Fact  → Base {Expo Base}
+        Fact  → [ - ] Primary
+            e.g., -a  -(b+c)  -6    (b+c) a 6
         """
         left = self.base()
+
         while self.currtok.kind == "expo":
             self.currtok = next(self.tg)  # advance to the next token
+
             right = self.fact()
             left = ExpoExpr(left, right)
+
         return left
 
     def base(self) -> Expr:
-        """
-        Base → [UnaryOp] primary
-        """
-        left = self.primary()
-        if self.currtok.kind in {"minus", "negate"}:
-            op = self.currtok.name
+        if self.currtok.kind == "minus":
             self.currtok = next(self.tg)
             tree = self.primary()
-            return UnaryOp(tree, op)
+            return UnaryMinus(tree)
 
-        return left
+        if self.currtok.kind == "negate":
+           self.currtok = next(self.tg)
+           tree = self.primary()
+           return UnaryNegate(tree)
+
+        return self.primary()
 
     def primary(self) -> Expr:
         """
@@ -405,9 +409,6 @@ class SLUCSyntaxError(Exception):
 
 
 if __name__ == '__main__':
-    if len(sys.argv)>1:
-        p = Parser(sys.argv[1])
-    else:
-        p = Parser("simple.c")
+    p = Parser('simple.c')
     t =p.program()
     print(t)

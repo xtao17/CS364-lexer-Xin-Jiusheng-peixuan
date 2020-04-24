@@ -32,7 +32,7 @@ int main() {
     // where to start checking divisors
     // number checking to see if prime
 
-    while (prime && i < n/2.0) {
+    while (prime || i < n/2.0) {
 
         if(n%i==0) //is n divisible by i?
             prime = false;
