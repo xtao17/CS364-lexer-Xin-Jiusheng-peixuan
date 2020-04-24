@@ -58,7 +58,7 @@ class Declaration:
 
 
 class FunctionDef:
-    def __init__(self, type: str, id: Expr, params: Param, decls: Declaration, stmts: Statement):
+    def __init__(self, type: str, id: Expr, params: Param, decls: Sequence[Declaration], stmts: Sequence[Statement]):
         self.type = type
         self.id = id
         self.params = params
@@ -186,7 +186,7 @@ class RelatExpr(Expr):
 
 
 class PrintStatement(Statement):
-    def __init__(self, prtarg: Expr, prtargs: Expr, tabs = ""):
+    def __init__(self, prtarg: Expr, prtargs: Sequence[Expr], tabs = ""):
         self.prtarg = prtarg
         self.prtargs = prtargs
         self.tabs = tabs
@@ -218,8 +218,8 @@ class IfStatement(Statement):
         self.tabs = tabs
     def __str__(self):
         if self.elsestmt :
-            return "{0}if ({1}) \n\t {2} else \n\t{3}".format(self.tabs, str(self.expr), str(self.stmt), str(self.elsestmt))
-        return "{0}if({1})\n{2}".format(self.tabs, str(self.expr), str(self.stmt))
+            return "{0}if ({1})\n\t{2} else \n\t{3}".format(self.tabs, str(self.expr), str(self.stmt), str(self.elsestmt))
+        return "{0}if({1})\n\t{2}".format(self.tabs, str(self.expr), str(self.stmt))
 
 
 class AssignmentStatement(Statement):
@@ -329,7 +329,7 @@ class FloatLitExpr(Expr):
         return str(self.floatlit)
 
 class FuncCExpr(Expr):
-    def __init__(self, left: Expr, right: Sequence[FunctionDef]):
+    def __init__(self, left: Expr, right: Sequence[Expr]):
         self.left = left
         self.right = right
 

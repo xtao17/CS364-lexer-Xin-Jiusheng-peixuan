@@ -1,4 +1,4 @@
-from lexer import Lexer, Token
+from lexer import Lexer
 from ast import *
 import sys
 """
@@ -71,6 +71,7 @@ class Parser:
     def functiondef(self) -> FunctionDef:
         stms = []
         decs = []
+        currentline = self.currtok.loc
         self.level = 0
         self.var_id.clear()
         if self.currtok.kind == "Keyword" and self.currtok.name in {"int", "bool", "float"}:
@@ -82,11 +83,9 @@ class Parser:
                 # add id to parameter list
                 self.currtok = next(self.tg)
                 if self.currtok.kind == "left-paren":
-                    print("left-paren")
                     self.currtok = next(self.tg)
                     parm = self.params()
                     if self.currtok.kind == "right-paren":
-                        print("right-paren")
                         self.currtok = next(self.tg)
                     if self.currtok.kind == "left-brace":
                         self.level += 1
@@ -101,7 +100,7 @@ class Parser:
                         self.currtok = next(self.tg)
                         return FunctionDef(type, id, parm, decs, stms)
 
-        raise SLUCSyntaxError("ERROR: Invalid function definition on line {}".format(self.currtok.loc))
+        raise SLUCSyntaxError("ERROR: Invalid function definition on line {}".format(currentline))
 
     def params(self) -> Param:
         args =[]
@@ -127,7 +126,7 @@ class Parser:
 
         elif self.currtok.kind == "right-paren":
             self.currtok = next(self.tg)
-            return Param(None, None)
+            return Param("", "")
 
         raise SLUCSyntaxError("ERROR: Invalid param on line {}".format(self.currtok.loc))
 
@@ -140,6 +139,8 @@ class Parser:
                 self.var_id.append(self.currtok.name)
                 right = IDExpr(self.currtok.name)
                 self.currtok = next(self.tg)
+            else:
+                raise SLUCSyntaxError("ERROR: Invalid declaration on line {}".format(self.currtok))
             if self.currtok.kind=="semicolon":
                 self.currtok = next(self.tg)
                 return Declaration(left, right, self.formctrl())
@@ -152,7 +153,7 @@ class Parser:
             self.currtok = next(self.tg)
             return Statement(tmp.name)
         if self.currtok.kind == "left-brace":
-            print(self.currtok.name)
+
             return self.block()
 
         if self.currtok.kind == "Keyword":
@@ -170,7 +171,6 @@ class Parser:
         self.currtok = next(self.tg)
         expr = self.expression()
         if self.currtok.kind == "semicolon":
-            print("returnstmt")
             self.currtok = next(self.tg)
             return ReturnStatement(expr, self.formctrl())
         raise SLUCSyntaxError("ERROR: Missing ; on line {}".format(currentline))
@@ -192,7 +192,6 @@ class Parser:
         self.currtok = next(self.tg)
         if self.currtok.kind == "assignment":
             self.currtok = next(self.tg)
-            print(self.currtok.name)
             expr = self.expression()
             if self.currtok.kind == "semicolon":
                 print("assigment")
@@ -229,11 +228,9 @@ class Parser:
         currentline = self.currtok.loc
         self.currtok = next(self.tg)
         if self.currtok.kind == "left-paren":
-            print("left-paren")
             self.currtok = next(self.tg)
             expr = self.expression()
             if self.currtok.kind == "right-paren":
-                print("right-paren")
                 self.currtok = next(self.tg)
                 stmt = self.statement()
                 whilestmt = WhileStatement(expr, stmt, self.formctrl())
@@ -244,14 +241,12 @@ class Parser:
     def printstmt(self) -> Statement:
         currentline = self.currtok.loc
         prtargs = []
-
-        if self.currtok.kind == "Keyword" and self.currtok.name == "print":
-            print("printStmt")
+        self.currtok = next(self.tg)
+        if self.currtok.kind == "left-paren":
             self.currtok = next(self.tg)
-            if self.currtok.kind == "left-paren":
-                print("left-paren")
-                self.currtok = next(self.tg)
-                prtarg = self.printarg()
+            prtarg = self.printarg()
+        else:
+            raise  SLUCSyntaxError("ERROR: Missing ( on line {}".format(currentline))
         while (self.currtok.kind == "comma"):
             self.currtok = next(self.tg)
             prtargs.append(self.printarg())
@@ -263,17 +258,14 @@ class Parser:
 
     def printarg(self) -> Expr:
         if self.currtok.kind == "String":
-            print("string")
             tmp = self.currtok
             self.currtok = next(self.tg)
             return StrLitExpr(tmp.name)
-        print("printExpr")
         return StrLitExpr(self.expression())
 
     def expression(self) -> Expr:
         left = self.conjunction()
         while self.currtok.kind == "or":
-            print("expression ")
             self.currtok = next(self.tg)
             right = self.conjunction()
             left = Expr(left, right)
@@ -283,7 +275,6 @@ class Parser:
         left = self.equality()
 
         while self.currtok.kind == "and":
-            print("conjunction")
             self.currtok = next(self.tg)
             right = self.equality()
             left = ConjExpr(left, right)
@@ -293,7 +284,6 @@ class Parser:
         left = self.relation()
 
         if self.currtok.kind in {"equal-equal", "not-equal"}:
-            print("equality")
             equop = self.currtok.name
             self.currtok = next(self.tg)
             right = self.relation()
@@ -303,7 +293,6 @@ class Parser:
     def relation(self) -> Expr:  # a < b
         left = self.addition()
         while self.currtok.kind in {"less-than", "less-equal", "greater-than", "greater-equal"}:
-            print("relation")
             relop = self.currtok.name
             self.currtok = next(self.tg)
             right = self.addition()
@@ -352,18 +341,18 @@ class Parser:
 
         return left
 
-
     def base(self) -> Expr:
         if self.currtok.kind == "minus":
             self.currtok = next(self.tg)
             tree = self.primary()
             return UnaryMinus(tree)
 
-        return self.primary()
         if self.currtok.kind == "negate":
            self.currtok = next(self.tg)
            tree = self.primary()
            return UnaryNegate(tree)
+
+        return self.primary()
 
     def primary(self) -> Expr:
         """
@@ -394,7 +383,6 @@ class Parser:
         # parse a parenthesized expression
         if self.currtok.kind == "left-paren":
             self.currtok = next(self.tg)
-            print("expr")
             tree = self.expression()
             if self.currtok.kind == "right-paren":
                 self.currtok = next(self.tg)
@@ -425,5 +413,5 @@ class SLUCSyntaxError(Exception):
 if __name__ == '__main__':
     p = Parser('simple.c')
 
-    t = p.program()
+    t =p.program()
     print(t)
