@@ -329,50 +329,31 @@ class Parser:
         """
         Term  → Exp { MulOp Exp }
         """
-        left = self.exp()
+        left = self.fact()
         while self.currtok.kind in {"multiply", "divide", "mod"}:
             op = self.currtok.name
             self.currtok = next(self.tg)
-            right = self.exp()
+            right = self.fact()
             left = MultExpr(left, right, op)
         return left
-    def exp(self, e = None)-> Expr:
-        '''
-        Exp -> exp_back_last_first {ExponentialOp Exp}
-        '''
-        if e:
-            left = self.s(e)
-        else:
-            left = self.currtok
-        while self.currtok.kind=="expo":
-            print("there")
-            self.currtok = next(self.tg)
-            right = self.s()
-            left = ExpoExpr(left, right)
-        return self.s()
-    '''
-    s-> exp | factor
-    '''
-    def s(self, e = None) -> Expr:
-        if e:
-            tmp = e
-        else:
-            tmp=self.currtok
-        self.currtok = next(self.tg)
-        if self.currtok.kind=="expo":
-            exp=self.exp(tmp)
-            return exp
-        return self.fact(tmp)
 
-    def fact(self, t=None) -> Expr:
+    def fact(self) -> Expr:
         """
         Fact  → [ - ] Primary
             e.g., -a  -(b+c)  -6    (b+c) a 6
         """
+        left = self.base()
 
-        # only advance to the next token on a successful match.
-        if t:
-            self.currtok = t
+        while self.currtok.kind == "expo":
+            self.currtok = next(self.tg)  # advance to the next token
+
+            right = self.base()
+            left = ExpoExpr(left, right)
+
+        return left
+
+
+    def base(self) -> Expr:
         if self.currtok.kind == "minus":
             self.currtok = next(self.tg)
             tree = self.primary()
@@ -383,8 +364,6 @@ class Parser:
            self.currtok = next(self.tg)
            tree = self.primary()
            return UnaryNegate(tree)
-
-        return self.primary()
 
     def primary(self) -> Expr:
         """
