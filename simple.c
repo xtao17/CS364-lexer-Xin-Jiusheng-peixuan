@@ -4,7 +4,7 @@ int sum_3_or_5 (int n) {
 	sum = 0;
 	i = 0;
 		while (i < n) {
-			if(((i % 3) == 0) || ((i % 5) == 0))
+			if(((i % 3 + 2 - 1) == 0) || ((i % 5) == 0))
 				sum = (sum + i);
  				i = (i + 1);
 
@@ -14,4 +14,5 @@ int sum_3_or_5 (int n) {
 
 int main (int u) {
 	int i;
+	i = 1 + 2 - 3;
 }

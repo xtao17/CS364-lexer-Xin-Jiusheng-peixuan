@@ -314,7 +314,7 @@ class Parser:
 
     def term(self) -> Expr:
         """
-        Term  → Exp { MulOp Exp }
+        Term  → Fact { MulOp Fact }
         """
         left = self.fact()
         while self.currtok.kind in {"multiply", "divide", "mod"}:
@@ -326,31 +326,27 @@ class Parser:
 
     def fact(self) -> Expr:
         """
-        Fact  → [ - ] Primary
-            e.g., -a  -(b+c)  -6    (b+c) a 6
+        Fact  → Base {Expo Base}
         """
         left = self.base()
-
         while self.currtok.kind == "expo":
             self.currtok = next(self.tg)  # advance to the next token
-
             right = self.fact()
             left = ExpoExpr(left, right)
-
         return left
 
     def base(self) -> Expr:
-        if self.currtok.kind == "minus":
+        """
+        Base → [UnaryOp] primary
+        """
+        left = self.primary()
+        if self.currtok.kind in {"minus", "negate"}:
+            op = self.currtok.name
             self.currtok = next(self.tg)
             tree = self.primary()
-            return UnaryMinus(tree)
+            return UnaryOp(tree, op)
 
-        if self.currtok.kind == "negate":
-           self.currtok = next(self.tg)
-           tree = self.primary()
-           return UnaryNegate(tree)
-
-        return self.primary()
+        return left
 
     def primary(self) -> Expr:
         """
@@ -412,6 +408,6 @@ if __name__ == '__main__':
     if len(sys.argv)>1:
         p = Parser(sys.argv[1])
     else:
-        p = Parser("main.c")
+        p = Parser("simple.c")
     t =p.program()
     print(t)

@@ -270,30 +270,13 @@ class MultExpr(Expr):
         return "({0} {1} {2})".format(str(self.left), self.op, str(self.right))
 
 
-class UnaryMinus(Expr):
-    def __init__(self, tree: Expr):
+class UnaryOp(Expr):
+    def __init__(self, tree: Expr, op: str):
         self.tree = tree
+        self.op = op
 
     def __str__(self):
-        return "-({0})".format(str(self.tree))
-
-    def scheme(self):
-        return "(- {0})".format(self.tree.scheme())
-
-    def eval(self):
-        return -self.tree.eval()
-
-class UnaryNegate(Expr):
-    def __init__(self,tree:Expr):
-        self.tree = tree
-
-    def __str__(self):
-
-        return "!({0})".format(str(self.tree))
-
-    def scheme(self):
-
-        return "(! {0})".format(self.tree.scheme())
+        return "{}({})".format(self.op, str(self.tree))
 
 
 class IDExpr(Expr):
