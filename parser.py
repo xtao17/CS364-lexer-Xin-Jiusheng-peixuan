@@ -379,6 +379,12 @@ class Parser:
             return UnaryMinus(tree)
 
         return self.primary()
+        if self.currtok.kind == "negate":
+           self.currtok = next(self.tg)
+           tree = self.primary()
+           return UnaryNegate(tree)
+
+        return self.primary()
 
     def primary(self) -> Expr:
         """
