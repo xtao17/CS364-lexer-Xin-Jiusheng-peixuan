@@ -126,6 +126,7 @@ class Parser:
 
         elif self.currtok.kind == "right-paren":
             self.currtok = next(self.tg)
+            print("hi")
             return ParamExpr(None, None)
 
         raise SLUCSyntaxError("ERROR: Invalid param on line {}".format(self.currtok.loc))
@@ -372,7 +373,7 @@ class Parser:
         if self.currtok.name in ["true", "false"]:
             tmp = self.currtok
             self.currtok = next(self.tg)
-            return Expr(tmp.name)
+            return Expr(tmp.name,None)
 
         # what if we get here we have a problem
         raise SLUCSyntaxError("ERROR: Unexpected token {0} on line {1}".format(self.currtok.name, self.currtok.loc))
@@ -390,6 +391,6 @@ class SLUCSyntaxError(Exception):
 
 
 if __name__ == '__main__':
-    p = Parser('simple.c')
+    p = Parser('main.c')
     t = p.program()
     print(t)
