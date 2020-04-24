@@ -1,6 +1,6 @@
 from lexer import Lexer, Token
 from ast import *
-
+import sys
 """
   Program         →  { FunctionDef }
   FunctionDef     →  Type id ( Params ) { Declarations Statements }
@@ -407,5 +407,6 @@ class SLUCSyntaxError(Exception):
 
 if __name__ == '__main__':
     p = Parser('simple.c')
+
     t = p.program()
     print(t)
