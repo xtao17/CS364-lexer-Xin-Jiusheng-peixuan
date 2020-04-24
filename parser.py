@@ -12,10 +12,12 @@ class Parser:
         self.lex = Lexer(fn)
         self.tg = self.lex.token_generator()
         self.currtok = next(self.tg)
+        #  expression dictionary for DRY rule
         self.ex_dict={
             "real":(lambda x:FloatLitExpr(x)),
             "int":(lambda x:IntLitExpr(x))
         }
+        #  Statement dictionary for DRY rule
         self.stmt_dict = {
             "if":(lambda x: self.ifstatement()),
             "while":(lambda x: self.whilestatement()),
@@ -23,16 +25,17 @@ class Parser:
             "return":(lambda x:self.returnstmt()),
             "ID":(lambda x:self.assignment())
          }
-
+    # function for create a \t based on level
     def formctrl(self) -> str:
         return "\t"*self.level
-
+    # function to check whether id exists or not
     def check_id_exist(self,var_name,id_list):
         if var_name not in id_list:
             return False
         return True
     def program(self) -> Program:
         funcdefs =[]
+        #   append functions until the end of file
         while self.currtok != None and self.currtok.name != "EOF":
             funcdefs.append(self.functiondef())
 
@@ -44,9 +47,11 @@ class Parser:
         currentline = self.currtok.loc
         self.level = 0
         self.var_id.clear()
+        #  check type
         if self.currtok.kind == "Keyword" and self.currtok.name in {"int", "bool", "float"}:
             type = self.currtok.name
             self.currtok = next(self.tg)
+            # check id
             if self.currtok.kind == "ID" or (self.currtok.kind=="Keyword" and self.currtok.name=="main"):
                 if self.check_id_exist(self.currtok.name,self.func_id):
                     raise SLUCSyntaxError("ERROR: ID {} duplicated on line {}".format(self.currtok.name,self.currtok.loc))
