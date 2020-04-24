@@ -194,9 +194,7 @@ class Parser:
             self.currtok = next(self.tg)
             expr = self.expression()
             if self.currtok.kind == "semicolon":
-                print("assigment")
                 self.currtok = next(self.tg)
-                print("level: {}".format(self.level))
                 assign = AssignmentStatement(id, expr, self.formctrl())
                 return assign
         raise SLUCSyntaxError("ERROR: Missing ; on line {}".format(currentline))
@@ -356,7 +354,7 @@ class Parser:
 
     def primary(self) -> Expr:
         """
-        Primary  → ID | INTLIT | ( Expr )
+        Primary  → ID | INTLIT | ( Expr ) | FuncCall
         """
         arguments=[]
         if self.currtok.kind == "ID":
@@ -411,7 +409,6 @@ class SLUCSyntaxError(Exception):
 
 
 if __name__ == '__main__':
-    p = Parser('simple.c')
-
+    p = Parser('main.c')
     t =p.program()
     print(t)

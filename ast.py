@@ -15,6 +15,7 @@ class Expr:
     def __init__(self,left,right):
         self.left=left
         self.right=right
+
     def __str__(self):
         return "{} || {}".format(self.left, self.right)
 
@@ -23,8 +24,10 @@ class Statement:
     def __init__(self, stmt, tabs = ""):
         self.left = stmt
         self.tabs = tabs
+
     def __str__(self):
         return "{}{}\n".format(self.tabs, str(self.left))
+
 
 class Param:
     def __init__(self, left:str, right:Expr, args = None):
@@ -252,9 +255,9 @@ class ReturnStatement(Statement):
     def __init__(self, expr: Expr, tabs = ""):
         self.left = expr
         self.tabs = tabs
+
     def __str__(self):
         return "{}return {};\n".format(self.tabs, str(self.left))
-
 
 
 class MultExpr(Expr):
