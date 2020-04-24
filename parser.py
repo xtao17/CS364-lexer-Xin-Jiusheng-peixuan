@@ -369,8 +369,10 @@ class Parser:
                 self.currtok = next(self.tg)
 
                 return FuncCExpr(func_name,arguments)
+            elif tmp.name in self.var_id:
+                    return IDExpr(tmp.name)
             else:
-                 return IDExpr(tmp.name)
+                raise SLUCSyntaxError("ERROR: Variable {} undefined on line {}".format(tmp.name, tmp.loc))
 
         if self.currtok.kind in self.ex_dict.keys():
             tmp=self.currtok
