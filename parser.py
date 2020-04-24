@@ -1,38 +1,11 @@
 from lexer import Lexer
 from ast import *
 import sys
-"""
-  Program         →  { FunctionDef }
-  FunctionDef     →  Type id ( Params ) { Declarations Statements }
-  Params          →  Type id { , Type id } | ε
-  Declarations    →  { Declaration }
-  Declaration     →  Type  id  ;
-  Type            →  int | bool | float
-  Statements      →  { Statement }
-  Statement       →  ; | Block | Assignment | IfStatement |
-                     WhileStatement |  PrintStmt | ReturnStmt
-  ReturnStmt      →  return Expression ;
-  Block           →  { Statements }
-  Assignment      →  id = Expression ;
-  IfStatement     →  if ( Expression ) Statement [ else Statement ]
-  WhileStatement  →  while ( Expression ) Statement
-  PrintStmt       →  print(PrintArg { , PrintArg })
-  PrintArg        →  Expression | stringlit
-  Expression      →  Conjunction { || Conjunction }
-  Conjunction     →  Equality { && Equality }
-  Equality        →  Relation [ EquOp Relation ]
-  Relation        →  Addition [ RelOp Addition ]
-  Addition        →  Term { AddOp Term }
-  Term            →  Factor { MulOp Factor }
-  Factor          →  [ UnaryOp ] Primary
-  UnaryOp         →  - | !
-  Primary         →  id | intlit | floatlit | ( Expression )
-  RelOp           →  < | <= | > | >=   AddOp           →  + | -  MulOp           →  * | / | %  EquOp           →  == | !=
-"""
 
 
 class Parser:
     def __init__(self, fn: str):
+        #  list for checking variable id and function id
         self.var_id=[]
         self.func_id=[]
         self.level = 0
@@ -54,13 +27,10 @@ class Parser:
     def formctrl(self) -> str:
         return "\t"*self.level
 
-    def check_id_exist(self,var_name,id_list,type):
+    def check_id_exist(self,var_name,id_list):
         if var_name not in id_list:
-            if type=="v":
-                raise SLUCSyntaxError("ERROR: variable {} undefined".format(var_name))
-            if type=="f":
-                raise SLUCSyntaxError("ERROR: function {} undefined".format(var_name))
-
+            return False
+        return True
     def program(self) -> Program:
         funcdefs =[]
         while self.currtok != None and self.currtok.name != "EOF":
@@ -78,6 +48,8 @@ class Parser:
             type = self.currtok.name
             self.currtok = next(self.tg)
             if self.currtok.kind == "ID" or (self.currtok.kind=="Keyword" and self.currtok.name=="main"):
+                if self.check_id_exist(self.currtok.name,self.func_id):
+                    raise SLUCSyntaxError("ERROR: ID {} duplicated on line {}".format(self.currtok.name,self.currtok.loc))
                 self.func_id.append(self.currtok.name)
                 id=IDExpr(self.currtok.name)
                 # add id to parameter list
@@ -136,16 +108,18 @@ class Parser:
             self.currtok = next(self.tg)
             if self.currtok.kind == "ID":
                 #  add id
-                self.var_id.append(self.currtok.name)
-                right = IDExpr(self.currtok.name)
-                self.currtok = next(self.tg)
+                if not self.check_id_exist(self.currtok.name, self.var_id):
+                    self.var_id.append(self.currtok.name)
+                    right = IDExpr(self.currtok.name)
+                    self.currtok = next(self.tg)
+                else:
+                    raise SLUCSyntaxError("ERROR: ID {} duplicated on line {}".format(self.currtok.name, self.currtok.loc))
             else:
                 raise SLUCSyntaxError("ERROR: Invalid declaration on line {}".format(self.currtok))
             if self.currtok.kind=="semicolon":
                 self.currtok = next(self.tg)
                 return Declaration(left, right, self.formctrl())
-        raise SLUCSyntaxError("ERROR: Invalid declaration on line {}".format(self.currtok))
-
+        raise SLUCSyntaxError("ERROR: Invalid declaration on line {}".format(self.currtok.loc))
 
     def statement(self) -> Statement:
         if self.currtok.kind == "semicolon":  # using ID in expression
@@ -186,9 +160,10 @@ class Parser:
 
     def assignment(self) -> Statement:
         currentline = self.currtok.loc
-        self.check_id_exist(self.currtok.name,self.var_id,"v")
-        id = IDExpr(self.currtok.name)
-
+        if self.check_id_exist(self.currtok.name,self.var_id):
+            id = IDExpr(self.currtok.name)
+        else:
+            raise SLUCSyntaxError("ERROR: Variable {} not defined on line {}".format(self.currtok.name, self.currtok.loc))
         self.currtok = next(self.tg)
         if self.currtok.kind == "assignment":
             self.currtok = next(self.tg)
@@ -197,7 +172,7 @@ class Parser:
                 self.currtok = next(self.tg)
                 assign = AssignmentStatement(id, expr, self.formctrl())
                 return assign
-        raise SLUCSyntaxError("ERROR: Missing ; on line {}".format(currentline))
+        raise SLUCSyntaxError("ERROR: Invalid Assignment on line {}".format(currentline))
 
     def ifstatement(self) -> Statement:
         self.level += 1
@@ -314,7 +289,7 @@ class Parser:
 
     def term(self) -> Expr:
         """
-        Term  → Exp { MulOp Exp }
+        Term  → Fact { MulOp Fact }
         """
         left = self.fact()
         while self.currtok.kind in {"multiply", "divide", "mod"}:
@@ -326,31 +301,27 @@ class Parser:
 
     def fact(self) -> Expr:
         """
-        Fact  → [ - ] Primary
-            e.g., -a  -(b+c)  -6    (b+c) a 6
+        Fact  → Base {Expo Base}
         """
         left = self.base()
-
         while self.currtok.kind == "expo":
             self.currtok = next(self.tg)  # advance to the next token
-
             right = self.fact()
             left = ExpoExpr(left, right)
-
         return left
 
     def base(self) -> Expr:
-        if self.currtok.kind == "minus":
+        """
+        Base → [UnaryOp] primary
+        """
+        left = self.primary()
+        if self.currtok.kind in {"minus", "negate"}:
+            op = self.currtok.name
             self.currtok = next(self.tg)
             tree = self.primary()
-            return UnaryMinus(tree)
+            return UnaryOp(tree, op)
 
-        if self.currtok.kind == "negate":
-           self.currtok = next(self.tg)
-           tree = self.primary()
-           return UnaryNegate(tree)
-
-        return self.primary()
+        return left
 
     def primary(self) -> Expr:
         """
@@ -362,13 +333,16 @@ class Parser:
             tmp = self.currtok
             self.currtok=next(self.tg)
             if self.currtok.kind=="left-paren":
-                self.check_id_exist(func_name, self.func_id,"f")
-                self.currtok=next(self.tg)
-                while(self.currtok.kind!="right-paren"):
-                    arguments.append(self.expression())
-                self.currtok = next(self.tg)
+                if self.check_id_exist(func_name, self.func_id):
+                    self.currtok=next(self.tg)
+                    while(self.currtok.kind!="right-paren"):
+                        arguments.append(self.expression())
+                    tmp=self.currtok
+                    self.currtok = next(self.tg)
 
-                return FuncCExpr(func_name,arguments)
+                    return FuncCExpr(func_name,arguments)
+                else:
+                    raise SLUCSyntaxError("ERROR: Function {} not defined on line {}".format(tmp.name, tmp.loc) )
             elif tmp.name in self.var_id:
                     return IDExpr(tmp.name)
             else:
@@ -411,6 +385,9 @@ class SLUCSyntaxError(Exception):
 
 
 if __name__ == '__main__':
-    p = Parser('simple.c')
+    if len(sys.argv)>1:
+        p = Parser(sys.argv[1])
+    else:
+        p = Parser("main.c")
     t =p.program()
     print(t)

@@ -17,7 +17,7 @@ class Expr:
         self.right=right
 
     def __str__(self):
-        return "{} || {}".format(self.left, self.right)
+        return "({} || {})".format(self.left, self.right)
 
 
 class Statement:
