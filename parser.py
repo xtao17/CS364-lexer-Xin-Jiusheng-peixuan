@@ -39,7 +39,6 @@ class Parser:
         self.tg = self.lex.token_generator()
         self.currtok = next(self.tg)
         self.ex_dict={
-            "ID":(lambda x: IDExpr(x)),
             "real":(lambda x:FloatLitExpr(x)),
             "int":(lambda x:IntLitExpr(x))
         }
@@ -126,7 +125,6 @@ class Parser:
 
         elif self.currtok.kind == "right-paren":
             self.currtok = next(self.tg)
-            print("hi")
             return ParamExpr(None, None)
 
         raise SLUCSyntaxError("ERROR: Invalid param on line {}".format(self.currtok.loc))
@@ -351,13 +349,26 @@ class Parser:
         """
         Primary  → ID | INTLIT | ( Expr )
         """
+        arguments=[]
+        if self.currtok.kind == "ID":
+            func_name=self.currtok.name
+            tmp = self.currtok
+            self.currtok=next(self.tg)
+            if self.currtok.kind=="left-paren":
+                self.currtok=next(self.tg)
+                while(self.currtok.kind!="right-paren"):
+                    arguments.append(self.expression())
+                self.currtok = next(self.tg)
+
+                return FuncCExpr(func_name,arguments)
+            else:
+                 return IDExpr(tmp.name)
 
         if self.currtok.kind in self.ex_dict.keys():
-            if(self.currtok.kind=="ID"):
-                self.check_id_exist(self.currtok.name, self.var_id)
             tmp=self.currtok
             self.currtok=next(self.tg)
             return self.ex_dict[tmp.kind](tmp.name)
+
 
         # parse a parenthesized expression
         if self.currtok.kind == "left-paren":
@@ -373,7 +384,7 @@ class Parser:
         if self.currtok.name in ["true", "false"]:
             tmp = self.currtok
             self.currtok = next(self.tg)
-            return Expr(tmp.name,None)
+            return BoolExpr(tmp.name)
 
         # what if we get here we have a problem
         raise SLUCSyntaxError("ERROR: Unexpected token {0} on line {1}".format(self.currtok.name, self.currtok.loc))
@@ -391,6 +402,6 @@ class SLUCSyntaxError(Exception):
 
 
 if __name__ == '__main__':
-    p = Parser('main.c')
+    p = Parser('simple.c')
     t = p.program()
     print(t)
