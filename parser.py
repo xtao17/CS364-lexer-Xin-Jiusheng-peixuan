@@ -54,15 +54,9 @@ class Parser:
 
     def check_id_exist(self,var_name,id_list):
         if var_name not in id_list:
-            var_id=[]
-            for element in self.var_id:
-                var_id.append(element[0])
-            if id_list==var_id:
+            if id_list==self.var_id:
                 raise SLUCSyntaxError("ERROR: variable {} undefine".format(var_name))
-            func_id=[]
-            for element in self.func_id:
-                func_id.append(element[0])
-            if id_list==func_id:
+            if id_list==self.func_id:
                 raise SLUCSyntaxError("ERROR: function {} undefine".format(var_name))
     def program(self) -> Program:
 
@@ -80,7 +74,7 @@ class Parser:
             type = self.currtok.name
             self.currtok = next(self.tg)
             if self.currtok.kind == "ID":
-                self.func_id.append([self.currtok.name,type])
+                self.func_id.append(self.currtok.name)
                 id=IDExpr(self.currtok.name)
                 # add id to parameter list
                 self.currtok = next(self.tg)
@@ -116,7 +110,7 @@ class Parser:
             left = self.currtok.name
             self.currtok = next(self.tg)
             if self.currtok.kind == "ID":
-                self.var_id.append([self.currtok.name,left])
+                self.var_id.append(self.currtok.name)
                 right = IDExpr(self.currtok.name)
                 self.currtok = next(self.tg)
             else:
@@ -128,13 +122,13 @@ class Parser:
                 args.append(self.currtok.name)
                 self.currtok = next(self.tg)
                 args.append(IDExpr(self.currtok.name))
-                self.var_id.append([self.currtok.name,type])
+                self.var_id.append(self.currtok.name)
                 self.currtok = next(self.tg)
-            return ParamExpr(left, right, args)
+            return Param(left, right, args)
 
         elif self.currtok.kind == "right-paren":
             self.currtok = next(self.tg)
-            return ParamExpr(None, None)
+            return Param(None, None)
 
         raise SLUCSyntaxError("ERROR: Invalid param on line {}".format(self.currtok.loc))
 
@@ -149,7 +143,7 @@ class Parser:
                 self.currtok = next(self.tg)
             if self.currtok.kind=="semicolon":
                 self.currtok = next(self.tg)
-                return DecExpr(left, right)
+                return Declaration(left, right)
         raise SLUCSyntaxError("ERROR: Invalid declaration on line {}".format(self.currtok))
 
 
@@ -157,7 +151,7 @@ class Parser:
         if self.currtok.kind == "semicolon":  # using ID in expression
             tmp = self.currtok
             self.currtok = next(self.tg)
-            return StmtExpr(tmp.name)
+            return Statement(tmp.name)
         if self.currtok.kind == "left-brace":
             print(self.currtok.name)
             return self.block()
@@ -179,7 +173,7 @@ class Parser:
         if self.currtok.kind == "semicolon":
             print("returnstmt")
             self.currtok = next(self.tg)
-            return ReturnExpr(expr)
+            return ReturnStatement(expr)
         raise SLUCSyntaxError("ERROR: Missing ; on line {}".format(currentline))
 
     def block(self) -> Expr:
@@ -189,7 +183,7 @@ class Parser:
         while self.currtok.kind != "right-brace":
             stmts.append(self.statement())
         self.currtok = next(self.tg)
-        return BlockExpr(stmt, stmts)
+        return BlockStatement(stmt, stmts)
 
     def assignment(self) -> Expr:
         currentline = self.currtok.loc
@@ -202,7 +196,7 @@ class Parser:
             if self.currtok.kind == "semicolon":
                 print("assigment")
                 self.currtok = next(self.tg)
-                assign = AssignmentExpr(id, expr)
+                assign = AssignmentStatement(id, expr)
                 return assign
         raise SLUCSyntaxError("ERROR: Missing ; on line {}".format(currentline))
 
@@ -222,9 +216,9 @@ class Parser:
                     print("elseStatement")
                     self.currtok = next(self.tg)
                     elsestmt = self.statement()
-                    return IfExpr(expr, stmt, elsestmt)
+                    return IfStatement(expr, stmt, elsestmt)
 
-                return IfExpr(expr, stmt)
+                return IfStatement(expr, stmt)
 
         raise SLUCSyntaxError("ERROR: Invalid ifstatement on line {}".format(currentline))
 
@@ -239,7 +233,7 @@ class Parser:
                 print("right-paren")
                 self.currtok = next(self.tg)
                 stmt = self.statement()
-                return WhileExpr(expr, stmt)
+                return WhileStatement(expr, stmt)
         raise SLUCSyntaxError("ERROR: Invalid whilestatement on line {}".format(currentline))
 
     def printstmt(self) -> Expr:
@@ -258,7 +252,7 @@ class Parser:
             prtargs.append(self.printarg())
         if self.currtok.kind == "right-paren":
             self.currtok = next(self.tg)
-            left = PrintStmtExpr(prtarg, prtargs)
+            left = PrintStatement(prtarg, prtargs)
             return left
         raise SLUCSyntaxError("ERROR: Invalid print statement on line {}".format(currentline))
 

@@ -10,40 +10,25 @@ Interpreter Pattern
 design patterns - catalog of best practices in software design
 """
 from typing import Sequence, Union, Optional
-
-
-# Use a class hierarchy to represent types.
+# Expr, Statements, FunctionDef,Pram
 class Expr:
-    def __init__(self, left, right):
-        self.left = left
-        self.right = right
-
+    def __init__(self,left,right):
+        self.left=left
+        self.right=right
     def __str__(self):
         return "{} || {}".format(self.left, self.right)
 
 
-class FunctionDef:
-    def __init__(self, type: str, id: Expr, params: Expr, decls: Expr, stmts: Expr):
-        self.type = type
-        self.id = id
-        self.params = params
-        self.decls = decls
-        self.stmts = stmts
+class Statement:
+    def __init__(self, stmt):
+        self.stmt = stmt
 
     def __str__(self):
-        declstr =""
-        stmtstr = ""
-        for d in self.decls:
-            declstr += str(d) + "\t"
-        for i in range(0, len(self.stmts)):
-            if i == len(self.stmts) - 1:
-                stmtstr += str(self.stmts[i])
-            else:
-                stmtstr += str(self.stmts[i]) + "\t"
-        return "{0} {1} ({2}) {{\n\t{3}{4}}}".format(self.type, str(self.id),str(self.params),declstr,stmtstr)
+        if self.stmt == ";":
+            return ";\n"
+        return "{}\n".format(str(self.stmt))
 
-
-class ParamExpr:
+class Param:
     def __init__(self, left:str, right:Expr, args = None):
         self.left=left
         self.right=right
@@ -64,8 +49,28 @@ class ParamExpr:
             return "{0} {1}{2}".format((str(self.left)), str(self.right), params)
         return "{0} {1}".format(str(self.left), str(self.right))
 
+class FunctionDef:
+    def __init__(self, type: str, id: Expr, params: Expr, decls: Expr, stmts: Statement):
+        self.type = type
+        self.id = id
+        self.params = params
+        self.decls = decls
+        self.stmts = stmts
 
-class Program(FunctionDef):
+    def __str__(self):
+        declstr =""
+        stmtstr = ""
+        for d in self.decls:
+            declstr += str(d) + "\t"
+        for i in range(0, len(self.stmts)):
+            if i == len(self.stmts) - 1:
+                stmtstr += str(self.stmts[i])
+            else:
+                stmtstr += str(self.stmts[i]) + "\t"
+        return "{0} {1} ({2}) {{\n\t{3}{4}}}".format(self.type, str(self.id),str(self.params),declstr,stmtstr)
+
+
+class Program:
     def __init__(self, funcs: Sequence[FunctionDef]):
         self.funcs = funcs
 
@@ -135,7 +140,7 @@ class ConjExpr(Expr):
         return "({0} && {1})".format(str(self.left), str(self.right))
 
 
-class DecExpr(Expr):
+class Declaration:
     def __init__(self, left: str, right: Expr):
         self.left = left
         self.right = right
@@ -180,7 +185,7 @@ class RelatExpr(Expr):
         return self.left.eval() +  self.right.eval()
 
 
-class PrintStmtExpr(Expr):
+class PrintStatement(Statement):
     def __init__(self, prtarg: Expr, prtargs: Expr):
         self.prtarg = prtarg
         self.prtargs = prtargs
@@ -194,18 +199,18 @@ class PrintStmtExpr(Expr):
         return "print({})".format(str(self.prtarg))
 
 
-class WhileExpr(Expr):
+class WhileStatement(Statement):
     def __init__(self, left: Expr, right: Expr):
         self.left = left
         self.right = right
 
     def __str__(self):
-        if type(self.right) == BlockExpr:
+        if type(self.right) == BlockStatement:
             print ("block111111111111")
         return "while {} {}".format(str(self.left), str(self.right))
 
 
-class IfExpr(Expr):
+class IfStatement(Statement):
     def __init__(self, expr: Expr, stmt: Expr, elsestmt: Expr = None):
         self.expr = expr
         self.stmt = stmt
@@ -216,7 +221,7 @@ class IfExpr(Expr):
         return "if({0}) {1}".format(str(self.expr), str(self.stmt))
 
 
-class AssignmentExpr(Expr):
+class AssignmentStatement(Statement):
     def __init__(self, left: Expr, right: Expr):
         self.left = left
         self.right = right
@@ -225,7 +230,7 @@ class AssignmentExpr(Expr):
         return "{} = {};\n".format(str(self.left), str(self.right))
 
 
-class BlockExpr(Expr):
+class BlockStatement(Statement):
     def __init__(self, stmt: Expr, args: Expr):
         self.stmt = stmt
         self.args = args
@@ -240,21 +245,13 @@ class BlockExpr(Expr):
         return "{{\n{0}}}\n".format(str(self.stmt))
 
 
-class ReturnExpr(Expr):
+class ReturnStatement(Statement):
     def __init__(self, expr: Expr):
         self.expr = expr
 
     def __str__(self):
         return "return {};\n".format(str(self.expr))
 
-class StmtExpr(Expr):
-    def __init__(self, stmt):
-        self.stmt = stmt
-
-    def __str__(self):
-        if self.stmt == ";":
-            return ";\n"
-        return "{}\n".format(str(self.stmt))
 
 
 class MultExpr(Expr):
