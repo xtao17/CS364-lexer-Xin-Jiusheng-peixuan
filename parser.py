@@ -54,11 +54,11 @@ class Parser:
     def formctrl(self) -> str:
         return "\t"*self.level
 
-    def check_id_exist(self,var_name,id_list):
+    def check_id_exist(self,var_name,id_list,type):
         if var_name not in id_list:
-            if id_list==self.var_id:
+            if type=="v":
                 raise SLUCSyntaxError("ERROR: variable {} undefined".format(var_name))
-            if id_list==self.func_id:
+            if type=="f":
                 raise SLUCSyntaxError("ERROR: function {} undefined".format(var_name))
 
     def program(self) -> Program:
@@ -186,7 +186,7 @@ class Parser:
 
     def assignment(self) -> Statement:
         currentline = self.currtok.loc
-        self.check_id_exist(self.currtok.name,self.var_id)
+        self.check_id_exist(self.currtok.name,self.var_id,"v")
         id = IDExpr(self.currtok.name)
 
         self.currtok = next(self.tg)
@@ -375,7 +375,7 @@ class Parser:
             tmp = self.currtok
             self.currtok=next(self.tg)
             if self.currtok.kind=="left-paren":
-                self.check_id_exist(func_name, self.func_id)
+                self.check_id_exist(func_name, self.func_id,"f")
                 self.currtok=next(self.tg)
                 while(self.currtok.kind!="right-paren"):
                     arguments.append(self.expression())
