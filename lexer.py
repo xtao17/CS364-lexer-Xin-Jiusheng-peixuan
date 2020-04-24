@@ -38,6 +38,7 @@ class Token:
     lbracket = "\["
     rbracket = "\]"
     mod = "%"
+    expo = "\*\*"
     negate = "!"
     mul = "\*"
     div = "\/"
@@ -77,7 +78,8 @@ class Token:
         div: "divide",
         arrayAccess: "arrayAccess",
         leftShift: "shift left",
-        rightShift: "shift right"
+        rightShift: "shift right",
+        expo : "expo"
     }
     '''
     constructor take the token and the location
@@ -131,7 +133,7 @@ class Lexer:
                (>>)|(>=) |(=)|
                ((?<!e)\+)   |
                ((?<!e)-)    |
-               (\*) |(\/) |(\%) |
+               (\*?\*) |(\/) |(\%) |
                (\! ) |
                (\; |\, |\{ |\} |\( |\)) # punctuation
             """,
