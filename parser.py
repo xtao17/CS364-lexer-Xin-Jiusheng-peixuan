@@ -409,6 +409,9 @@ class SLUCSyntaxError(Exception):
 
 
 if __name__ == '__main__':
-    p = Parser('main.c')
+    if len(sys.argv)>1:
+        p = Parser(sys.argv[1])
+    else:
+        p = Parser("main.c")
     t =p.program()
     print(t)
