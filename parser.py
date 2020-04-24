@@ -50,11 +50,19 @@ class Parser:
             "ID":(lambda x:self.assignment())
          }
 
+
+
     def check_id_exist(self,var_name,id_list):
         if var_name not in id_list:
-            if id_list==self.var_id:
+            var_id=[]
+            for element in self.var_id:
+                var_id.append(element[0])
+            if id_list==var_id:
                 raise SLUCSyntaxError("ERROR: variable {} undefine".format(var_name))
-            if id_list==self.func_id:
+            func_id=[]
+            for element in self.func_id:
+                func_id.append(element[0])
+            if id_list==func_id:
                 raise SLUCSyntaxError("ERROR: function {} undefine".format(var_name))
     def program(self) -> Program:
 
@@ -72,7 +80,7 @@ class Parser:
             type = self.currtok.name
             self.currtok = next(self.tg)
             if self.currtok.kind == "ID":
-                self.func_id.append(self.currtok.name)
+                self.func_id.append([self.currtok.name,type])
                 id=IDExpr(self.currtok.name)
                 # add id to parameter list
                 self.currtok = next(self.tg)
@@ -108,7 +116,7 @@ class Parser:
             left = self.currtok.name
             self.currtok = next(self.tg)
             if self.currtok.kind == "ID":
-                self.var_id.append(self.currtok.name)
+                self.var_id.append([self.currtok.name,left])
                 right = IDExpr(self.currtok.name)
                 self.currtok = next(self.tg)
             else:
@@ -116,10 +124,11 @@ class Parser:
 
             while (self.currtok.kind == "comma"):
                 self.currtok = next(self.tg)
+                type=self.currtok.name
                 args.append(self.currtok.name)
                 self.currtok = next(self.tg)
                 args.append(IDExpr(self.currtok.name))
-                self.var_id.append(self.currtok.name)
+                self.var_id.append([self.currtok.name,type])
                 self.currtok = next(self.tg)
             return ParamExpr(left, right, args)
 
