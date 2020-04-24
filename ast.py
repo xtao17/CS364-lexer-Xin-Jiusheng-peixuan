@@ -280,6 +280,19 @@ class UnaryMinus(Expr):
     def eval(self):
         return -self.tree.eval()
 
+class UnaryNegate(Expr):
+    def __init__(self,tree:Expr):
+        self.tree = tree
+
+    def __str__(self):
+
+        return "!({0})".format(str(self.tree))
+
+    def scheme(self):
+
+        return "(! {0})".format(self.tree.scheme())
+
+
 class IDExpr(Expr):
 
     def __init__(self, id: str):
