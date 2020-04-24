@@ -188,9 +188,11 @@ class Parser:
         currentline = self.currtok.loc
         self.check_id_exist(self.currtok.name,self.var_id)
         id = IDExpr(self.currtok.name)
+
         self.currtok = next(self.tg)
         if self.currtok.kind == "assignment":
             self.currtok = next(self.tg)
+            print(self.currtok.name)
             expr = self.expression()
             if self.currtok.kind == "semicolon":
                 print("assigment")
@@ -325,25 +327,52 @@ class Parser:
 
     def term(self) -> Expr:
         """
-        Term  → Fact { * Fact }
+        Term  → Exp { MulOp Exp }
         """
-        left = self.fact()
-
+        left = self.exp()
         while self.currtok.kind in {"multiply", "divide", "mod"}:
             op = self.currtok.name
             self.currtok = next(self.tg)
-            right = self.fact()
+            right = self.exp()
             left = MultExpr(left, right, op)
-
         return left
+    def exp(self, e = None)-> Expr:
+        '''
+        Exp -> exp_back_last_first {ExponentialOp Exp}
+        '''
+        if e:
+            left = self.s(e)
+        else:
+            left = self.currtok
+        while self.currtok.kind=="expo":
+            print("there")
+            self.currtok = next(self.tg)
+            right = self.s()
+            left = ExpoExpr(left, right)
+        return self.s()
+    '''
+    s-> exp | factor
+    '''
+    def s(self, e = None) -> Expr:
+        if e:
+            tmp = e
+        else:
+            tmp=self.currtok
+        self.currtok = next(self.tg)
+        if self.currtok.kind=="expo":
+            exp=self.exp(tmp)
+            return exp
+        return self.fact(tmp)
 
-    def fact(self) -> Expr:
+    def fact(self, t=None) -> Expr:
         """
         Fact  → [ - ] Primary
             e.g., -a  -(b+c)  -6    (b+c) a 6
         """
 
         # only advance to the next token on a successful match.
+        if t:
+            self.currtok = t
         if self.currtok.kind == "minus":
             self.currtok = next(self.tg)
             tree = self.primary()

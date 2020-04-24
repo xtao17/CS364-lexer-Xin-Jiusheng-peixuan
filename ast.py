@@ -329,6 +329,14 @@ class FuncCExpr(Expr):
         return "{0}()".format(str(self.left))
 
 
+class ExpoExpr(Expr):
+    def __init__(self, left: Expr, right: Expr):
+        self.left = left
+        self.right = right
+
+    def __str__(self):
+        return "({} ** {})".format(str(self.left), str(self.right))
+
 if __name__ == '__main__':
     """
     Represent a + b + c * d
