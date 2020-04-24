@@ -98,6 +98,13 @@ class SLUCTypeError(Exception):
     def __str__(self):
         return self.message
 
+class BoolExpr(Expr):
+    def __init__(self, bool: str):
+        self.bool = bool
+
+    def __str__(self):
+        return "{}".format(self.bool)
+
 
 class AddExpr(Expr):
     def __init__(self, left: Expr, right: Expr):
@@ -308,7 +315,18 @@ class FloatLitExpr(Expr):
     def __str__(self):
         return str(self.floatlit)
 
+class FuncCExpr(Expr):
+    def __init__(self, left: Expr, right: Sequence[FunctionDef]):
+        self.left = left
+        self.right = right
 
+    def __str__(self):
+        if self.right:
+            args = ""
+            for arg in self.right:
+                args += str(arg)
+            return "{0}({1})".format(str(self.left), args)
+        return "{0}()".format(str(self.left))
 
 
 if __name__ == '__main__':
