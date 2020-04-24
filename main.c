@@ -1,32 +1,43 @@
-float f(int n) {
-     float z;
-     // What is the "environment" in which we run f?
+// Test #1 Euler project problem 1
 
-     z = 2.141;
-     return 3.14159 * n * n + z;
+int sum_3_or_5(int n) {
+
+int sum;
+int i;
+sum = 0;
+ i = 0;
+
+while (i < n) {
+
+    if (i % 3 == 0 || i % 5 == 0)
+    sum = sum + i; i = i + 1;
+
 }
 
+return sum;
+
+}
+ //print("The answer is: ", sum_3_or_5(1000), "Woot!");
+
+int main(int u) {
+int i;
+}
+// Test #2 A program that determines if // a number n is prime
 int main() {
-    int a;
-    float b;
-    bool c;
 
-    b = f(21);  // 21 gets passed to n
+    bool prime; int i;
+    int n;
+    i = 2;
+    n = 1234567; prime = true;
+    // where to start checking divisors
+    // number checking to see if prime
 
-    // a statement does not have a type, but the LHS and the RHS do have types
-    // and those must "agree".
-    a = 5;   // type check?
+    while (prime && i < n/2.0) {
 
-    // legal, truncate the value?
-    a = a * 3.14159;  // warning. int(3.14159)   (int) 3.14159
+        if(n%i==0) //is n divisible by i?
+            prime = false;
+        i=i+1;
+     }
 
-    // int * float should be a float
-
-    a = c;  // Illegal can't assign a bool to an int
-
-    // condition should be a boolean
-    // A statement "type checks" if all of the components type check
-    if (a < 10 && c) {
-        a = 0;
-    }
+    print(i-1);
 }
