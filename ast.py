@@ -232,7 +232,7 @@ class AssignmentStatement(Statement):
         self.tabs = tabs
 
     def __str__(self):
-        return "{}{} = {};\n".format(self.tabs, str(self.left), str(self.right))
+        return "{0}{1} = {2};\n".format(self.tabs, str(self.left), str(self.right))
 
 
 class BlockStatement(Statement):
@@ -246,9 +246,9 @@ class BlockStatement(Statement):
             stmtargs = ""
             for arg in self.right:
                 stmtargs += self.tabs + str(arg) + "\n"
-            return "{{\n{} {}{}}}\n".format(str(self.left), stmtargs, self.tabs)
+            return "{2}{{\n{0} {1}{2}}}\n".format(str(self.left), stmtargs, self.tabs)
 
-        return "{{\n{}{}}}\n".format(str(self.left), self.tabs)
+        return "{1}{{\n{0}{1}}}\n".format(str(self.left), self.tabs)
 
 
 class ReturnStatement(Statement):
