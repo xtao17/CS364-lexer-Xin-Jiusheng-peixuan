@@ -16,5 +16,19 @@ int sum_3_or_5 (int n) {
 int a(int a,int b) {
 	int i;
 	i = 1 + 2 - 3;
-	print(sum_3_or_5(1||2||3))
+	print("str", sum_3_or_5(1), 1);
+}
+
+int main () {
+	int a;
+	float b;
+	bool c;
+
+	a = 5;
+	a = (a * 3.14159);
+	a = c;
+		if(((a < 10) && c))
+	{
+		a = 0;
+		}
 }

@@ -287,6 +287,43 @@ class Parser:
 
         return left
 
+    def funcC(self, f_id) -> Expr:
+        """
+        FuncC → id (farg {, farg})
+         """
+        left = self.farg()
+        args = []
+        while self.currtok.kind == "comma":
+            self.currtok = next(self.tg)
+            args.append(self.farg())
+        if self.currtok.kind == "right-paren":
+            self.currtok = next(self.tg)
+            left = FuncCExpr(f_id, left, args)
+            return left
+
+        raise SLUCSyntaxError("ERROR: Invalid function call on line {}".format(self.currtok.loc))
+
+    def farg(self) -> Farg:
+        """
+        Farg → id | intlit | float | epsilon
+        """
+        if self.currtok.kind == "ID":
+            if self.check_id_exist(self.currtok.name, self.var_id):
+                tmp = self.currtok
+                self.currtok = next(self.tg)
+                return Farg(tmp.name)
+            else:
+                raise SLUCSyntaxError("ERROR: Variable {} undefined on line {} ".format(self.currtok.name, self.currtok.loc))
+        else:
+            if self.currtok.kind in {"int", "real"}:
+                tmp = self.currtok
+                self.currtok = next(self.tg)
+                return Farg(tmp.name)
+            if self.currtok.kind == "right-paren":
+                self.currtok = next(self.tg)
+                return Farg("")
+        raise SLUCSyntaxError("ERROR: Invalid function argument {} on line {} ".format(self.currtok.name, self.currtok.loc))
+
     def term(self) -> Expr:
         """
         Term  → Fact { MulOp Fact }
@@ -335,12 +372,7 @@ class Parser:
             if self.currtok.kind=="left-paren":
                 if self.check_id_exist(func_name, self.func_id):
                     self.currtok=next(self.tg)
-                    while(self.currtok.kind!="right-paren"):
-                        arguments.append(self.expression())
-                    tmp=self.currtok
-                    self.currtok = next(self.tg)
-
-                    return FuncCExpr(func_name,arguments)
+                    return self.funcC(tmp.name)
                 else:
                     raise SLUCSyntaxError("ERROR: Function {} not defined on line {}".format(tmp.name, tmp.loc) )
             elif tmp.name in self.var_id:
@@ -388,6 +420,6 @@ if __name__ == '__main__':
     if len(sys.argv)>1:
         p = Parser(sys.argv[1])
     else:
-        p = Parser("main.c")
+        p = Parser("simple.c")
     t =p.program()
     print(t)

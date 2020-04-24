@@ -315,17 +315,29 @@ class FloatLitExpr(Expr):
         return str(self.floatlit)
 
 class FuncCExpr(Expr):
-    def __init__(self, left: Expr, right: Sequence[Expr]):
+    def __init__(self, f_id: str, left: Expr, right: Sequence[Expr]):
+        self.f_id = f_id
         self.left = left
         self.right = right
 
     def __str__(self):
         if self.right:
-            args = ""
-            for arg in self.right:
-                args += str(arg)
-            return "{0}({1})".format(str(self.left), args)
-        return "{0}()".format(str(self.left))
+            args = ", "
+            for i in range(0, len(self.right)):
+                if i == len(self.right) - 1:
+                    args += str(self.right[i])
+                else:
+                    args += str(self.right[i]) + ", "
+            return "{}({}{})".format(self.f_id, str(self.left), args)
+        return "{}({})".format(self.f_id, str(self.left))
+
+
+class Farg:
+    def __init__(self, arg: str):
+        self.farg = arg
+
+    def __str__(self):
+        return "{}".format(self.farg)
 
 
 class ExpoExpr(Expr):
