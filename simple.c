@@ -15,7 +15,7 @@ int sum_3_or_5(int n) {
  }
  return sum;
 }
-int sum() {
+int main() {
 
  print("The answer is: ", sum_3_or_5(1000 || n));
 }

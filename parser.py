@@ -55,9 +55,9 @@ class Parser:
     def check_id_exist(self,var_name,id_list):
         if var_name not in id_list:
             if id_list==self.var_id:
-                raise SLUCSyntaxError("ERROR: variable {} undefine".format(var_name))
+                raise SLUCSyntaxError("ERROR: variable {} undefined".format(var_name))
             if id_list==self.func_id:
-                raise SLUCSyntaxError("ERROR: function {} undefine".format(var_name))
+                raise SLUCSyntaxError("ERROR: function {} undefined".format(var_name))
     def program(self) -> Program:
 
         funcdefs =[]
@@ -73,7 +73,7 @@ class Parser:
         if self.currtok.kind == "Keyword" and self.currtok.name in {"int", "bool", "float"}:
             type = self.currtok.name
             self.currtok = next(self.tg)
-            if self.currtok.kind == "ID":
+            if self.currtok.kind == "ID" or (self.currtok.kind=="Keyword" and self.currtok.name=="main"):
                 self.func_id.append(self.currtok.name)
                 id=IDExpr(self.currtok.name)
                 # add id to parameter list
@@ -358,6 +358,7 @@ class Parser:
             tmp = self.currtok
             self.currtok=next(self.tg)
             if self.currtok.kind=="left-paren":
+                self.check_id_exist(func_name, self.func_id)
                 self.currtok=next(self.tg)
                 while(self.currtok.kind!="right-paren"):
                     arguments.append(self.expression())
@@ -377,7 +378,7 @@ class Parser:
         if self.currtok.kind == "left-paren":
             self.currtok = next(self.tg)
             print("expr")
-            tree = self.expression()  # TODO Keeps changing!
+            tree = self.expression()
             if self.currtok.kind == "right-paren":
                 self.currtok = next(self.tg)
                 return tree
