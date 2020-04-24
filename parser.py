@@ -1,9 +1,17 @@
+'''
+Xin, Jiusheng, Peixuan
+
+'''
 from lexer import Lexer
 from ast import *
 import sys
 
 
 class Parser:
+    '''
+        Parser class is used to implement SLUC grammar
+
+    '''
     def __init__(self, fn: str):
         #  list for checking variable id and function id
         self.var_id=[]
@@ -40,7 +48,6 @@ class Parser:
             funcdefs.append(self.functiondef())
 
         return Program(funcdefs)
-
     def functiondef(self) -> FunctionDef:
         stms = []
         decs = []
@@ -59,11 +66,13 @@ class Parser:
                 id=IDExpr(self.currtok.name)
                 # add id to parameter list
                 self.currtok = next(self.tg)
+                # dealing with parameters
                 if self.currtok.kind == "left-paren":
                     self.currtok = next(self.tg)
                     parm = self.params()
                     if self.currtok.kind == "right-paren":
                         self.currtok = next(self.tg)
+                # dealing with braces
                     if self.currtok.kind == "left-brace":
                         self.level += 1
                         self.currtok = next(self.tg)
@@ -132,7 +141,6 @@ class Parser:
             self.currtok = next(self.tg)
             return Statement(tmp.name)
         if self.currtok.kind == "left-brace":
-
             return self.block()
 
         if self.currtok.kind == "Keyword":
@@ -183,6 +191,7 @@ class Parser:
         self.level += 1
         currentline = self.currtok.loc
         self.currtok = next(self.tg)
+        #  dealing with conditions
         if self.currtok.kind == "left-paren":
             self.currtok = next(self.tg)
             expr = self.expression()
@@ -205,6 +214,7 @@ class Parser:
         self.level += 1
         currentline = self.currtok.loc
         self.currtok = next(self.tg)
+        # dealing with conditions
         if self.currtok.kind == "left-paren":
             self.currtok = next(self.tg)
             expr = self.expression()
@@ -425,6 +435,6 @@ if __name__ == '__main__':
     if len(sys.argv)>1:
         p = Parser(sys.argv[1])
     else:
-        p = Parser("simple.c")
+        p = Parser("main.c")
     t =p.program()
     print(t)

@@ -16,11 +16,13 @@ int sum_3_or_5 (int n) {
 int a(int a,int b) {
 	int i;
 	i = 1 + 2 - 3;
-	print("str", sum_3_or_5(1), 1);
+	if(sum_3_or_5(1,a)==2)
+        print(a);
+    print(a)
 }
 
 int main () {
-	int a;
+    int a;
 	float b;
 	bool c;
 
