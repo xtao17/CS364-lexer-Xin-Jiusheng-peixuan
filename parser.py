@@ -347,7 +347,7 @@ class Parser:
         while self.currtok.kind == "expo":
             self.currtok = next(self.tg)  # advance to the next token
 
-            right = self.base()
+            right = self.fact()
             left = ExpoExpr(left, right)
 
         return left

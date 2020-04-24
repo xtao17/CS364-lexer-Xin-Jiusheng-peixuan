@@ -12,7 +12,9 @@ int sum_3_or_5(int n) {
  if (i % 3 == 0 || i % 5 == 0)
  sum = sum + i;
  sum = 1+2*3**2*3**4;
- sum = 2**3**4;
+ sum = 2**3**4+6*5**4**3;
+ sum = 3**-a**a;
+ sum = 3.14**3.14;
  i = i + 1;
  }
  return sum;
