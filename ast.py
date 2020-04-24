@@ -21,12 +21,9 @@ class Expr:
 
 class Statement:
     def __init__(self, stmt):
-        self.stmt = stmt
-
+        self.left = stmt
     def __str__(self):
-        if self.stmt == ";":
-            return ";\n"
-        return "{}\n".format(str(self.stmt))
+        return "{}\n".format(str(self.left))
 
 class Param:
     def __init__(self, left:str, right:Expr, args = None):
@@ -49,8 +46,17 @@ class Param:
             return "{0} {1}{2}".format((str(self.left)), str(self.right), params)
         return "{0} {1}".format(str(self.left), str(self.right))
 
+
+class Declaration:
+    def __init__(self, left: str, right: Expr):
+        self.left = left
+        self.right = right
+    def __str__(self):
+        return "{0} {1};\n".format(self.left, str(self.right))
+
+
 class FunctionDef:
-    def __init__(self, type: str, id: Expr, params: Expr, decls: Expr, stmts: Statement):
+    def __init__(self, type: str, id: Expr, params: Param, decls: Declaration, stmts: Statement):
         self.type = type
         self.id = id
         self.params = params
@@ -140,14 +146,6 @@ class ConjExpr(Expr):
         return "({0} && {1})".format(str(self.left), str(self.right))
 
 
-class Declaration:
-    def __init__(self, left: str, right: Expr):
-        self.left = left
-        self.right = right
-    def __str__(self):
-        return "{0} {1};\n".format(self.left, str(self.right))
-
-
 class EqExpr(Expr):
     def __init__(self, left: Expr, right: Expr,Eqlop):
         self.left = left
@@ -200,18 +198,16 @@ class PrintStatement(Statement):
 
 
 class WhileStatement(Statement):
-    def __init__(self, left: Expr, right: Expr):
+    def __init__(self, left: Expr, right: Statement):
         self.left = left
         self.right = right
 
     def __str__(self):
-        if type(self.right) == BlockStatement:
-            print ("block111111111111")
         return "while {} {}".format(str(self.left), str(self.right))
 
 
 class IfStatement(Statement):
-    def __init__(self, expr: Expr, stmt: Expr, elsestmt: Expr = None):
+    def __init__(self, expr: Expr, stmt: Statement, elsestmt: Statement = None):
         self.expr = expr
         self.stmt = stmt
         self.elsestmt = elsestmt
@@ -231,26 +227,26 @@ class AssignmentStatement(Statement):
 
 
 class BlockStatement(Statement):
-    def __init__(self, stmt: Expr, args: Expr):
-        self.stmt = stmt
-        self.args = args
+    def __init__(self, stmt: Statement, args: Statement):
+        self.left = stmt
+        self.right = args
 
     def __str__(self):
-        if self.args:
+        if self.right:
             stmtargs = ""
-            for arg in self.args:
+            for arg in self.right:
                 stmtargs += "\n" + str(arg)
-            return "{{\n{0} {1}}}\n".format(str(self.stmt), stmtargs)
+            return "{{\n{0} {1}}}\n".format(str(self.left), stmtargs)
 
-        return "{{\n{0}}}\n".format(str(self.stmt))
+        return "{{\n{0}}}\n".format(str(self.left))
 
 
 class ReturnStatement(Statement):
     def __init__(self, expr: Expr):
-        self.expr = expr
+        self.left = expr
 
     def __str__(self):
-        return "return {};\n".format(str(self.expr))
+        return "return {};\n".format(str(self.left))
 
 
 
