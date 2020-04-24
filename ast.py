@@ -193,8 +193,8 @@ class PrintStatement(Statement):
             args = ""
             for arg in self.prtargs:
                 args += ", " + str(arg)
-            return "(print({} {}))".format(str(self.prtarg), args)
-        return "(print({}))".format(str(self.prtarg))
+            return "print({} {})".format(str(self.prtarg), args)
+        return "print({})".format(str(self.prtarg))
 
 
 class WhileStatement(Statement):
@@ -203,7 +203,7 @@ class WhileStatement(Statement):
         self.right = right
 
     def __str__(self):
-        return "(while {} {})".format(str(self.left), str(self.right))
+        return "while {} {}".format(str(self.left), str(self.right))
 
 
 class IfStatement(Statement):
@@ -213,8 +213,8 @@ class IfStatement(Statement):
         self.elsestmt = elsestmt
     def __str__(self):
         if self.elsestmt :
-            return "(if ({0}) \n\t {1} else \n\t{2})".format(str(self.expr), str(self.stmt), str(self.elsestmt))
-        return "(if({0}) {1})".format(str(self.expr), str(self.stmt))
+            return "if ({0}) \n\t {1} else \n\t{2}".format(str(self.expr), str(self.stmt), str(self.elsestmt))
+        return "if({0}) {1}".format(str(self.expr), str(self.stmt))
 
 
 class AssignmentStatement(Statement):
@@ -223,7 +223,7 @@ class AssignmentStatement(Statement):
         self.right = right
 
     def __str__(self):
-        return "({} = {};)\n".format(str(self.left), str(self.right))
+        return "{} = {};\n".format(str(self.left), str(self.right))
 
 
 class BlockStatement(Statement):
@@ -236,9 +236,9 @@ class BlockStatement(Statement):
             stmtargs = ""
             for arg in self.right:
                 stmtargs += "\n" + str(arg)
-            return "({{\n{0} {1}}})\n".format(str(self.left), stmtargs)
+            return "{{\n{0} {1}}}\n".format(str(self.left), stmtargs)
 
-        return "({{\n{0}}}\n)".format(str(self.left))
+        return "{{\n{0}}}\n".format(str(self.left))
 
 
 class ReturnStatement(Statement):
@@ -246,7 +246,7 @@ class ReturnStatement(Statement):
         self.left = expr
 
     def __str__(self):
-        return "(return {};\n)".format(str(self.left))
+        return "return {};\n".format(str(self.left))
 
 
 
@@ -318,8 +318,8 @@ class FuncCExpr(Expr):
             args = ""
             for arg in self.right:
                 args += str(arg)
-            return "({0}({1}))".format(str(self.left), args)
-        return "({0}())".format(str(self.left))
+            return "{0}({1})".format(str(self.left), args)
+        return "{0}()".format(str(self.left))
 
 
 if __name__ == '__main__':
