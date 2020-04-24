@@ -20,10 +20,11 @@ class Expr:
 
 
 class Statement:
-    def __init__(self, stmt):
+    def __init__(self, stmt, tabs = ""):
         self.left = stmt
+        self.tabs = tabs
     def __str__(self):
-        return "{}\n".format(str(self.left))
+        return "{}{}\n".format(self.tabs, str(self.left))
 
 class Param:
     def __init__(self, left:str, right:Expr, args = None):
@@ -48,11 +49,12 @@ class Param:
 
 
 class Declaration:
-    def __init__(self, left: str, right: Expr):
+    def __init__(self, left: str, right: Expr, tabs =""):
         self.left = left
         self.right = right
+        self.tabs = tabs
     def __str__(self):
-        return "{0} {1};\n".format(self.left, str(self.right))
+        return "{0}{1} {2};\n".format(self.tabs, self.left, str(self.right))
 
 
 class FunctionDef:
@@ -67,13 +69,13 @@ class FunctionDef:
         declstr =""
         stmtstr = ""
         for d in self.decls:
-            declstr += str(d) + "\t"
+            declstr += str(d)
         for i in range(0, len(self.stmts)):
             if i == len(self.stmts) - 1:
                 stmtstr += str(self.stmts[i])
             else:
-                stmtstr += str(self.stmts[i]) + "\t"
-        return "{0} {1} ({2}) {{\n\t{3}{4}}}".format(self.type, str(self.id),str(self.params),declstr,stmtstr)
+                stmtstr += str(self.stmts[i])
+        return "{0} {1} ({2}) {{\n{3}{4}}}".format(self.type, str(self.id),str(self.params),declstr,stmtstr)
 
 
 class Program:
@@ -184,69 +186,74 @@ class RelatExpr(Expr):
 
 
 class PrintStatement(Statement):
-    def __init__(self, prtarg: Expr, prtargs: Expr):
+    def __init__(self, prtarg: Expr, prtargs: Expr, tabs = ""):
         self.prtarg = prtarg
         self.prtargs = prtargs
+        self.tabs = tabs
 
     def __str__(self):
         if self.prtargs:
             args = ""
             for arg in self.prtargs:
                 args += ", " + str(arg)
-            return "print({} {})".format(str(self.prtarg), args)
-        return "print({})".format(str(self.prtarg))
+            return "{}print({} {})".format(self.tabs, str(self.prtarg), args)
+        return "{}print({})".format(self.tabs, str(self.prtarg))
 
 
 class WhileStatement(Statement):
-    def __init__(self, left: Expr, right: Statement):
+    def __init__(self, left: Expr, right: Statement, tabs = ""):
         self.left = left
         self.right = right
+        self.tabs = tabs
 
     def __str__(self):
-        return "while {} {}".format(str(self.left), str(self.right))
+        return "{}while {} {}".format(self.tabs, str(self.left), str(self.right))
 
 
 class IfStatement(Statement):
-    def __init__(self, expr: Expr, stmt: Statement, elsestmt: Statement = None):
+    def __init__(self, expr: Expr, stmt: Statement, elsestmt: Statement = None, tabs = ""):
         self.expr = expr
         self.stmt = stmt
         self.elsestmt = elsestmt
+        self.tabs = tabs
     def __str__(self):
         if self.elsestmt :
-            return "if ({0}) \n\t {1} else \n\t{2}".format(str(self.expr), str(self.stmt), str(self.elsestmt))
-        return "if({0}) {1}".format(str(self.expr), str(self.stmt))
+            return "{0}if ({1}) \n\t {2} else \n\t{3}".format(self.tabs, str(self.expr), str(self.stmt), str(self.elsestmt))
+        return "{0}if({1})\n{2}".format(self.tabs, str(self.expr), str(self.stmt))
 
 
 class AssignmentStatement(Statement):
-    def __init__(self, left: Expr, right: Expr):
+    def __init__(self, left: Expr, right: Expr, tabs = ""):
         self.left = left
         self.right = right
+        self.tabs = tabs
 
     def __str__(self):
-        return "{} = {};\n".format(str(self.left), str(self.right))
+        return "{}{} = {};\n".format(self.tabs, str(self.left), str(self.right))
 
 
 class BlockStatement(Statement):
-    def __init__(self, stmt: Statement, args: Statement):
+    def __init__(self, stmt: Statement, args: Statement, tabs= ""):
         self.left = stmt
         self.right = args
+        self.tabs = tabs
 
     def __str__(self):
         if self.right:
             stmtargs = ""
             for arg in self.right:
-                stmtargs += "\n" + str(arg)
-            return "{{\n{0} {1}}}\n".format(str(self.left), stmtargs)
+                stmtargs += self.tabs + str(arg) + "\n"
+            return "{{\n{} {}{}}}\n".format(str(self.left), stmtargs, self.tabs)
 
-        return "{{\n{0}}}\n".format(str(self.left))
+        return "{{\n{}{}}}\n".format(str(self.left), self.tabs)
 
 
 class ReturnStatement(Statement):
-    def __init__(self, expr: Expr):
+    def __init__(self, expr: Expr, tabs = ""):
         self.left = expr
-
+        self.tabs = tabs
     def __str__(self):
-        return "return {};\n".format(str(self.left))
+        return "{}return {};\n".format(self.tabs, str(self.left))
 
 
 
