@@ -278,6 +278,10 @@ class WhileStatement(Statement):
     def __str__(self):
         return "{}while {} {}".format(self.tabs, str(self.left), str(self.right))
 
+    def eval(self, env):
+        while self.left.eval():
+            self.right.eval(env)
+
 
 class IfStatement(Statement):
     def __init__(self, expr: Expr, stmt: Statement, elsestmt: Statement = None, tabs = ""):
@@ -292,10 +296,10 @@ class IfStatement(Statement):
 
     def eval(self, env):
 
-        if self.cond.eval():
-            self.truepart.eval(env)
-        elif self.falsepart is not None:
-            self.falsepart.eval(env)
+        if self.expr.eval():
+            self.stmt.eval(env)
+        elif self.elsestmt is not None:
+            self.elsestmt.eval(env)
 
 
 class AssignmentStatement(Statement):
@@ -443,6 +447,7 @@ class FuncCExpr(Expr):
         return "{}({})".format(self.f_id, str(self.left))
 
 
+
 class Farg:
     def __init__(self, arg: str):
         self.farg = arg
@@ -450,6 +455,8 @@ class Farg:
     def __str__(self):
         return "{}".format(self.farg)
 
+    def eval(self):
+        return self.farg
 
 class ExpoExpr(Expr):
     def __init__(self, left: Expr, right: Expr):
