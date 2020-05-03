@@ -115,39 +115,6 @@ class BinaryExpr(Expr):
     pass
 
 
-class AndExpr(Expr):
-    def __init__(self, left: Expr, right: Expr):
-        self.left = left
-        self.right = right
-
-    def __str__(self):
-        return "({0} && {1})".format(str(self.left), str(self.right))
-
-        # def typeof(self) -> str: # where string is 'int' or 'float' or 'bool' or 'error'
-        # strings are not abstract "INT" "int" "fred"
-        # Expressions have types
-        # def typeof(self) -> Type:
-
-    def typeof(self) -> Union[int, bool, float]:  #
-        """
-        Return the type of the expression.
-        1) 4 + 4 is an int
-        2) 2 * 3.14 is a float
-        3) True && False is a bool
-        4) True && 3.14 type error
-        Static type checking: type check the program *before* we evaluate it.
-        Scheme is dynamically type checked. Type errors checked at run time.
-        Java - statically type checked.
-        C - static
-        Python - dynamic, checked at run time
-                 mypy - static type checker for Python
-        """
-        if self.left.typeof() == BoolType and self.right.typeof() == BoolType:
-            return BoolType
-        else:
-            # type error
-            raise SLUCTypeError(
-                "type error on line {0}, expected two booleans got a {1} and a {2}".format(0))
 
 
 
@@ -165,6 +132,10 @@ class BoolExpr(Expr):
 
     def __str__(self):
         return "{}".format(self.bool)
+
+    def eval(self)-> bool:
+
+        return self.cond.eval()
 
 
 class AddExpr(Expr):
@@ -187,6 +158,42 @@ class AddExpr(Expr):
         return self.left.eval() +  self.right.eval()
 
 
+"""class AndExpr(Expr):
+    def __init__(self, left: Expr, right: Expr):
+        self.left = left
+        self.right = right
+
+    def __str__(self):
+        return "({0} && {1})".format(str(self.left), str(self.right))
+
+        # def typeof(self) -> str: # where string is 'int' or 'float' or 'bool' or 'error'
+        # strings are not abstract "INT" "int" "fred"
+        # Expressions have types
+        # def typeof(self) -> Type:
+
+    def typeof(self) -> Union[int, bool, float]:  #
+        
+        Return the type of the expression.
+        1) 4 + 4 is an int
+        2) 2 * 3.14 is a float
+        3) True && False is a bool
+        4) True && 3.14 type error
+        Static type checking: type check the program *before* we evaluate it.
+        Scheme is dynamically type checked. Type errors checked at run time.
+        Java - statically type checked.
+        C - static
+        Python - dynamic, checked at run time
+                 mypy - static type checker for Python
+        
+        if self.left.typeof() == BoolType and self.right.typeof() == BoolType:
+            return BoolType
+        else:
+            # type error
+            raise SLUCTypeError(
+                "type error on line {0}, expected two booleans got a {1} and a {2}".format(0))
+"""
+
+
 class ConjExpr(Expr):
     def __init__(self, left: Expr, right: Expr):
         self.left = left
@@ -194,6 +201,18 @@ class ConjExpr(Expr):
 
     def __str__(self):
         return "({0} && {1})".format(str(self.left), str(self.right))
+
+    def eval(self)-> Union[int, bool, float]:
+        return self.left.eval() and self.right.eval()
+
+    def typeof(self) -> Union[int, bool, float]:
+        if self.left.typeof() == BoolType and self.right.typeof() == BoolType:
+            return BoolType
+
+        else:
+        # type error
+            raise SLUCTypeError(
+                "type error on line {0}, expected two booleans got a {1} and a {2}".format(0))
 
 
 class EqExpr(Expr):
