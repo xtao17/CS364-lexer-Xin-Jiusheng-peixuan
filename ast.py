@@ -267,6 +267,9 @@ class PrintStatement(Statement):
                 args += ", " + str(arg)
             return "{}print({} {})".format(self.tabs, str(self.prtarg), args)
         return "{}print({})".format(self.tabs, str(self.prtarg))
+    def eval(self):
+        for arg in self.prtargs:
+            print(arg, end =" ")
 
 
 class WhileStatement(Statement):
@@ -336,7 +339,8 @@ class ReturnStatement(Statement):
     def __str__(self):
         return "{}return {};\n".format(self.tabs, str(self.left))
 
-
+    def eval(self):
+        return self.left.eval()
 class MultExpr(Expr):
     def __init__(self, left: Expr, right: Expr, op: str):
         self.left = left
