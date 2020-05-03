@@ -212,6 +212,8 @@ class EqExpr(Expr):
         return "(== {0} {1})".format(self.left.scheme(), self.right.scheme())
 
 
+
+
 class RelatExpr(Expr):
     def __init__(self, left: Expr, right: Expr, relop):
         self.left = left
@@ -377,9 +379,9 @@ class IntLitExpr(Expr):
     #def typeof(self) -> Type:
     # representing SLU-C types using Python types
     def typeof(self) -> type:
-
         #return IntegerType
         return int
+
 
 class StrLitExpr(Expr):
 
@@ -388,6 +390,9 @@ class StrLitExpr(Expr):
 
     def __str__(self):
         return str(self.strlit)
+
+    def eval(self):
+        return self.strlit   # base case
 
 
 class FloatLitExpr(Expr):
@@ -398,6 +403,8 @@ class FloatLitExpr(Expr):
     def __str__(self):
         return str(self.floatlit)
 
+    def eval(self):
+        return self.floatlit   # base case
 
 class FuncCExpr(Expr):
     def __init__(self, f_id: str, left: Expr, right: Sequence[Expr]):
@@ -432,6 +439,13 @@ class ExpoExpr(Expr):
 
     def __str__(self):
         return "({} ** {})".format(str(self.left), str(self.right))
+
+    def eval(self) -> Union[int, float]:
+        # TODO environment
+        # If we checked type when running eval we have a "dynamically typed"
+        # language
+
+        return self.left.eval() ** self.right.eval()
 
 if __name__ == '__main__':
     """
