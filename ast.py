@@ -19,6 +19,17 @@ class Expr:
     def __str__(self):
         return "({} || {})".format(self.left, self.right)
 
+class Type:
+    pass
+
+class IntegerType(Type):
+    pass
+
+class FloatType(Type):
+    pass
+
+class BoolType(Type):
+    pass
 
 class Statement:
     def __init__(self, stmt, tabs = ""):
@@ -80,7 +91,14 @@ class FunctionDef:
                 stmtstr += str(self.stmts[i])
         return "{0} {1} ({2}) {{\n{3}{4}}}".format(self.type, str(self.id),str(self.params),declstr,stmtstr)
 
-
+    def eval(self) -> Union[int, float, bool]:
+        # an environment maps identifiers to values
+        # parameters or local variables
+        # to evaluate a function you evaluate all of the statements
+        # within the environment
+        env = {}   # TODO Fix this
+        for s in self.stmts:
+            s.eval(env)  # TODO define environment
 class Program:
     def __init__(self, funcs: Sequence[FunctionDef]):
         self.funcs = funcs
@@ -105,6 +123,40 @@ class AndExpr(Expr):
     def __str__(self):
         return "({0} && {1})".format(str(self.left), str(self.right))
 
+        # def typeof(self) -> str: # where string is 'int' or 'float' or 'bool' or 'error'
+        # strings are not abstract "INT" "int" "fred"
+        # Expressions have types
+        # def typeof(self) -> Type:
+
+    def typeof(self) -> Union[int, bool, float]:  #
+        """
+        Return the type of the expression.
+        1) 4 + 4 is an int
+        2) 2 * 3.14 is a float
+        3) True && False is a bool
+        4) True && 3.14 type error
+        Static type checking: type check the program *before* we evaluate it.
+        Scheme is dynamically type checked. Type errors checked at run time.
+        Java - statically type checked.
+        C - static
+        Python - dynamic, checked at run time
+                 mypy - static type checker for Python
+        """
+        if self.left.typeof() == BoolType and self.right.typeof() == BoolType:
+            return BoolType
+        else:
+            # type error
+            raise SLUCTypeError(
+                "type error on line {0}, expected two booleans got a {1} and a {2}".format(0))
+
+
+class SLUCTypeError(Exception):
+    def __init__(self, message: str):
+        Exception.__init__(self)
+        self.message = message
+
+    def __str__(self):
+        return self.message
 
 class SLUCTypeError(Exception):
     def __init__(self, message: str):
@@ -224,6 +276,13 @@ class IfStatement(Statement):
             return "{0}if ({1})\n\t{2} else \n\t{3}".format(self.tabs, str(self.expr), str(self.stmt), str(self.elsestmt))
         return "{0}if({1})\n\t{2}".format(self.tabs, str(self.expr), str(self.stmt))
 
+    def eval(self, env):
+
+        if self.cond.eval():
+            self.truepart.eval(env)
+        elif self.falsepart is not None:
+            self.falsepart.eval(env)
+
 
 class AssignmentStatement(Statement):
     def __init__(self, left: Expr, right: Expr, tabs = ""):
@@ -270,6 +329,16 @@ class MultExpr(Expr):
         return "({0} {1} {2})".format(str(self.left), self.op, str(self.right))
 
 
+    def eval(self) -> Union[int,float]:
+        # TODO environment
+        # Implementing SLU-C multiplication using Python's multiplication
+        # implmented * using mul instruction
+
+        # If we checked type when running eval we have a "dynamically typed"
+        # language
+
+        return self.left.eval() *  self.right.eval()
+
 class UnaryOp(Expr):
     def __init__(self, tree: Expr, op: str):
         self.tree = tree
@@ -278,6 +347,8 @@ class UnaryOp(Expr):
     def __str__(self):
         return "{}({})".format(self.op, str(self.tree))
 
+    def eval(self):
+        return -self.tree.eval()
 
 class IDExpr(Expr):
 
@@ -286,6 +357,17 @@ class IDExpr(Expr):
 
     def __str__(self):
         return self.id
+
+    def eval(self, env):  # a + 7
+        # lookup the value of self.id. Look up where?
+        # env is a dictionary
+        pass
+
+    def typeof(self, decls) -> Type:
+        # TODO type decls appropriately as a dictionary type
+        # look up the variable type in the declaration dictoinary
+        # from the function definition (FunctionDef)
+        pass
 
 
 class IntLitExpr(Expr):
@@ -296,6 +378,15 @@ class IntLitExpr(Expr):
     def __str__(self):
         return str(self.intlit)
 
+    def eval(self):
+        return self.intlit   # base case
+
+    #def typeof(self) -> Type:
+    # representing SLU-C types using Python types
+    def typeof(self) -> type:
+
+        #return IntegerType
+        return int
 
 class StrLitExpr(Expr):
 
@@ -313,6 +404,7 @@ class FloatLitExpr(Expr):
 
     def __str__(self):
         return str(self.floatlit)
+
 
 class FuncCExpr(Expr):
     def __init__(self, f_id: str, left: Expr, right: Sequence[Expr]):
