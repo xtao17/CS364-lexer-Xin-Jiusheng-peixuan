@@ -150,13 +150,6 @@ class AndExpr(Expr):
                 "type error on line {0}, expected two booleans got a {1} and a {2}".format(0))
 
 
-class SLUCTypeError(Exception):
-    def __init__(self, message: str):
-        Exception.__init__(self)
-        self.message = message
-
-    def __str__(self):
-        return self.message
 
 class SLUCTypeError(Exception):
     def __init__(self, message: str):
