@@ -10,29 +10,36 @@ Interpreter Pattern
 design patterns - catalog of best practices in software design
 """
 from typing import Sequence, Union, Optional
+
+
 # Expr, Statements, FunctionDef,Pram
 class Expr:
-    def __init__(self,left,right):
-        self.left=left
-        self.right=right
+    def __init__(self, left, right):
+        self.left = left
+        self.right = right
 
     def __str__(self):
         return "({} || {})".format(self.left, self.right)
 
+
 class Type:
     pass
+
 
 class IntegerType(Type):
     pass
 
+
 class FloatType(Type):
     pass
+
 
 class BoolType(Type):
     pass
 
+
 class Statement:
-    def __init__(self, stmt, tabs = ""):
+    def __init__(self, stmt, tabs=""):
         self.left = stmt
         self.tabs = tabs
 
@@ -42,10 +49,11 @@ class Statement:
     def eval(self):
         self.left.eval()
 
+
 class Param:
-    def __init__(self, left:str, right:Expr, args = None):
-        self.left=left
-        self.right=right
+    def __init__(self, left: str, right: Expr, args=None):
+        self.left = left
+        self.right = right
         self.args = args
 
     def __str__(self):
@@ -53,7 +61,7 @@ class Param:
             return ""
 
         if self.args:
-            params =""
+            params = ""
             for arg in self.args:
                 if type(arg) == str:
                     params += ", " + str(arg)
@@ -65,10 +73,11 @@ class Param:
 
 
 class Declaration:
-    def __init__(self, left: str, right: Expr, tabs =""):
+    def __init__(self, left: str, right: Expr, tabs=""):
         self.left = left
         self.right = right
         self.tabs = tabs
+
     def __str__(self):
         return "{0}{1} {2};\n".format(self.tabs, self.left, str(self.right))
 
@@ -82,7 +91,7 @@ class FunctionDef:
         self.stmts = stmts
 
     def __str__(self):
-        declstr =""
+        declstr = ""
         stmtstr = ""
         for d in self.decls:
             declstr += str(d)
@@ -91,7 +100,7 @@ class FunctionDef:
                 stmtstr += str(self.stmts[i])
             else:
                 stmtstr += str(self.stmts[i])
-        return "{0} {1} ({2}) {{\n{3}{4}}}".format(self.type, str(self.id),str(self.params),declstr,stmtstr)
+        return "{0} {1} ({2}) {{\n{3}{4}}}".format(self.type, str(self.id), str(self.params), declstr, stmtstr)
 
     def eval(self) -> Union[int, float, bool]:
         # an environment maps identifiers to values
@@ -101,6 +110,8 @@ class FunctionDef:
         env = {}   # TODO Fix this
         for s in self.stmts:
             s.eval(env)  # TODO define environment
+
+
 class Program:
     def __init__(self, funcs: Sequence[FunctionDef]):
         self.funcs = funcs
@@ -109,14 +120,12 @@ class Program:
         alist = list(map(str, self.funcs))
         strs = ""
         for f in alist:
-            strs += f +"\n\n"
+            strs += f + "\n\n"
         return "{}".format(strs)
 
 
-
-
 class PrintStatement(Statement):
-    def __init__(self, prtarg: Expr, prtargs: Sequence[Expr], tabs = ""):
+    def __init__(self, prtarg: Expr, prtargs: Sequence[Expr], tabs=""):
         self.prtarg = prtarg
         self.prtargs = prtargs
         self.tabs = tabs
@@ -131,7 +140,7 @@ class PrintStatement(Statement):
 
 
 class WhileStatement(Statement):
-    def __init__(self, left: Expr, right: Statement, tabs = ""):
+    def __init__(self, left: Expr, right: Statement, tabs=""):
         self.left = left
         self.right = right
         self.tabs = tabs
@@ -145,14 +154,16 @@ class WhileStatement(Statement):
 
 
 class IfStatement(Statement):
-    def __init__(self, expr: Expr, stmt: Statement, elsestmt: Statement = None, tabs = ""):
+    def __init__(self, expr: Expr, stmt: Statement, elsestmt: Statement = None, tabs=""):
         self.expr = expr
         self.stmt = stmt
         self.elsestmt = elsestmt
         self.tabs = tabs
+
     def __str__(self):
         if self.elsestmt :
-            return "{0}if ({1})\n\t{2} else \n\t{3}".format(self.tabs, str(self.expr), str(self.stmt), str(self.elsestmt))
+            return "{0}if ({1})\n\t{2} else \n\t{3}".format(self.tabs, str(self.expr),
+                                                            str(self.stmt), str(self.elsestmt))
         return "{0}if({1})\n\t{2}".format(self.tabs, str(self.expr), str(self.stmt))
 
     def eval(self, env):
@@ -164,7 +175,7 @@ class IfStatement(Statement):
 
 
 class AssignmentStatement(Statement):
-    def __init__(self, left: Expr, right: Expr, tabs = ""):
+    def __init__(self, left: Expr, right: Expr, tabs=""):
         self.left = left
         self.right = right
         self.tabs = tabs
@@ -174,7 +185,7 @@ class AssignmentStatement(Statement):
 
 
 class BlockStatement(Statement):
-    def __init__(self, stmt: Statement, args: Statement, tabs= ""):
+    def __init__(self, stmt: Statement, args: Statement, tabs=""):
         self.left = stmt
         self.right = args
         self.tabs = tabs
@@ -190,7 +201,7 @@ class BlockStatement(Statement):
 
 
 class ReturnStatement(Statement):
-    def __init__(self, expr: Expr, tabs = ""):
+    def __init__(self, expr: Expr, tabs=""):
         self.left = expr
         self.tabs = tabs
 
@@ -203,9 +214,6 @@ class ReturnStatement(Statement):
 
 class BinaryExpr(Expr):
     pass
-
-
-
 
 
 class SLUCTypeError(Exception):
@@ -236,16 +244,9 @@ class AddExpr(Expr):
     def __str__(self):
         return "({0} + {1})".format(str(self.left), str(self.right))
 
-    def scheme(self) -> str:
-        """
-        Return a string that represents the expression in Scheme syntax.
-        e.g.,  (a + b)   -> (+ a b)
-        """
-        return "(+ {0} {1})".format(self.left.scheme(), self.right.scheme())
-
-    def eval(self) -> Union[int,float]:
+    def eval(self) -> Union[int, float]:
         # TODO environment
-        return self.left.eval() +  self.right.eval()
+        return self.left.eval() + self.right.eval()
 
 
 """class AndExpr(Expr):
@@ -292,7 +293,7 @@ class ConjExpr(Expr):
     def __str__(self):
         return "({0} && {1})".format(str(self.left), str(self.right))
 
-    def eval(self)-> Union[int, bool, float]:
+    def eval(self) -> Union[int, bool, float]:
         return self.left.eval() and self.right.eval()
 
     def typeof(self) -> Union[int, bool, float]:
@@ -300,13 +301,12 @@ class ConjExpr(Expr):
             return BoolType
 
         else:
-        # type error
-            raise SLUCTypeError(
-                "type error on line {0}, expected two booleans got a {1} and a {2}".format(0))
+            # type error
+            raise SLUCTypeError("type error on line {0}, expected two booleans got a {1} and a {2}".format(0))
 
 
 class EqExpr(Expr):
-    def __init__(self, left: Expr, right: Expr,Eqlop):
+    def __init__(self, left: Expr, right: Expr, Eqlop):
         self.left = left
         self.right = right
         self.Eqlop = Eqlop
@@ -314,20 +314,11 @@ class EqExpr(Expr):
     def __str__(self):
         return "({0} {1} {2})".format(str(self.left), str(self.Eqlop), str(self.right))
 
-    def scheme(self) -> str:
-        """
-        Return a string that represents the expression in Scheme syntax.
-        e.g.,  (a + b)   -> (+ a b)
-        """
-        return "(== {0} {1})".format(self.left.scheme(), self.right.scheme())
-
-    def eval(self)->Union[int, bool, float]:
+    def eval(self) -> Union[int, bool, float]:
         if self.Eqlop == "==":
             return self.left.eval() == self.right.eval()
         elif self.Eqlop == "!=":
             return self.left.eval() != self.right.eval()
-
-
 
 
 class RelatExpr(Expr):
@@ -348,11 +339,11 @@ class RelatExpr(Expr):
 
     def eval(self) -> Union[int,float]:
         # TODO environment
-        return self.left.eval() +  self.right.eval()
+        return self.left.eval() + self.right.eval()
 
 
 class PrintStatement(Statement):
-    def __init__(self, prtarg: Expr, prtargs: Sequence[Expr], tabs = ""):
+    def __init__(self, prtarg: Expr, prtargs: Sequence[Expr], tabs=""):
         self.prtarg = prtarg
         self.prtargs = prtargs
         self.tabs = tabs
@@ -364,13 +355,14 @@ class PrintStatement(Statement):
                 args += ", " + str(arg)
             return "{}print({} {})".format(self.tabs, str(self.prtarg), args)
         return "{}print({})".format(self.tabs, str(self.prtarg))
+
     def eval(self):
         for arg in self.prtargs:
-            print(arg, end =" ")
+            print(arg, end=" ")
 
 
 class WhileStatement(Statement):
-    def __init__(self, left: Expr, right: Statement, tabs = ""):
+    def __init__(self, left: Expr, right: Statement, tabs=""):
         self.left = left
         self.right = right
         self.tabs = tabs
@@ -384,14 +376,16 @@ class WhileStatement(Statement):
 
 
 class IfStatement(Statement):
-    def __init__(self, expr: Expr, stmt: Statement, elsestmt: Statement = None, tabs = ""):
+    def __init__(self, expr: Expr, stmt: Statement, elsestmt: Statement = None, tabs=""):
         self.expr = expr
         self.stmt = stmt
         self.elsestmt = elsestmt
         self.tabs = tabs
+
     def __str__(self):
-        if self.elsestmt :
-            return "{0}if ({1})\n\t{2} else \n\t{3}".format(self.tabs, str(self.expr), str(self.stmt), str(self.elsestmt))
+        if self.elsestmt:
+            return "{0}if ({1})\n\t{2} else \n\t{3}".format(self.tabs, str(self.expr),
+                                                            str(self.stmt), str(self.elsestmt))
         return "{0}if({1})\n\t{2}".format(self.tabs, str(self.expr), str(self.stmt))
 
     def eval(self, env):
@@ -403,7 +397,7 @@ class IfStatement(Statement):
 
 
 class AssignmentStatement(Statement):
-    def __init__(self, left: Expr, right: Expr, tabs = ""):
+    def __init__(self, left: Expr, right: Expr, tabs=""):
         self.left = left
         self.right = right
         self.tabs = tabs
@@ -413,7 +407,7 @@ class AssignmentStatement(Statement):
 
 
 class BlockStatement(Statement):
-    def __init__(self, stmt: Statement, args: Statement, tabs= ""):
+    def __init__(self, stmt: Statement, args: Statement, tabs=""):
         self.left = stmt
         self.right = args
         self.tabs = tabs
@@ -428,9 +422,8 @@ class BlockStatement(Statement):
         return "{1}{{\n{0}{1}}}\n".format(str(self.left), self.tabs)
 
 
-
 class ReturnStatement(Statement):
-    def __init__(self, expr: Expr, tabs = ""):
+    def __init__(self, expr: Expr, tabs=""):
         self.left = expr
         self.tabs = tabs
 
@@ -439,6 +432,8 @@ class ReturnStatement(Statement):
 
     def eval(self):
         return self.left.eval()
+
+
 class MultExpr(Expr):
     def __init__(self, left: Expr, right: Expr, op: str):
         self.left = left
@@ -448,8 +443,7 @@ class MultExpr(Expr):
     def __str__(self):
         return "({0} {1} {2})".format(str(self.left), self.op, str(self.right))
 
-
-    def eval(self) -> Union[int,float]:
+    def eval(self) -> Union[int, float]:
         # TODO environment
         # Implementing SLU-C multiplication using Python's multiplication
         # implmented * using mul instruction
@@ -457,7 +451,8 @@ class MultExpr(Expr):
         # If we checked type when running eval we have a "dynamically typed"
         # language
 
-        return self.left.eval() *  self.right.eval()
+        return self.left.eval() * self.right.eval()
+
 
 class UnaryOp(Expr):
     def __init__(self, tree: Expr, op: str):
@@ -469,6 +464,7 @@ class UnaryOp(Expr):
 
     def eval(self):
         return -self.tree.eval()
+
 
 class IDExpr(Expr):
 
@@ -501,17 +497,17 @@ class IntLitExpr(Expr):
     def eval(self):
         return self.intlit   # base case
 
-    #def typeof(self) -> Type:
+    # def typeof(self) -> Type:
     # representing SLU-C types using Python types
     def typeof(self) -> type:
-        #return IntegerType
+        # return IntegerType
         return int
 
 
 class StrLitExpr(Expr):
 
-    def __init__(self,strLit:[str, Expr]):
-        self.strlit = strLit
+    def __init__(self, strlit: [str, Expr]):
+        self.strlit = strlit
 
     def __str__(self):
         return str(self.strlit)
@@ -531,6 +527,7 @@ class FloatLitExpr(Expr):
     def eval(self):
         return self.floatlit   # base case
 
+
 class FuncCExpr(Expr):
     def __init__(self, f_id: str, left: Expr, right: Sequence[Expr]):
         self.f_id = f_id
@@ -549,7 +546,6 @@ class FuncCExpr(Expr):
         return "{}({})".format(self.f_id, str(self.left))
 
 
-
 class Farg:
     def __init__(self, arg: str):
         self.farg = arg
@@ -559,6 +555,7 @@ class Farg:
 
     def eval(self):
         return self.farg
+
 
 class ExpoExpr(Expr):
     def __init__(self, left: Expr, right: Expr):
@@ -574,6 +571,7 @@ class ExpoExpr(Expr):
         # language
 
         return self.left.eval() ** self.right.eval()
+
 
 if __name__ == '__main__':
     """
