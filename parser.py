@@ -1,53 +1,56 @@
-'''
+"""
 Xin, Jiusheng, Peixuan
 
-'''
+"""
 from lexer import Lexer
 from ast import *
 import sys
 
 
 class Parser:
-    '''
+    """
         Parser class is used to implement SLUC grammar
-
-    '''
+    """
     def __init__(self, fn: str):
         #  list for checking variable id and function id
-        self.var_id=[]
-        self.func_id=[]
+        self.var_id = []
+        self.func_id = []
         self.level = 0
         self.lex = Lexer(fn)
         self.tg = self.lex.token_generator()
         self.currtok = next(self.tg)
         #  expression dictionary for DRY rule
-        self.ex_dict={
-            "real":(lambda x:FloatLitExpr(x)),
-            "int":(lambda x:IntLitExpr(x))
+        self.ex_dict = {
+            "real": (lambda x: FloatLitExpr(x)),
+            "int": (lambda x: IntLitExpr(x))
         }
         #  Statement dictionary for DRY rule
         self.stmt_dict = {
-            "if":(lambda x: self.ifstatement()),
-            "while":(lambda x: self.whilestatement()),
-            "print":(lambda x: self.printstmt()),
-            "return":(lambda x:self.returnstmt()),
-            "ID":(lambda x:self.assignment())
+            "if": (lambda x: self.ifstatement()),
+            "while": (lambda x: self.whilestatement()),
+            "print": (lambda x: self.printstmt()),
+            "return": (lambda x: self.returnstmt()),
+            "ID": (lambda x: self.assignment())
          }
+
     # function for create a \t based on level
     def formctrl(self) -> str:
         return "\t"*self.level
+
     # function to check whether id exists or not
     def check_id_exist(self,var_name,id_list):
         if var_name not in id_list:
             return False
         return True
+
     def program(self) -> Program:
-        funcdefs =[]
+        funcdefs = []
         #   append functions until the end of file
-        while self.currtok != None and self.currtok.name != "EOF":
+        while self.currtok and self.currtok.name != "EOF":
             funcdefs.append(self.functiondef())
 
         return Program(funcdefs)
+
     def functiondef(self) -> FunctionDef:
         stms = []
         decs = []
@@ -295,7 +298,9 @@ class Parser:
         left = self.term()
 
         while self.currtok.kind in {"plus", "minus"}:
-            self.currtok = next(self.tg)  # advance to the next token
+            if self.currtok.kind == "plus":
+                self.currtok = next(self.tg)  # advance to the next token
+
             # because we matched a +
             right = self.term()
             left = AddExpr(left, right)
@@ -366,20 +371,19 @@ class Parser:
         """
         Base → [UnaryOp] primary
         """
-        left = self.primary()
         if self.currtok.kind in {"minus", "negate"}:
+
             op = self.currtok.name
             self.currtok = next(self.tg)
             tree = self.primary()
             return UnaryOp(tree, op)
 
-        return left
+        return self.primary()
 
     def primary(self) -> Expr:
         """
         Primary  → ID | INTLIT | ( Expr ) | FuncCall
         """
-        arguments=[]
         if self.currtok.kind == "ID":
             func_name=self.currtok.name
             tmp = self.currtok
