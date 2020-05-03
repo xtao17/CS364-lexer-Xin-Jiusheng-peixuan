@@ -39,6 +39,8 @@ class Statement:
     def __str__(self):
         return "{}{}\n".format(self.tabs, str(self.left))
 
+    def eval(self):
+        self.left.eval()
 
 class Param:
     def __init__(self, left:str, right:Expr, args = None):
@@ -424,6 +426,7 @@ class BlockStatement(Statement):
             return "{2}{{\n{0} {1}{2}}}\n".format(str(self.left), stmtargs, self.tabs)
 
         return "{1}{{\n{0}{1}}}\n".format(str(self.left), self.tabs)
+
 
 
 class ReturnStatement(Statement):
