@@ -81,6 +81,10 @@ class Declaration:
     def __str__(self):
         return "{0}{1} {2};\n".format(self.tabs, self.left, str(self.right))
 
+    def eval(self, env):
+        env[self.right] = (self.left, None) # ID: (type, value)
+        return None
+
 
 class FunctionDef:
     def __init__(self, type: str, id: Expr, params: Param, decls: Sequence[Declaration], stmts: Sequence[Statement]):
@@ -182,6 +186,11 @@ class AssignmentStatement(Statement):
 
     def __str__(self):
         return "{0}{1} = {2};\n".format(self.tabs, str(self.left), str(self.right))
+
+    def eval(self, env):
+        type = env[self.left][0]
+        env.update({self.left: (type, self.right)})
+        return None
 
 
 class BlockStatement(Statement):
@@ -337,7 +346,7 @@ class RelatExpr(Expr):
         """
         return "(+ {0} {1})".format(self.left.scheme(), self.right.scheme())
 
-    def eval(self) -> Union[int,float]:
+    def eval(self) -> Union[int, float]:
         # TODO environment
         return self.left.eval() + self.right.eval()
 
