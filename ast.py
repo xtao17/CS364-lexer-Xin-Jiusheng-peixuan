@@ -321,10 +321,10 @@ class EqExpr(Expr):
 
     def eval(self)->Union[int, bool, float]:
         if self.Eqlop == "==":
-            return "(== {0} {1})".format(self.left.scheme(), self.right.scheme())
+            return self.left.eval() == self.right.eval()
         elif self.Eqlop == "!=":
-            return "(!= {0} {1})".format(self.left.scheme(), self.right.scheme())
-        return self.left.eval() == self.right.eval()
+            return self.left.eval() != self.right.eval()
+
 
 
 
