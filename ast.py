@@ -127,57 +127,6 @@ class Program:
             strs += f + "\n\n"
         return "{}".format(strs)
 
-
-class PrintStatement(Statement):
-    def __init__(self, prtarg: Expr, prtargs: Sequence[Expr], tabs=""):
-        self.prtarg = prtarg
-        self.prtargs = prtargs
-        self.tabs = tabs
-
-    def __str__(self):
-        if self.prtargs:
-            args = ""
-            for arg in self.prtargs:
-                args += ", " + str(arg)
-            return "{}print({} {})".format(self.tabs, str(self.prtarg), args)
-        return "{}print({})".format(self.tabs, str(self.prtarg))
-
-
-class WhileStatement(Statement):
-    def __init__(self, left: Expr, right: Statement, tabs=""):
-        self.left = left
-        self.right = right
-        self.tabs = tabs
-
-    def __str__(self):
-        return "{}while {} {}".format(self.tabs, str(self.left), str(self.right))
-
-    def eval(self, env):
-        while self.left.eval():
-            self.right.eval(env)
-
-
-class IfStatement(Statement):
-    def __init__(self, expr: Expr, stmt: Statement, elsestmt: Statement = None, tabs=""):
-        self.expr = expr
-        self.stmt = stmt
-        self.elsestmt = elsestmt
-        self.tabs = tabs
-
-    def __str__(self):
-        if self.elsestmt:
-            return "{0}if ({1})\n\t{2} else \n\t{3}".format(self.tabs, str(self.expr),
-                                                            str(self.stmt), str(self.elsestmt))
-        return "{0}if({1})\n\t{2}".format(self.tabs, str(self.expr), str(self.stmt))
-
-    def eval(self, env):
-
-        if self.expr.eval():
-            self.stmt.eval(env)
-        elif self.elsestmt is not None:
-            self.elsestmt.eval(env)
-
-
 class AssignmentStatement(Statement):
     def __init__(self, left: Expr, right: Expr, tabs=""):
         self.left = left
@@ -192,32 +141,6 @@ class AssignmentStatement(Statement):
         env.update({str(self.left): (type, self.right)})
 
 
-class BlockStatement(Statement):
-    def __init__(self, stmt: Statement, args: Statement, tabs=""):
-        self.left = stmt
-        self.right = args
-        self.tabs = tabs
-
-    def __str__(self):
-        if self.right:
-            stmtargs = ""
-            for arg in self.right:
-                stmtargs += self.tabs + str(arg) + "\n"
-            return "{2}{{\n{0} {1}{2}}}\n".format(str(self.left), stmtargs, self.tabs)
-
-        return "{1}{{\n{0}{1}}}\n".format(str(self.left), self.tabs)
-
-
-class ReturnStatement(Statement):
-    def __init__(self, expr: Expr, tabs=""):
-        self.left = expr
-        self.tabs = tabs
-
-    def __str__(self):
-        return "{}return {};\n".format(self.tabs, str(self.left))
-
-    def eval(self):
-        return self.left.eval()
 
 
 class BinaryExpr(Expr):
