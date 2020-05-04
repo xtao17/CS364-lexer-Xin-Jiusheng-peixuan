@@ -232,7 +232,7 @@ class SLUCTypeError(Exception):
         return self.message
 
 
-class AddExpr(Expr):
+class AddExpr(BinaryExpr):
     def __init__(self, left: Expr, right: Expr):
         self.left = left
         self.right = right
@@ -250,6 +250,56 @@ class AddExpr(Expr):
         else:
             right = self.right.eval(env)
         return left + right
+
+
+class MultExpr(BinaryExpr):
+    def __init__(self, left: Expr, right: Expr, op: str):
+        self.left = left
+        self.right = right
+        self.op = op
+
+    def __str__(self):
+        return "({0} {1} {2})".format(str(self.left), self.op, str(self.right))
+
+    def eval(self, env) -> Union[int, float]:
+        # TODO environment
+        # Implementing SLU-C multiplication using Python's multiplication
+        # implmented * using mul instruction
+
+        # If we checked type when running eval we have a "dynamically typed"
+        # language
+        if self.left == IDExpr:
+            left = self.left.eval(env)[1]
+        else:
+            left = self.left.eval()
+        if self.right == IDExpr:
+            right = self.right.eval(env)[1]
+        else:
+            right = self.right.eval(env)
+        return left * right
+
+
+class ExpoExpr(BinaryExpr):
+    def __init__(self, left: Expr, right: Expr):
+        self.left = left
+        self.right = right
+
+    def __str__(self):
+        return "({} ** {})".format(str(self.left), str(self.right))
+
+    def eval(self, env) -> Union[int, float]:
+        # TODO environment
+        # If we checked type when running eval we have a "dynamically typed"
+        # language
+        if self.left == IDExpr:
+            left = self.left.eval(env)[1]
+        else:
+            left = self.left.eval()
+        if self.right == IDExpr:
+            right = self.right.eval(env)[1]
+        else:
+            right = self.right.eval(env)
+        return left ** right
 
 
 """class AndExpr(Expr):
@@ -288,7 +338,7 @@ class AddExpr(Expr):
 """
 
 
-class ConjExpr(Expr):
+class ConjExpr(BinaryExpr):
     def __init__(self, left: Expr, right: Expr):
         self.left = left
         self.right = right
@@ -308,7 +358,7 @@ class ConjExpr(Expr):
             raise SLUCTypeError("type error on line {0}, expected two booleans got a {1} and a {2}".format(0))
 
 
-class EqExpr(Expr):
+class EqExpr(BinaryExpr):
     def __init__(self, left: Expr, right: Expr, Eqlop):
         self.left = left
         self.right = right
@@ -324,7 +374,7 @@ class EqExpr(Expr):
             return self.left.eval() != self.right.eval()
 
 
-class RelatExpr(Expr):
+class RelatExpr(BinaryExpr):
     def __init__(self, left: Expr, right: Expr, relop):
         self.left = left
         self.right = right
@@ -437,33 +487,6 @@ class ReturnStatement(Statement):
         return self.left.eval()
 
 
-class MultExpr(Expr):
-    def __init__(self, left: Expr, right: Expr, op: str):
-        self.left = left
-        self.right = right
-        self.op = op
-
-    def __str__(self):
-        return "({0} {1} {2})".format(str(self.left), self.op, str(self.right))
-
-    def eval(self, env) -> Union[int, float]:
-        # TODO environment
-        # Implementing SLU-C multiplication using Python's multiplication
-        # implmented * using mul instruction
-
-        # If we checked type when running eval we have a "dynamically typed"
-        # language
-        if self.left == IDExpr:
-            left = self.left.eval(env)[1]
-        else:
-            left = self.left.eval()
-        if self.right == IDExpr:
-            right = self.right.eval(env)[1]
-        else:
-            right = self.right.eval(env)
-        return left * right
-
-
 class UnaryOp(Expr):
     def __init__(self, tree: Expr, op: str):
         self.tree = tree
@@ -473,8 +496,10 @@ class UnaryOp(Expr):
         return "{}({})".format(self.op, str(self.tree))
 
     def eval(self):
-        return -self.tree.eval()
-
+        if self.op == "-":
+            return -self.tree.eval()
+        else:
+            return not self.tree.eval()
 
 class IDExpr(Expr):
 
@@ -576,31 +601,6 @@ class Farg:
 
     def eval(self):
         return self.farg
-
-
-class ExpoExpr(Expr):
-    def __init__(self, left: Expr, right: Expr):
-        self.left = left
-        self.right = right
-
-    def __str__(self):
-        return "({} ** {})".format(str(self.left), str(self.right))
-
-    def eval(self, env) -> Union[int, float]:
-        # TODO environment
-        # If we checked type when running eval we have a "dynamically typed"
-        # language
-        if self.left == IDExpr:
-            left = self.left.eval(env)[1]
-        else:
-            left = self.left.eval()
-        if self.right == IDExpr:
-            right = self.right.eval(env)[1]
-        else:
-            right = self.right.eval(env)
-        return left ** right
-
-
 
 
 if __name__ == '__main__':
