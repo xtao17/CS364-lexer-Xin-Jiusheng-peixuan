@@ -9,7 +9,7 @@ import sys
 
 class Parser:
     """
-        Parser class is used to implement SLUC grammar
+     Parser class is used to implement SLUC grammar
     """
     def __init__(self, fn: str):
         #  list for checking variable id and function id
@@ -38,7 +38,7 @@ class Parser:
         return "\t"*self.level
 
     # function to check whether id exists or not
-    def check_id_exist(self,var_name,id_list):
+    def check_id_exist(self, var_name, id_list):
         if var_name not in id_list:
             return False
         return True
@@ -382,7 +382,7 @@ class Parser:
 
     def primary(self) -> Expr:
         """
-        Primary  → ID | INTLIT | ( Expr ) | FuncCall
+        Primary  → ID | INTLIT | ( Expr ) | FuncCall | Bool
         """
         if self.currtok.kind == "ID":
             func_name=self.currtok.name

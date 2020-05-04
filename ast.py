@@ -248,7 +248,7 @@ class AddExpr(Expr):
         if self.right == IDExpr:
             right = self.right.eval(env)[1]
         else:
-            right = self.right.eval()
+            right = self.right.eval(env)
         return left + right
 
 
@@ -446,15 +446,22 @@ class MultExpr(Expr):
     def __str__(self):
         return "({0} {1} {2})".format(str(self.left), self.op, str(self.right))
 
-    def eval(self) -> Union[int, float]:
+    def eval(self, env) -> Union[int, float]:
         # TODO environment
         # Implementing SLU-C multiplication using Python's multiplication
         # implmented * using mul instruction
 
         # If we checked type when running eval we have a "dynamically typed"
         # language
-
-        return self.left.eval() * self.right.eval()
+        if self.left == IDExpr:
+            left = self.left.eval(env)[1]
+        else:
+            left = self.left.eval()
+        if self.right == IDExpr:
+            right = self.right.eval(env)[1]
+        else:
+            right = self.right.eval(env)
+        return left * right
 
 
 class UnaryOp(Expr):
@@ -527,7 +534,7 @@ class FloatLitExpr(Expr):
     def __str__(self):
         return str(self.floatlit)
 
-    def eval(self):
+    def eval(self) -> float:
         return self.floatlit   # base case
 
 
@@ -579,12 +586,21 @@ class ExpoExpr(Expr):
     def __str__(self):
         return "({} ** {})".format(str(self.left), str(self.right))
 
-    def eval(self) -> Union[int, float]:
+    def eval(self, env) -> Union[int, float]:
         # TODO environment
         # If we checked type when running eval we have a "dynamically typed"
         # language
+        if self.left == IDExpr:
+            left = self.left.eval(env)[1]
+        else:
+            left = self.left.eval()
+        if self.right == IDExpr:
+            right = self.right.eval(env)[1]
+        else:
+            right = self.right.eval(env)
+        return left ** right
 
-        return self.left.eval() ** self.right.eval()
+
 
 
 if __name__ == '__main__':
