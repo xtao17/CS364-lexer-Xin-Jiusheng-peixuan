@@ -232,17 +232,6 @@ class SLUCTypeError(Exception):
         return self.message
 
 
-class BoolExpr(Expr):
-    def __init__(self, bool: str):
-        self.bool = bool
-
-    def __str__(self):
-        return "{}".format(self.bool)
-
-    def eval(self) -> bool:
-        return self.cond.eval()
-
-
 class AddExpr(Expr):
     def __init__(self, left: Expr, right: Expr):
         self.left = left
@@ -540,6 +529,17 @@ class FloatLitExpr(Expr):
 
     def eval(self):
         return self.floatlit   # base case
+
+
+class BoolExpr(Expr):
+    def __init__(self, bool: str):
+        self.bool = bool
+
+    def __str__(self):
+        return "{}".format(self.bool)
+
+    def eval(self) -> bool:
+        return self.bool.eval()
 
 
 class FuncCExpr(Expr):
