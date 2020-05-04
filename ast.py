@@ -46,8 +46,8 @@ class Statement:
     def __str__(self):
         return "{}{}\n".format(self.tabs, str(self.left))
 
-    def eval(self):
-        self.left.eval()
+    def eval(self, global_env, env):
+        self.left.eval(global_env, env)
 
 
 class Param:
@@ -82,7 +82,7 @@ class Declaration:
     def __str__(self):
         return "{0}{1} {2};\n".format(self.tabs, self.left, str(self.right))
 
-    def eval(self, env):
+    def eval(self, global_env, env):
         env[str(self.right)] = (self.left, None)  # ID: (type, value)
 
 
@@ -106,14 +106,17 @@ class FunctionDef:
                 stmtstr += str(self.stmts[i])
         return "{0} {1} ({2}) {{\n{3}{4}}}".format(self.type, str(self.id), str(self.params), declstr, stmtstr)
 
-    def eval(self) -> Union[int, float, bool]:
+    def eval(self, global_env) -> Union[int, float, bool]:
         # an environment maps identifiers to values
         # parameters or local variables
         # to evaluate a function you evaluate all of the statements
         # within the environment
+        global_env[str(self.id)] = self.type  # id:type
         env = {}   # TODO Fix this
         for s in self.stmts:
-            s.eval(env)  # TODO define environment
+
+            s.eval(global_env , env)
+
 
 
 
@@ -127,6 +130,12 @@ class Program:
         for f in alist:
             strs += f + "\n\n"
         return "{}".format(strs)
+
+    def eval(self):
+        env_func = {}
+        for func in self.funcs:
+            func.eval(env_func)
+
 
 
 
@@ -331,7 +340,7 @@ class PrintStatement(Statement):
             return "{}print({} {})".format(self.tabs, str(self.prtarg), args)
         return "{}print({})".format(self.tabs, str(self.prtarg))
 
-    def eval(self):
+    def eval(self, global_env, env):
         for arg in self.prtargs:
             print(arg, end=" ")
 
@@ -345,9 +354,9 @@ class WhileStatement(Statement):
     def __str__(self):
         return "{}while {} {}".format(self.tabs, str(self.left), str(self.right))
 
-    def eval(self, env):
+    def eval(self, global_env, env):
         while self.left.eval():
-            self.right.eval(env)
+            self.right.eval(global_env, env)
 
 
 class IfStatement(Statement):
@@ -363,12 +372,11 @@ class IfStatement(Statement):
                                                             str(self.stmt), str(self.elsestmt))
         return "{0}if({1})\n\t{2}".format(self.tabs, str(self.expr), str(self.stmt))
 
-    def eval(self, env):
-
+    def eval(self, global_env, env):
         if self.expr.eval():
-            self.stmt.eval(env)
+            self.stmt.eval(global_env, env)
         elif self.elsestmt is not None:
-            self.elsestmt.eval(env)
+            self.elsestmt.eval(global_env, env)
 
 
 
@@ -381,7 +389,7 @@ class AssignmentStatement(Statement):
     def __str__(self):
         return "{0}{1} = {2};\n".format(self.tabs, str(self.left), str(self.right))
 
-    def eval(self, env):
+    def eval(self, global_env, env):
         type = env[self.left][0]
         env.update({str(self.left): (type, self.right)})
 
@@ -400,10 +408,9 @@ class BlockStatement(Statement):
             return "{2}{{\n{0} {1}{2}}}\n".format(str(self.left), stmtargs, self.tabs)
 
         return "{1}{{\n{0}{1}}}\n".format(str(self.left), self.tabs)
-    def eval(self, env):
+    def eval(self, global_env, env):
         for argument in self.right:
-            argument.eval(env)
-
+            argument.eval(global_env, env)
 
 
 class ReturnStatement(Statement):
@@ -414,7 +421,7 @@ class ReturnStatement(Statement):
     def __str__(self):
         return "{}return {};\n".format(self.tabs, str(self.left))
 
-    def eval(self):
+    def eval(self , global_env , env):
         return self.left.eval()
 
 
@@ -431,6 +438,7 @@ class UnaryOp(Expr):
             return -self.tree.eval()
         else:
             return not self.tree.eval()
+
 
 class IDExpr(Expr):
 
