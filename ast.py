@@ -82,7 +82,7 @@ class Declaration:
         return "{0}{1} {2};\n".format(self.tabs, self.left, str(self.right))
 
     def eval(self, env):
-        env[self.right] = (self.left, None)  # ID: (type, value)
+        env[str(self.right)] = (self.left, None)  # ID: (type, value)
 
 
 class FunctionDef:
@@ -188,7 +188,7 @@ class AssignmentStatement(Statement):
 
     def eval(self, env):
         type = env[self.left][0]
-        env.update({self.left: (type, self.right)})
+        env.update({str(self.left): (type, self.right)})
 
 
 class BlockStatement(Statement):
@@ -251,9 +251,16 @@ class AddExpr(Expr):
     def __str__(self):
         return "({0} + {1})".format(str(self.left), str(self.right))
 
-    def eval(self) -> Union[int, float]:
-        # TODO environment
-        return self.left.eval() + self.right.eval()
+    def eval(self, env) -> Union[int, float]:
+        if self.left == IDExpr:
+            left = self.left.eval(env)[1]
+        else:
+            left = self.left.eval()
+        if self.right == IDExpr:
+            right = self.right.eval(env)[1]
+        else:
+            right = self.right.eval()
+        return left + right
 
 
 """class AndExpr(Expr):
