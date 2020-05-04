@@ -82,8 +82,7 @@ class Declaration:
         return "{0}{1} {2};\n".format(self.tabs, self.left, str(self.right))
 
     def eval(self, env):
-        env[self.right] = (self.left, None) # ID: (type, value)
-        return None
+        env[self.right] = (self.left, None)  # ID: (type, value)
 
 
 class FunctionDef:
@@ -165,7 +164,7 @@ class IfStatement(Statement):
         self.tabs = tabs
 
     def __str__(self):
-        if self.elsestmt :
+        if self.elsestmt:
             return "{0}if ({1})\n\t{2} else \n\t{3}".format(self.tabs, str(self.expr),
                                                             str(self.stmt), str(self.elsestmt))
         return "{0}if({1})\n\t{2}".format(self.tabs, str(self.expr), str(self.stmt))
@@ -190,7 +189,6 @@ class AssignmentStatement(Statement):
     def eval(self, env):
         type = env[self.left][0]
         env.update({self.left: (type, self.right)})
-        return None
 
 
 class BlockStatement(Statement):
