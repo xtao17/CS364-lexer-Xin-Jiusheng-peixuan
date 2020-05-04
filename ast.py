@@ -127,18 +127,6 @@ class Program:
             strs += f + "\n\n"
         return "{}".format(strs)
 
-class AssignmentStatement(Statement):
-    def __init__(self, left: Expr, right: Expr, tabs=""):
-        self.left = left
-        self.right = right
-        self.tabs = tabs
-
-    def __str__(self):
-        return "{0}{1} = {2};\n".format(self.tabs, str(self.left), str(self.right))
-
-    def eval(self, env):
-        type = env[self.left][0]
-        env.update({str(self.left): (type, self.right)})
 
 
 
@@ -373,6 +361,7 @@ class IfStatement(Statement):
             self.elsestmt.eval(env)
 
 
+
 class AssignmentStatement(Statement):
     def __init__(self, left: Expr, right: Expr, tabs=""):
         self.left = left
@@ -381,6 +370,10 @@ class AssignmentStatement(Statement):
 
     def __str__(self):
         return "{0}{1} = {2};\n".format(self.tabs, str(self.left), str(self.right))
+
+    def eval(self, env):
+        type = env[self.left][0]
+        env.update({str(self.left): (type, self.right)})
 
 
 class BlockStatement(Statement):
