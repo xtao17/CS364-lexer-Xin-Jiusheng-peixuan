@@ -72,6 +72,7 @@ class Param:
         return "{0} {1}".format(str(self.left), str(self.right))
 
 
+
 class Declaration:
     def __init__(self, left: str, right: Expr, tabs=""):
         self.left = left
@@ -153,12 +154,15 @@ class AddExpr(BinaryExpr):
         return "({0} + {1})".format(str(self.left), str(self.right))
 
     def eval(self, env) -> Union[int, float]:
-        if self.left == IDExpr:
+        if type(self.left) == IDExpr:
             left = self.left.eval(env)[1]
         else:
             left = self.left.eval()
-        if self.right == IDExpr:
+        if type(self.right) == IDExpr:
             right = self.right.eval(env)[1]
+        elif type(self.right) == IntLitExpr:
+
+            right = self.right.eval()
         else:
             right = self.right.eval(env)
         return left + right
@@ -180,12 +184,15 @@ class MultExpr(BinaryExpr):
 
         # If we checked type when running eval we have a "dynamically typed"
         # language
-        if self.left == IDExpr:
+        if type(self.left) == IDExpr:
             left = self.left.eval(env)[1]
         else:
             left = self.left.eval()
-        if self.right == IDExpr:
+        if type(self.right) == IDExpr:
             right = self.right.eval(env)[1]
+        elif type(self.right) == IntLitExpr:
+
+            right = self.right.eval()
         else:
             right = self.right.eval(env)
         return left * right
@@ -203,12 +210,15 @@ class ExpoExpr(BinaryExpr):
         # TODO environment
         # If we checked type when running eval we have a "dynamically typed"
         # language
-        if self.left == IDExpr:
+        if type(self.left) == IDExpr:
             left = self.left.eval(env)[1]
         else:
             left = self.left.eval()
-        if self.right == IDExpr:
+        if type(self.right) == IDExpr:
             right = self.right.eval(env)[1]
+        elif type(self.right) == IntLitExpr:
+
+            right = self.right.eval()
         else:
             right = self.right.eval(env)
         return left ** right
@@ -390,6 +400,10 @@ class BlockStatement(Statement):
             return "{2}{{\n{0} {1}{2}}}\n".format(str(self.left), stmtargs, self.tabs)
 
         return "{1}{{\n{0}{1}}}\n".format(str(self.left), self.tabs)
+    def eval(self, env):
+        for argument in self.right:
+            argument.eval(env)
+
 
 
 class ReturnStatement(Statement):
@@ -429,7 +443,7 @@ class IDExpr(Expr):
     def eval(self, env):  # a + 7
         # lookup the value of self.id. Look up where?
         # env is a dictionary
-        pass
+        return env[self.id][1]
 
     def typeof(self, decls) -> Type:
         # TODO type decls appropriately as a dictionary type
@@ -488,7 +502,7 @@ class BoolExpr(Expr):
         return "{}".format(self.bool)
 
     def eval(self) -> bool:
-        return self.bool.eval()
+        return self.bool
 
 
 class FuncCExpr(Expr):
@@ -525,6 +539,5 @@ if __name__ == '__main__':
     Represent a + b + c * d
     ((a + b) + (c * d))
     """
-    expr = AddExpr(AddExpr(IDExpr('a'), IDExpr('b')),
-                   MultExpr(IDExpr('c'), IDExpr('d')))
-    print(expr)
+    expr = AddExpr(IntLitExpr(1),IntLitExpr(2))
+    print(expr.eval({}))
