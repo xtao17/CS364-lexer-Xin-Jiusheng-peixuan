@@ -448,7 +448,7 @@ class IDExpr(Expr):
     def __str__(self):
         return self.id
 
-    def eval(self, env):  # a + 7
+    def eval(self, global_env, env):  # a + 7
         # lookup the value of self.id. Look up where?
         # env is a dictionary
         return env[self.id][1]
@@ -468,7 +468,7 @@ class IntLitExpr(Expr):
     def __str__(self):
         return str(self.intlit)
 
-    def eval(self):
+    def eval(self, global_env, env):
         return self.intlit   # base case
 
     # def typeof(self) -> Type:
@@ -486,7 +486,7 @@ class StrLitExpr(Expr):
     def __str__(self):
         return str(self.strlit)
 
-    def eval(self):
+    def eval(self, global_env, env):
         return self.strlit   # base case
 
 
@@ -498,7 +498,7 @@ class FloatLitExpr(Expr):
     def __str__(self):
         return str(self.floatlit)
 
-    def eval(self) -> float:
+    def eval(self, global_env, env) -> float:
         return self.floatlit   # base case
 
 
@@ -509,7 +509,7 @@ class BoolExpr(Expr):
     def __str__(self):
         return "{}".format(self.bool)
 
-    def eval(self) -> bool:
+    def eval(self, global_env, env) -> bool:
         return self.bool
 
 
