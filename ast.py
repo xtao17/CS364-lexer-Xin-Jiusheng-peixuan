@@ -47,6 +47,8 @@ class Statement:
         return "{}{}\n".format(self.tabs, str(self.left))
 
     def eval(self, global_env, env):
+        if self.left ==";":
+            return self.left
         self.left.eval(global_env, env)
 
 
@@ -83,6 +85,7 @@ class Declaration:
         return "{0}{1} {2};\n".format(self.tabs, self.left, str(self.right))
 
     def eval(self, global_env, env):
+        print(env)
         env[str(self.right)] = (self.left, None)  # ID: (type, value)
 
 
@@ -113,11 +116,10 @@ class FunctionDef:
         # within the environment
         global_env[str(self.id)] = self.type  # id:type
         env = {}   # TODO Fix this
+        for d in self.decls:
+            d.eval(global_env, env)
         for s in self.stmts:
-
             s.eval(global_env , env)
-
-
 
 
 class Program:
@@ -135,10 +137,6 @@ class Program:
         env_func = {}
         for func in self.funcs:
             func.eval(env_func)
-
-
-
-
 
 
 class BinaryExpr(Expr):
@@ -162,18 +160,18 @@ class AddExpr(BinaryExpr):
     def __str__(self):
         return "({0} + {1})".format(str(self.left), str(self.right))
 
-    def eval(self, env) -> Union[int, float]:
+    def eval(self, global_env, env) -> Union[int, float]:
         if type(self.left) == IDExpr:
-            left = self.left.eval(env)[1]
+            left = self.left.eval(global_env, env)
         else:
             left = self.left.eval()
         if type(self.right) == IDExpr:
-            right = self.right.eval(env)[1]
+            right = self.right.eval(global_env, env)
         elif type(self.right) == IntLitExpr:
 
             right = self.right.eval()
         else:
-            right = self.right.eval(env)
+            right = self.right.eval(global_env, env)
         return left + right
 
 
@@ -186,7 +184,7 @@ class MultExpr(BinaryExpr):
     def __str__(self):
         return "({0} {1} {2})".format(str(self.left), self.op, str(self.right))
 
-    def eval(self, env) -> Union[int, float]:
+    def eval(self, global_env, env) -> Union[int, float]:
         # TODO environment
         # Implementing SLU-C multiplication using Python's multiplication
         # implmented * using mul instruction
@@ -194,16 +192,16 @@ class MultExpr(BinaryExpr):
         # If we checked type when running eval we have a "dynamically typed"
         # language
         if type(self.left) == IDExpr:
-            left = self.left.eval(env)[1]
+            left = self.left.eval(global_env, env)
         else:
             left = self.left.eval()
         if type(self.right) == IDExpr:
-            right = self.right.eval(env)[1]
+            right = self.right.eval(global_env, env)
         elif type(self.right) == IntLitExpr:
 
             right = self.right.eval()
         else:
-            right = self.right.eval(env)
+            right = self.right.eval(global_env, env)
         return left * right
 
 
@@ -215,21 +213,21 @@ class ExpoExpr(BinaryExpr):
     def __str__(self):
         return "({} ** {})".format(str(self.left), str(self.right))
 
-    def eval(self, env) -> Union[int, float]:
+    def eval(self, global_env, env) -> Union[int, float]:
         # TODO environment
         # If we checked type when running eval we have a "dynamically typed"
         # language
         if type(self.left) == IDExpr:
-            left = self.left.eval(env)[1]
+            left = self.left.eval(global_env, env)
         else:
             left = self.left.eval()
         if type(self.right) == IDExpr:
-            right = self.right.eval(env)[1]
+            right = self.right.eval(global_env, env)
         elif type(self.right) == IntLitExpr:
 
             right = self.right.eval()
         else:
-            right = self.right.eval(env)
+            right = self.right.eval(global_env, env)
         return left ** right
 
 
@@ -277,8 +275,8 @@ class ConjExpr(BinaryExpr):
     def __str__(self):
         return "({0} && {1})".format(str(self.left), str(self.right))
 
-    def eval(self) -> Union[int, bool, float]:
-        return self.left.eval() and self.right.eval()
+    def eval(self, global_env, env) -> Union[int, bool, float]:
+        return self.left.eval(global_env, env) and self.right.eval(global_env, env)
 
     def typeof(self) -> Union[int, bool, float]:
         if self.left.typeof() == BoolType and self.right.typeof() == BoolType:
@@ -321,9 +319,9 @@ class RelatExpr(BinaryExpr):
         """
         return "(+ {0} {1})".format(self.left.scheme(), self.right.scheme())
 
-    def eval(self) -> Union[int, float]:
+    def eval(self, global_env, env) -> Union[int, float]:
         # TODO environment
-        return self.left.eval() + self.right.eval()
+        return self.left.eval(global_env, env) + self.right.eval(global_env, env)
 
 
 class PrintStatement(Statement):
@@ -341,6 +339,7 @@ class PrintStatement(Statement):
         return "{}print({})".format(self.tabs, str(self.prtarg))
 
     def eval(self, global_env, env):
+        print(self.prtarg, end=" ")
         for arg in self.prtargs:
             print(arg, end=" ")
 
@@ -373,7 +372,7 @@ class IfStatement(Statement):
         return "{0}if({1})\n\t{2}".format(self.tabs, str(self.expr), str(self.stmt))
 
     def eval(self, global_env, env):
-        if self.expr.eval():
+        if self.expr.eval(global_env, env):
             self.stmt.eval(global_env, env)
         elif self.elsestmt is not None:
             self.elsestmt.eval(global_env, env)
@@ -390,8 +389,9 @@ class AssignmentStatement(Statement):
         return "{0}{1} = {2};\n".format(self.tabs, str(self.left), str(self.right))
 
     def eval(self, global_env, env):
-        type = env[self.left][0]
+        type = env[str(self.left)][0]
         env.update({str(self.left): (type, self.right)})
+        print(env)
 
 
 class BlockStatement(Statement):
@@ -468,7 +468,7 @@ class IntLitExpr(Expr):
     def __str__(self):
         return str(self.intlit)
 
-    def eval(self, global_env, env):
+    def eval(self):
         return self.intlit   # base case
 
     # def typeof(self) -> Type:
@@ -486,19 +486,18 @@ class StrLitExpr(Expr):
     def __str__(self):
         return str(self.strlit)
 
-    def eval(self, global_env, env):
+    def eval(self):
         return self.strlit   # base case
 
 
 class FloatLitExpr(Expr):
-
     def __init__(self, floatlit: str):
         self.floatlit = float(floatlit)
 
     def __str__(self):
         return str(self.floatlit)
 
-    def eval(self, global_env, env) -> float:
+    def eval(self) -> float:
         return self.floatlit   # base case
 
 
@@ -509,7 +508,7 @@ class BoolExpr(Expr):
     def __str__(self):
         return "{}".format(self.bool)
 
-    def eval(self, global_env, env) -> bool:
+    def eval(self) -> bool:
         return self.bool
 
 
@@ -547,5 +546,9 @@ if __name__ == '__main__':
     Represent a + b + c * d
     ((a + b) + (c * d))
     """
-    expr = AddExpr(IntLitExpr(1),IntLitExpr(2))
-    print(expr.eval({}))
+    globalenv = {"b": ("int", 2)}
+    env = {"a": ("int", 1)}
+    expr = AddExpr(IDExpr("a"),IntLitExpr(2))
+    assignment = AssignmentStatement(IDExpr("c"), 3)
+    print(assignment.eval({}, {"c": ("int", None)}))
+    print(expr.eval({}, env))
