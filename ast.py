@@ -211,11 +211,15 @@ class MultExpr(BinaryExpr):
         if type(self.right) == IDExpr:
             right = self.right.eval(global_env, env)
         elif type(self.right) == IntLitExpr:
-
             right = self.right.eval()
         else:
             right = self.right.eval(global_env, env)
-        return left * right
+        if(self.op=="*"):
+            return left * right
+        if (self.op == "/"):
+            return left // right
+        if (self.op == "%"):
+            return left % right
 
 
 class ExpoExpr(BinaryExpr):
@@ -289,7 +293,6 @@ class ConjExpr(BinaryExpr):
         return "({0} && {1})".format(str(self.left), str(self.right))
 
     def eval(self, global_env, env) -> Union[int, bool, float]:
-        print("conj success")
         left_eval = self.left.eval(global_env, env)
         if self.right:
             for ele in self.right:
@@ -342,8 +345,6 @@ class RelatExpr(BinaryExpr):
         # TODO environment
         if self.right:
             if self.relop=="<":
-                print("< works")
-                print(self.left.eval(global_env, env) < self.right.eval(global_env, env))
                 return self.left.eval(global_env, env) < self.right.eval(global_env, env)
             elif self.relop=="<=":
                 return self.left.eval(global_env, env) <= self.right.eval(global_env, env)
@@ -368,10 +369,16 @@ class PrintStatement(Statement):
         return "{}print({})".format(self.tabs, str(self.prtarg))
 
     def eval(self, global_env, env):
-        print(type(self.prtarg))
-        print(self.prtarg.eval(global_env, env), end=" ")
-        for arg in self.prtargs:
-            print(arg, end=" ")
+        if self.prtargs:
+            print(self.prtarg.eval(global_env, env), end=" ")
+            for i in range(0, len(self.prtargs)):
+                if i == len(self.prtargs) -1:
+                    print(self.prtargs[i])
+                else:
+                    print(self.prtargs[i], end=" ")
+        else:
+            print(self.prtarg.eval(global_env, env))
+
 
 
 class WhileStatement(Statement):
@@ -434,7 +441,7 @@ class AssignmentStatement(Statement):
             env.update({str(self.left): (t, self.right.eval(global_env,env))})
 
 
-        print(env)
+        #print(env)
 
 
 class BlockStatement(Statement):
