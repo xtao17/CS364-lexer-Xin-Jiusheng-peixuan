@@ -22,6 +22,7 @@ class Expr:
         return "({} || {})".format(self.left, self.right)
 
 
+
 class Type:
     pass
 
@@ -276,6 +277,7 @@ class ConjExpr(BinaryExpr):
         return "({0} && {1})".format(str(self.left), str(self.right))
 
     def eval(self, global_env, env) -> Union[int, bool, float]:
+        print("conj success")
         return self.left.eval(global_env, env) and self.right.eval(global_env, env)
 
     def typeof(self) -> Union[int, bool, float]:
@@ -296,11 +298,11 @@ class EqExpr(BinaryExpr):
     def __str__(self):
         return "({0} {1} {2})".format(str(self.left), str(self.Eqlop), str(self.right))
 
-    def eval(self) -> Union[int, bool, float]:
+    def eval(self,global_env,env) -> Union[int, bool, float]:
         if self.Eqlop == "==":
-            return self.left.eval() == self.right.eval()
+            return self.left.eval(global_env, env) == self.right.eval(global_env, env)
         elif self.Eqlop == "!=":
-            return self.left.eval() != self.right.eval()
+            return self.left.eval(global_env, env) != self.right.eval(global_env, env)
 
 
 class RelatExpr(BinaryExpr):
@@ -372,6 +374,7 @@ class IfStatement(Statement):
         return "{0}if({1})\n\t{2}".format(self.tabs, str(self.expr), str(self.stmt))
 
     def eval(self, global_env, env):
+        print("success")
         if self.expr.eval(global_env, env):
             self.stmt.eval(global_env, env)
         elif self.elsestmt is not None:
