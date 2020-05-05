@@ -87,7 +87,7 @@ class Param:
         return "{0} {1}".format(str(self.left), str(self.right))
 
     def eval(self, global_env, env):
-        env[str(self.right)] = ("int", str(env["param"]))
+        env[str(self.right)] = ("int", int(str(env["param"])))
 
 
 class Declaration:

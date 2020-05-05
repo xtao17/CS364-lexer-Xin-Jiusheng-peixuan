@@ -1,5 +1,5 @@
 int a(int x){
-    return x;
+    return x+2;
 }
 int main() {
     int x;
