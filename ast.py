@@ -132,7 +132,7 @@ class FunctionDef:
         for d in self.decls:
             d.eval(global_env, env)
         for s in self.stmts:
-            s.eval(global_env , env)
+            s.eval(global_env, env)
 
 
 class Program:
@@ -366,7 +366,8 @@ class PrintStatement(Statement):
         return "{}print({})".format(self.tabs, str(self.prtarg))
 
     def eval(self, global_env, env):
-        print(self.prtarg, end=" ")
+        print(type(self.prtarg))
+        print(self.prtarg.eval(global_env, env), end=" ")
         for arg in self.prtargs:
             print(arg, end=" ")
 

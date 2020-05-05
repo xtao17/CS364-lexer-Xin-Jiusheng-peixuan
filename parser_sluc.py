@@ -252,7 +252,7 @@ class Parser:
             tmp = self.currtok
             self.currtok = next(self.tg)
             return StrLitExpr(tmp.name)
-        return StrLitExpr(self.expression())
+        return self.expression()
 
     def expression(self) -> Expr:
         left = self.conjunction()
