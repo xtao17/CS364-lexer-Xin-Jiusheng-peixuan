@@ -400,9 +400,8 @@ class IfStatement(Statement):
         return "{0}if({1})\n\t{2}".format(self.tabs, str(self.expr), str(self.stmt))
 
     def eval(self, global_env, env):
-        print("success")
-        if self.expr.eval(global_env, env):
 
+        if self.expr.eval(global_env, env):
             self.stmt.eval(global_env, env)
         elif self.elsestmt is not None:
             self.elsestmt.eval(global_env, env)
@@ -419,8 +418,16 @@ class AssignmentStatement(Statement):
         return "{0}{1} = {2};\n".format(self.tabs, str(self.left), str(self.right))
 
     def eval(self, global_env, env):
-        type = env[str(self.left)][0]
-        env.update({str(self.left): (type, int(str(self.right)))})
+        t = env[str(self.left)][0]
+
+        if type(self.right) == IntLitExpr:
+            env.update({str(self.left): (t, int(str(self.right)))})
+        if type(self.right) == StrLitExpr:
+            env.update({str(self.left): (t, str(self.right))})
+        if type(self.right) == FloatLitExpr:
+            env.update({str(self.left): (t, float(str(self.right)))})
+        if type(self.right) == BoolExpr:
+            env.update({str(self.left): (t, str(self.right))})
         print(env)
 
 
@@ -439,6 +446,7 @@ class BlockStatement(Statement):
 
         return "{1}{{\n{0}{1}}}\n".format(str(self.left), self.tabs)
     def eval(self, global_env, env):
+        self.left.eval(global_env,env)
         for argument in self.right:
             argument.eval(global_env, env)
 
