@@ -382,7 +382,9 @@ class WhileStatement(Statement):
         return "{}while {} {}".format(self.tabs, str(self.left), str(self.right))
 
     def eval(self, global_env, env):
-        while self.left.eval():
+        print("eval works")
+        while self.left.eval(global_env,env):
+            print(2)
             self.right.eval(global_env, env)
 
 
@@ -524,7 +526,7 @@ class StrLitExpr(Expr):
     def __str__(self):
         return str(self.strlit)
 
-    def eval(self):
+    def eval(self,global_env={}, env={}):
         return self.strlit   # base case
 
 
@@ -535,7 +537,7 @@ class FloatLitExpr(Expr):
     def __str__(self):
         return str(self.floatlit)
 
-    def eval(self) -> float:
+    def eval(self, global_env={}, env={}) -> float:
         return self.floatlit   # base case
 
 
@@ -546,7 +548,7 @@ class BoolExpr(Expr):
     def __str__(self):
         return "{}".format(self.bool)
 
-    def eval(self) -> bool:
+    def eval(self,global_env={}, env={}) -> bool:
         return self.bool
 
 

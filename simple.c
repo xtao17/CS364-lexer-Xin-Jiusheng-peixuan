@@ -8,8 +8,9 @@ int main () {
 	a = 5;
 	// a = (a * 3.14159);
 	// a = c;
-    if(a==5){
+    while(a==5){
+        print("while works")
         a=3;
     }
-    print(a+1)
+    print(a)
 }
