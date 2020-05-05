@@ -442,4 +442,3 @@ if __name__ == '__main__':
         p = Parser("simple.c")
     t =p.program()
     print(t)
-    t.eval()
