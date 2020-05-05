@@ -8,5 +8,4 @@ if __name__ == '__main__':
     else:
         p = Parser("simple.c")
     t = p.program()
-    print(t)
     t.eval()

@@ -87,7 +87,7 @@ class Param:
         return "{0} {1}".format(str(self.left), str(self.right))
 
     def eval(self, global_env, env):
-        env[str(self.right)] = env["param"]
+        env[str(self.right)] = ("int", str(env["param"]))
 
 
 class Declaration:
@@ -100,7 +100,6 @@ class Declaration:
         return "{0}{1} {2};\n".format(self.tabs, self.left, str(self.right))
 
     def eval(self, global_env, env):
-        print(env)
         env[str(self.right)] = (self.left, None)  # ID: (type, value)
 
 
@@ -137,12 +136,16 @@ class FunctionDef:
                 d.eval(global_env, env)
             for s in self.stmts:
                 s.eval(global_env, env)
+                if type(s) == ReturnStatement:
+                    return s.eval(global_env, env)
+
         elif str(self.id) == "main":
             env = {}
             for d in self.decls:
                 d.eval(global_env, env)
             for s in self.stmts:
                 s.eval(global_env, env)
+
         else:
             global_env[str(self.id)] = (
                 FunctionDef(self.type, self.id, self.params, self.decls, self.stmts)
@@ -516,7 +519,7 @@ class IDExpr(Expr):
     def eval(self, global_env, env):  # a + 7
         # lookup the value of self.id. Look up where?
         # env is a dictionary
-        return env[self.id][1]
+        return env[str(self.id)][1]
 
     def typeof(self, decls) -> Type:
         # TODO type decls appropriately as a dictionary type
