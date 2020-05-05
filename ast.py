@@ -342,6 +342,8 @@ class RelatExpr(BinaryExpr):
         # TODO environment
         if self.right:
             if self.relop=="<":
+                print("< works")
+                print(self.left.eval(global_env, env) < self.right.eval(global_env, env))
                 return self.left.eval(global_env, env) < self.right.eval(global_env, env)
             elif self.relop=="<=":
                 return self.left.eval(global_env, env) <= self.right.eval(global_env, env)
@@ -382,9 +384,7 @@ class WhileStatement(Statement):
         return "{}while {} {}".format(self.tabs, str(self.left), str(self.right))
 
     def eval(self, global_env, env):
-        print("eval works")
         while self.left.eval(global_env,env):
-            print(2)
             self.right.eval(global_env, env)
 
 
@@ -424,12 +424,16 @@ class AssignmentStatement(Statement):
 
         if type(self.right) == IntLitExpr:
             env.update({str(self.left): (t, int(str(self.right)))})
-        if type(self.right) == StrLitExpr:
+        elif type(self.right) == StrLitExpr:
             env.update({str(self.left): (t, str(self.right))})
-        if type(self.right) == FloatLitExpr:
+        elif type(self.right) == FloatLitExpr:
             env.update({str(self.left): (t, float(str(self.right)))})
-        if type(self.right) == BoolExpr:
+        elif type(self.right) == BoolExpr:
             env.update({str(self.left): (t, str(self.right))})
+        else:
+            env.update({str(self.left): (t, self.right.eval(global_env,env))})
+
+
         print(env)
 
 
@@ -473,11 +477,11 @@ class UnaryOp(Expr):
     def __str__(self):
         return "{}({})".format(self.op, str(self.tree))
 
-    def eval(self):
+    def eval(self,global_env, env):
         if self.op == "-":
-            return -self.tree.eval()
+            return -self.tree.eval(global_env, env)
         else:
-            return not self.tree.eval()
+            return not self.tree.eval(global_env, env)
 
 
 class IDExpr(Expr):
