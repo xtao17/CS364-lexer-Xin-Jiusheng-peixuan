@@ -21,6 +21,14 @@ class Expr:
     def __str__(self):
         return "({} || {})".format(self.left, self.right)
 
+    def eval(self, global_env, env):
+        left_eval=self.left.eval(global_env, env)
+        if self.right:
+            for ele in self.right:
+                right_eval = ele.eval()
+                left_eval = left_eval or right_eval
+        return left_eval
+
 
 
 
@@ -282,11 +290,11 @@ class ConjExpr(BinaryExpr):
 
     def eval(self, global_env, env) -> Union[int, bool, float]:
         print("conj success")
-        left_eval=self.left.eval(global_env, env)
-        if self.right!=None:
+        left_eval = self.left.eval(global_env, env)
+        if self.right:
             for ele in self.right:
-                right_eval=ele.eval(global_env,env)
-                left_eval=left_eval or right_eval
+                right_eval = ele.eval()
+                left_eval = left_eval and right_eval
         return left_eval
 
     def typeof(self) -> Union[int, bool, float]:
@@ -310,7 +318,7 @@ class EqExpr(BinaryExpr):
     def eval(self,global_env,env) -> Union[int, bool, float]:
         if self.Eqlop == "==":
             return self.left.eval(global_env, env) == self.right.eval(global_env, env)
-        elif self.Eqlop == "!=":
+        else:
             return self.left.eval(global_env, env) != self.right.eval(global_env, env)
 
 
@@ -332,8 +340,16 @@ class RelatExpr(BinaryExpr):
 
     def eval(self, global_env, env) -> Union[int, float]:
         # TODO environment
-        return self.left.eval(global_env, env) + self.right.eval(global_env, env)
-
+        if self.right:
+            if self.relop=="<":
+                return self.left.eval(global_env, env) < self.right.eval(global_env, env)
+            elif self.relop=="<=":
+                return self.left.eval(global_env, env) <= self.right.eval(global_env, env)
+            elif self.relop==">":
+                return self.left.eval(global_env, env) > self.right.eval(global_env, env)
+            elif self.relop==">=":
+                return self.left.eval(global_env, env) >= self.right.eval(global_env, env)
+        return self.left.eval(global_env, env)
 
 class PrintStatement(Statement):
     def __init__(self, prtarg: Expr, prtargs: Sequence[Expr], tabs=""):
