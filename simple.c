@@ -11,5 +11,5 @@ int main () {
     if(a==5){
         a=3;
     }
-    print(1)
+    print(a+1)
 }

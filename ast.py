@@ -497,7 +497,7 @@ class IntLitExpr(Expr):
     def __str__(self):
         return str(self.intlit)
 
-    def eval(self):
+    def eval(self,global_env={}, env={}):
         return self.intlit   # base case
 
     # def typeof(self) -> Type:
