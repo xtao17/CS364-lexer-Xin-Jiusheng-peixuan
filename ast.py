@@ -287,7 +287,7 @@ class ConjExpr(BinaryExpr):
             for ele in self.right:
                 right_eval=ele.eval(global_env,env)
                 left_eval=left_eval or right_eval
-            return left_eval
+        return left_eval
 
     def typeof(self) -> Union[int, bool, float]:
         if self.left.typeof() == BoolType and self.right.typeof() == BoolType:
