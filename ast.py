@@ -420,7 +420,7 @@ class AssignmentStatement(Statement):
 
     def eval(self, global_env, env):
         type = env[str(self.left)][0]
-        env.update({str(self.left): (type, self.right)})
+        env.update({str(self.left): (type, int(str(self.right)))})
         print(env)
 
 
