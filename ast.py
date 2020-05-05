@@ -86,6 +86,8 @@ class Param:
             return "{0} {1}{2}".format((str(self.left)), str(self.right), params)
         return "{0} {1}".format(str(self.left), str(self.right))
 
+    def eval(self, global_env, env):
+        env[str(self.right)] = env["param"]
 
 
 class Declaration:
@@ -122,17 +124,29 @@ class FunctionDef:
                 stmtstr += str(self.stmts[i])
         return "{0} {1} ({2}) {{\n{3}{4}}}".format(self.type, str(self.id), str(self.params), declstr, stmtstr)
 
-    def eval(self, global_env) -> Union[int, float, bool]:
+    def eval(self, global_env, env={}) -> Union[int, float, bool]:
         # an environment maps identifiers to values
         # parameters or local variables
         # to evaluate a function you evaluate all of the statements
         # within the environment
-        global_env[str(self.id)] = self.type  # id:type
-        env = {}   # TODO Fix this
-        for d in self.decls:
-            d.eval(global_env, env)
-        for s in self.stmts:
-            s.eval(global_env, env)
+        # id: (type, params, decls, stmts)
+
+        if str(self.id) in global_env:
+            self.params.eval(global_env, env)
+            for d in self.decls:
+                d.eval(global_env, env)
+            for s in self.stmts:
+                s.eval(global_env, env)
+        elif str(self.id) == "main":
+            env = {}
+            for d in self.decls:
+                d.eval(global_env, env)
+            for s in self.stmts:
+                s.eval(global_env, env)
+        else:
+            global_env[str(self.id)] = (
+                FunctionDef(self.type, self.id, self.params, self.decls, self.stmts)
+            )
 
 
 class Program:
@@ -177,7 +191,7 @@ class AddExpr(BinaryExpr):
         if type(self.left) == IDExpr:
             left = self.left.eval(global_env, env)
         else:
-            left = self.left.eval()
+            left = self.left.eval(global_env,env)
         if type(self.right) == IDExpr:
             right = self.right.eval(global_env, env)
         elif type(self.right) == IntLitExpr:
@@ -473,7 +487,7 @@ class ReturnStatement(Statement):
         return "{}return {};\n".format(self.tabs, str(self.left))
 
     def eval(self , global_env , env):
-        return self.left.eval()
+        return self.left.eval(global_env, env)
 
 
 class UnaryOp(Expr):
@@ -580,6 +594,8 @@ class FuncCExpr(Expr):
             return "{}({}{})".format(self.f_id, str(self.left), args)
         return "{}({})".format(self.f_id, str(self.left))
 
+    def eval(self, global_env, env):
+        return global_env[str(self.f_id)].eval(global_env, {"param": self.left})
 
 class Farg:
     def __init__(self, arg: str):
