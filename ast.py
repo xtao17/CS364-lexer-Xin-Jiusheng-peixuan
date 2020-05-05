@@ -23,6 +23,10 @@ class Expr:
 
 
 
+
+
+
+
 class Type:
     pass
 
@@ -278,7 +282,12 @@ class ConjExpr(BinaryExpr):
 
     def eval(self, global_env, env) -> Union[int, bool, float]:
         print("conj success")
-        return self.left.eval(global_env, env) and self.right.eval(global_env, env)
+        left_eval=self.left.eval(global_env, env)
+        if self.right!=None:
+            for ele in self.right:
+                right_eval=ele.eval(global_env,env)
+                left_eval=left_eval or right_eval
+            return left_eval
 
     def typeof(self) -> Union[int, bool, float]:
         if self.left.typeof() == BoolType and self.right.typeof() == BoolType:
@@ -376,6 +385,7 @@ class IfStatement(Statement):
     def eval(self, global_env, env):
         print("success")
         if self.expr.eval(global_env, env):
+
             self.stmt.eval(global_env, env)
         elif self.elsestmt is not None:
             self.elsestmt.eval(global_env, env)
