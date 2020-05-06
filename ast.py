@@ -50,7 +50,7 @@ class Statement:
         return "{}{}\n".format(self.tabs, str(self.left))
 
     def eval(self, global_env, env):
-        if self.left ==";":
+        if self.left == ";":
             return self.left
         self.left.eval(global_env, env)
 
@@ -178,6 +178,7 @@ class SLUCTypeError(Exception):
     def __init__(self, message: str):
         Exception.__init__(self)
         self.message = message
+
     def __str__(self):
         return self.message
 
@@ -194,7 +195,7 @@ class AddExpr(BinaryExpr):
         if type(self.left) == IDExpr:
             left = self.left.eval(global_env, env)
         else:
-            left = self.left.eval(global_env,env)
+            left = self.left.eval(global_env, env)
         if type(self.right) == IDExpr:
             right = self.right.eval(global_env, env)
         elif type(self.right) == IntLitExpr:
@@ -224,12 +225,11 @@ class MultExpr(BinaryExpr):
 
         left = self.left.eval(global_env, env)
         right = self.right.eval(global_env, env)
-
-        if(self.op == "*"):
+        if self.op == "*":
             return left * right
-        if (self.op == "/"):
-            return left // right
-        if (self.op == "%"):
+        if self.op == "/":
+            return left / right
+        if self.op == "%":
             return left % right
 
 
@@ -604,8 +604,7 @@ if __name__ == '__main__':
     """
     globalenv = {"b": ("int", 2)}
     env = {"a": ("int", 1)}
-    expr = AddExpr(IDExpr("a"),IntLitExpr(2))
+    expr = AddExpr(IDExpr("a"), IntLitExpr(2))
     assignment = AssignmentStatement(IDExpr("c"), 3)
     print(assignment.eval({}, {"c": ("int", None)}))
     print(expr.eval({}, env))
-

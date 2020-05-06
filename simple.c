@@ -14,20 +14,9 @@ int main() {
    float y;
    bool z;
    x = 55;
-   y = true;
-   while (x > 0) {
-        if (x % 2 == 0){
-            print(x);
-            print(x+x);
-        }
-        x = x - 1;
-    }
-
-   print(true && false || true && false)
+   y = 5/2;
+   x = 5/2;
    print(y);
-   print(3**2**3);
-   print(exp(2,3));
-   print(f(f(33)*2));
-   print("hello", x);
+   print(x)
 
 }
