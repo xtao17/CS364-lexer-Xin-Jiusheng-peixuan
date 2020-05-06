@@ -607,8 +607,8 @@ class Farg:
     def __str__(self):
         return "{}".format(self.farg)
 
-    def eval(self):
-        return self.farg
+    def eval(self,global_env,env):
+        return self.farg.eval(global_env,env)
 
 
 if __name__ == '__main__':
