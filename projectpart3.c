@@ -73,11 +73,11 @@ int main() {
 
 // compute x^y recursively
 int exp(int x, int y) {
+    print(y)
     if (y == 0)
         return 1;
     else
-        return x*exp(y-1);
-    print(y);
+        return x*exp(x,y-1);
 }
 
 // Hint: Use a stack of environments (stack of dictionaries)

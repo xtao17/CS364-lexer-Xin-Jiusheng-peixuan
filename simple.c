@@ -22,5 +22,5 @@ int main() {
    print(exp());
 
 
-   print(f(f(33)));   // function composition should work
+   print(f());   // function composition should work
 }
