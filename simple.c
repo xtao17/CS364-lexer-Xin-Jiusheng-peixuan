@@ -2,6 +2,7 @@ int f(int x) {
     return x*x;
 }
 
+
 int main() {
    int x;
    float y;
@@ -13,9 +14,8 @@ int main() {
 
    y = x * 3.14;  // type checking. int * float is a float
    x = 3.14;      // convert to an int by truncating
-   print(x)
+   print(x**2**3)
 
-   print("hello", f(33));
 
    print(f(f(33)));   // function composition should work
 }

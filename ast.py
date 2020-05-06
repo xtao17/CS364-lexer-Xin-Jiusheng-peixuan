@@ -648,3 +648,4 @@ if __name__ == '__main__':
     assignment = AssignmentStatement(IDExpr("c"), 3)
     print(assignment.eval({}, {"c": ("int", None)}))
     print(expr.eval({}, env))
+
