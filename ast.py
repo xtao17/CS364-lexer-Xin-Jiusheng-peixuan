@@ -23,13 +23,37 @@ class Expr:
 
     def eval(self, global_env, env):
         left_eval = self.left.eval(global_env, env)
+        if type(left_eval) == bool:
+            left = left_eval
+
+        else:
+            if left_eval == "true":
+                left = True
+            else:
+                left = False
+
+        if self.right:
+            right_eval = self.right.eval(global_env, env)
+
+            if right_eval == True:
+                right = True
+            else:
+                right = False
+
+            left = left or right
+
+
+        return left
+    '''
+    left_eval = self.left.eval(global_env, env)
         if self.right:
             for ele in self.right:
                 right_eval = ele.eval()
                 left_eval = left_eval or right_eval
         return left_eval
 
-
+    left_eval = self.left.eval(global_env, env)
+    '''
 class Type:
     pass
 
