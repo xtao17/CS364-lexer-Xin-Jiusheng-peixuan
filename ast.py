@@ -435,8 +435,8 @@ class IfStatement(Statement):
 
 class AssignmentStatement(Statement):
     def __init__(self, left: Expr, right: Expr, tabs=""):
-        self.left = left
-        self.right = right
+        self.left = left    # id
+        self.right = right  # value
         self.tabs = tabs
 
     def __str__(self):
@@ -454,7 +454,7 @@ class AssignmentStatement(Statement):
                 raise SLUCTypeError("ERROR: type is wrong")
             else:
                 result=self.right.eval(global_env, env)
-                env.update({str(self.left): (str(type(result)), int(result))})
+                env.update({str(self.left): (t, int(result))})
 
         if t == "float":
             if type(self.right) == IntLitExpr or type(self.right) == FloatLitExpr:
@@ -463,7 +463,7 @@ class AssignmentStatement(Statement):
                 raise SLUCTypeError("ERROR: type is wrong")
             else:
                 result = self.right.eval(global_env, env)
-                env.update({str(self.left): (str(type(result)), float(result))})
+                env.update({str(self.left): (t, float(result))})
 
         if t == "bool":
             if type(self.right) == BoolExpr:
@@ -479,6 +479,7 @@ class AssignmentStatement(Statement):
                     env.update({str(self.left): (t, result)})
                 else:
                     raise SLUCTypeError("ERROR: type is wrong")
+
         if t == "str":
             if type(self.right) == StrLitExpr:
                 env.update({str(self.left): (t, str(self.right.eval(global_env, env)))})
@@ -500,6 +501,7 @@ class BlockStatement(Statement):
             return "{2}{{\n{0} {1}{2}}}\n".format(str(self.left), stmtargs, self.tabs)
 
         return "{1}{{\n{0}{1}}}\n".format(str(self.left), self.tabs)
+
     def eval(self, global_env, env):
         self.left.eval(global_env,env)
         for argument in self.right:
