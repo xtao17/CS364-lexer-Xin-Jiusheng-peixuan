@@ -391,9 +391,9 @@ class PrintStatement(Statement):
             print(self.prtarg.eval(global_env, env), end=" ")
             for i in range(0, len(self.prtargs)):
                 if i == len(self.prtargs) -1:
-                    print(self.prtargs[i])
+                    print(self.prtargs[i].eval(global_env, env))
                 else:
-                    print(self.prtargs[i], end=" ")
+                    print(self.prtargs[i].eval(global_env, env), end=" ")
         else:
             print(self.prtarg.eval(global_env, env))
 
