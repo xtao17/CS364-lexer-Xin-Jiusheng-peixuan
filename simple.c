@@ -1,5 +1,5 @@
-int a(int x){
-    return x+2;
+int a(int x, int y){
+    return x+y;
 }
 int main() {
     int x;
@@ -9,7 +9,7 @@ int main() {
     x = 55;
     y = x * 8;
 
-    print(a(1));
+    print(a(1, 2));
     while (x > 0) {
         if (x % 2 == 0)
             print(x);

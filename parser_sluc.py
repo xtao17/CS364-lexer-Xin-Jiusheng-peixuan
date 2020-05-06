@@ -331,17 +331,21 @@ class Parser:
             if self.check_id_exist(self.currtok.name, self.var_id):
                 tmp = self.currtok
                 self.currtok = next(self.tg)
-                return Farg(tmp.name)
+                return Farg(IDExpr(tmp.name))
             else:
                 raise SLUCSyntaxError("ERROR: Variable {} undefined on line {} ".format(self.currtok.name, self.currtok.loc))
         else:
-            if self.currtok.kind in {"int", "real"}:
+            if self.currtok.kind == "int":
                 tmp = self.currtok
                 self.currtok = next(self.tg)
-                return Farg(tmp.name)
+                return Farg(IntLitExpr(tmp.name))
+            if self.currtok.kind == "real":
+                tmp = self.currtok
+                self.currtok = next(self.tg)
+                return Farg(FloatLitExpr(tmp.name))
             if self.currtok.kind == "right-paren":
                 self.currtok = next(self.tg)
-                return Farg("")
+                return Farg(StrLitExpr(""))
         raise SLUCSyntaxError("ERROR: Invalid function argument {} on line {} ".format(self.currtok.name, self.currtok.loc))
 
     def term(self) -> Expr:

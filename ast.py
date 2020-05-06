@@ -22,17 +22,12 @@ class Expr:
         return "({} || {})".format(self.left, self.right)
 
     def eval(self, global_env, env):
-        left_eval=self.left.eval(global_env, env)
+        left_eval = self.left.eval(global_env, env)
         if self.right:
             for ele in self.right:
                 right_eval = ele.eval()
                 left_eval = left_eval or right_eval
         return left_eval
-
-
-
-
-
 
 
 class Type:
@@ -67,27 +62,38 @@ class Statement:
 
 class Param:
     def __init__(self, left: str, right: Expr, args=None):
-        self.left = left
-        self.right = right
-        self.args = args
+        self.left = left    # type
+        self.right = right  # id
+        self.args = args    # [type id]
 
     def __str__(self):
         if not self.left:
             return ""
-
         if self.args:
             params = ""
             for arg in self.args:
-                if type(arg) == str:
+                if type(arg) == str:    # arg is type now
                     params += ", " + str(arg)
-                else:
+                else:   # arg is id
                     params += " " + str(arg)
 
             return "{0} {1}{2}".format((str(self.left)), str(self.right), params)
         return "{0} {1}".format(str(self.left), str(self.right))
 
     def eval(self, global_env, env):
-        env[str(self.right)] = ("int", int(str(env["param"])))
+        alist = env["arg"]
+        if len(alist) > 1:
+            tlist = [self.left]
+            ilist = [self.right]
+            for arg in self.args:
+                if type(arg) == str:
+                    tlist.append(arg)
+                else:
+                    ilist.append(arg)
+            for i in range(0, len(ilist)):
+                env[str(ilist[i])] = (tlist[i], alist[i])
+        else:
+            env[str(self.right)] = ("int", (alist[0]))
 
 
 class Declaration:
@@ -519,7 +525,7 @@ class IDExpr(Expr):
     def eval(self, global_env, env):  # a + 7
         # lookup the value of self.id. Look up where?
         # env is a dictionary
-        return env[str(self.id)][1]
+        return env[self.id][1]
 
     def typeof(self, decls) -> Type:
         # TODO type decls appropriately as a dictionary type
@@ -598,7 +604,14 @@ class FuncCExpr(Expr):
         return "{}({})".format(self.f_id, str(self.left))
 
     def eval(self, global_env, env):
-        return global_env[str(self.f_id)].eval(global_env, {"param": self.left})
+        if self.right:
+            args = [self.left.eval(global_env, env)]
+            for a in self.right:
+                args.append(a.eval(global_env, env))
+            return global_env[str(self.f_id)].eval(global_env, {"arg": args})
+        else:
+            return global_env[str(self.f_id)].eval(global_env, {"arg": [self.left.eval(global_env, env)]})
+
 
 class Farg:
     def __init__(self, arg: Expr):
@@ -607,8 +620,8 @@ class Farg:
     def __str__(self):
         return "{}".format(str(self.farg))
 
-    def eval(self,global_env,env):
-        return self.farg.eval(global_env,env)
+    def eval(self, global_env, env):
+        return self.farg.eval(global_env, env)
 
 
 if __name__ == '__main__':
