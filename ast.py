@@ -27,10 +27,7 @@ class Expr:
             left = left_eval
 
         else:
-            if left_eval == "true":
-                left = True
-            else:
-                left = False
+            raise SLUCTypeError("ERROR: type error")
 
         if self.right:
             right_eval = self.right.eval(global_env, env)
@@ -38,39 +35,10 @@ class Expr:
             if type(right_eval) == bool:
                 right = right_eval
             else:
-                if right_eval == "true":
-                    right = True
-                else:
-                    right = False
+                raise SLUCTypeError("ERROR: type error")
 
             left = left or right
-
-
         return left
-    '''
-    left_eval = self.left.eval(global_env, env)
-        if self.right:
-            for ele in self.right:
-                right_eval = ele.eval()
-                left_eval = left_eval or right_eval
-        return left_eval
-
-    left_eval = self.left.eval(global_env, env)
-    '''
-class Type:
-    pass
-
-
-class IntegerType(Type):
-    pass
-
-
-class FloatType(Type):
-    pass
-
-
-class BoolType(Type):
-    pass
 
 
 class Statement:
@@ -346,32 +314,17 @@ class ConjExpr(BinaryExpr):
         if type(left_eval) == bool:
             left = left_eval
         else:
-            if left_eval == "true":
-                left = True
-            else:
-                left = False
+            raise SLUCTypeError("ERROR: type error")
 
         if self.right:
             right_eval = self.right.eval(global_env, env)
-
             if type(right_eval) == bool:
                 right = right_eval
             else:
-                if right_eval == "true":
-                    right = True
-                else:
-                    right = False
+                raise SLUCTypeError("ERROR: type error")
             left = left and right
 
         return left
-
-    def typeof(self) -> Union[int, bool, float]:
-        if self.left.typeof() == BoolType and self.right.typeof() == BoolType:
-            return BoolType
-
-        else:
-            # type error
-            raise SLUCTypeError("type error on line {0}, expected two booleans got a {1} and a {2}".format(0))
 
 
 class EqExpr(BinaryExpr):
@@ -609,12 +562,6 @@ class IDExpr(Expr):
         # env is a dictionary
         return env[self.id][1]
 
-    # env key: id, tuple[0] type, tuple[1] value
-    def typeof(self, decls, env) -> Type:
-        # TODO type decls appropriately as a dictionary type
-        # look up the variable type in the declaration dictoinary
-        # from the function definition (FunctionDef)
-        return env[decls][0]
 
 
 class IntLitExpr(Expr):
@@ -628,11 +575,6 @@ class IntLitExpr(Expr):
     def eval(self,global_env={}, env={}):
         return self.intlit   # base case
 
-    # def typeof(self) -> Type:
-    # representing SLU-C types using Python types
-    def typeof(self) -> type:
-        return int
-
 
 class StrLitExpr(Expr):
 
@@ -644,8 +586,7 @@ class StrLitExpr(Expr):
 
     def eval(self,global_env={}, env={}):
         return self.strlit   # base case
-    def typeof(self) -> type:
-        return str
+
 
 class FloatLitExpr(Expr):
     def __init__(self, floatlit: str):
@@ -656,8 +597,7 @@ class FloatLitExpr(Expr):
 
     def eval(self, global_env={}, env={}) -> float:
         return self.floatlit   # base case
-    def typeof(self) -> type:
-        return float
+
 
 class BoolExpr(Expr):
     def __init__(self, bool: str):
@@ -667,10 +607,11 @@ class BoolExpr(Expr):
         return "{}".format(self.bool)
 
     def eval(self,global_env={}, env={}) -> bool:
-        return self.bool
+        if self.bool == "true":
+            return True
+        else:
+            return False
 
-    def typeof(self) -> type:
-        return bool
 
 class FuncCExpr(Expr):
     def __init__(self, f_id: str, left: Expr, right: Sequence[Expr]):
