@@ -398,7 +398,6 @@ class PrintStatement(Statement):
             print(self.prtarg.eval(global_env, env))
 
 
-
 class WhileStatement(Statement):
     def __init__(self, left: Expr, right: Statement, tabs=""):
         self.left = left
@@ -427,12 +426,11 @@ class IfStatement(Statement):
         return "{0}if({1})\n\t{2}".format(self.tabs, str(self.expr), str(self.stmt))
 
     def eval(self, global_env, env):
-
         if self.expr.eval(global_env, env):
             self.stmt.eval(global_env, env)
+
         elif self.elsestmt is not None:
             self.elsestmt.eval(global_env, env)
-
 
 
 class AssignmentStatement(Statement):
@@ -446,6 +444,7 @@ class AssignmentStatement(Statement):
 
     def eval(self, global_env, env):
         t = env[str(self.left)][0]
+
         if t == "int":
             if type(self.right) == IntLitExpr:
                 env.update({str(self.left): (t, int(str(self.right)))})
@@ -457,18 +456,18 @@ class AssignmentStatement(Statement):
                 result=self.right.eval(global_env, env)
                 env.update({str(self.left): (str(type(result)), int(result))})
 
-        if t=="float":
+        if t == "float":
             if type(self.right) == IntLitExpr or type(self.right) == FloatLitExpr:
                 env.update({str(self.left): (t, (float(str(self.right))))})
             elif type(self.right) == StrLitExpr or type(self.right) == BoolExpr:
                 raise SLUCTypeError("ERROR: type is wrong")
-
             else:
                 result = self.right.eval(global_env, env)
                 env.update({str(self.left): (str(type(result)), float(result))})
-        if t=="bool":
+
+        if t == "bool":
             if type(self.right) == BoolExpr:
-                env.update({str(self.left): (t, str(self.right))})
+                env.update({str(self.left): (t, self.right.eval(global_env, env))})
             elif type(self.right) == IntLitExpr \
                     or type(self.right) == FloatLitExpr \
                     or type(self.right) == StrLitExpr:
@@ -480,26 +479,11 @@ class AssignmentStatement(Statement):
                     env.update({str(self.left): (t, result)})
                 else:
                     raise SLUCTypeError("ERROR: type is wrong")
-        if t=="str":
+        if t == "str":
             if type(self.right) == StrLitExpr:
                 env.update({str(self.left): (t, str(self.right.eval(global_env, env)))})
             else:
                 raise SLUCTypeError("ERROR: type is wrong")
-
-
-        '''
-        if type(self.right) == IntLitExpr:
-            env.update({str(self.left): (t, int(str(self.right)))})
-        elif type(self.right) == StrLitExpr:
-            env.update({str(self.left): (t, str(self.right))})
-        elif type(self.right) == FloatLitExpr:
-            env.update({str(self.left): (t, float(str(self.right)))})
-        elif type(self.right) == BoolExpr:
-            env.update({str(self.left): (t, str(self.right))})
-        else:
-            env.update({str(self.left): (t, self.right.eval(global_env,env))})
-        '''
-        #print(env)
 
 
 class BlockStatement(Statement):
