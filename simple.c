@@ -3,11 +3,8 @@ int f(int x) {
 }
 
 int exp(int x, int y) {
-    if (y == 0){
-        print(y);
+    if (y == 0)
         return 1;
-    }
-
     else
         return x*exp(x,y-1);
 }
@@ -16,17 +13,19 @@ int main() {
    int x;
    float y;
    bool z;
-   x = f(33);  // <-- Need to add function call syntax
+   x = 55;
+   y = 5;
+   while (x > 0) {
+        if (x % 2 == 0){
+            print(x);
+            print(x+x);
+        }
 
-   // It is not hard to add function call syntax. It is just an identifier
-   // followed by zero or more expressions separated by commas.
-
-   y = x * 3.14;  // type checking. int * float is a float
-   x = 3.14;      // convert to an int by truncating
-
-   if(x==3){
-    print("hello")
-   }
-   print(exp(1,4));
+        x = x - 1;
+    }
+   print(y);
+   print(3**2**3);
+   print(exp(2,3));
+   print(f(f(33)));
 
 }

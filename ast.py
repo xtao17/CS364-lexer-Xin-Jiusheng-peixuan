@@ -10,7 +10,7 @@ Interpreter Pattern
 design patterns - catalog of best practices in software design
 """
 from typing import Sequence, Union, Optional
-import math
+
 
 # Expr, Statements, FunctionDef,Pram
 class Expr:
@@ -132,13 +132,15 @@ class FunctionDef:
         # id: (type, params, decls, stmts)
 
         if str(self.id) in global_env:
-            self.params.eval(global_env, env)
+            self.params.eval(global_env, env)   # get the value of a param
             for d in self.decls:
                 d.eval(global_env, env)
             for s in self.stmts:
-                s.eval(global_env, env)
-                if type(s) == ReturnStatement:
+                """if type(s) == ReturnStatement:
                     return s.eval(global_env, env)
+                else:
+                    return s.eval(global_env, env)"""
+                return s.eval(global_env, env)
 
         elif str(self.id) == "main":
             env = {}
@@ -148,9 +150,7 @@ class FunctionDef:
                 s.eval(global_env, env)
 
         else:
-            global_env[str(self.id)] = (
-                FunctionDef(self.type, self.id, self.params, self.decls, self.stmts)
-            )
+            global_env[str(self.id)] = FunctionDef(self.type, self.id, self.params, self.decls, self.stmts)
 
 
 class Program:
@@ -223,10 +223,9 @@ class MultExpr(BinaryExpr):
         # language
 
         left = self.left.eval(global_env, env)
-        print("left:",left)
         right = self.right.eval(global_env, env)
-        print(right)
-        if(self.op=="*"):
+
+        if(self.op == "*"):
             return left * right
         if (self.op == "/"):
             return left // right
@@ -258,42 +257,6 @@ class ExpoExpr(BinaryExpr):
         else:
             right = self.right.eval(global_env, env)
         return left ** right
-
-
-"""class AndExpr(Expr):
-    def __init__(self, left: Expr, right: Expr):
-        self.left = left
-        self.right = right
-
-    def __str__(self):
-        return "({0} && {1})".format(str(self.left), str(self.right))
-
-        # def typeof(self) -> str: # where string is 'int' or 'float' or 'bool' or 'error'
-        # strings are not abstract "INT" "int" "fred"
-        # Expressions have types
-        # def typeof(self) -> Type:
-
-    def typeof(self) -> Union[int, bool, float]:  #
-        
-        Return the type of the expression.
-        1) 4 + 4 is an int
-        2) 2 * 3.14 is a float
-        3) True && False is a bool
-        4) True && 3.14 type error
-        Static type checking: type check the program *before* we evaluate it.
-        Scheme is dynamically type checked. Type errors checked at run time.
-        Java - statically type checked.
-        C - static
-        Python - dynamic, checked at run time
-                 mypy - static type checker for Python
-        
-        if self.left.typeof() == BoolType and self.right.typeof() == BoolType:
-            return BoolType
-        else:
-            # type error
-            raise SLUCTypeError(
-                "type error on line {0}, expected two booleans got a {1} and a {2}".format(0))
-"""
 
 
 class ConjExpr(BinaryExpr):
@@ -357,13 +320,13 @@ class RelatExpr(BinaryExpr):
     def eval(self, global_env, env) -> Union[int, float]:
         # TODO environment
         if self.right:
-            if self.relop=="<":
+            if self.relop == "<":
                 return self.left.eval(global_env, env) < self.right.eval(global_env, env)
-            elif self.relop=="<=":
+            elif self.relop == "<=":
                 return self.left.eval(global_env, env) <= self.right.eval(global_env, env)
-            elif self.relop==">":
+            elif self.relop == ">":
                 return self.left.eval(global_env, env) > self.right.eval(global_env, env)
-            elif self.relop==">=":
+            elif self.relop == ">=":
                 return self.left.eval(global_env, env) >= self.right.eval(global_env, env)
         return self.left.eval(global_env, env)
 
@@ -422,10 +385,10 @@ class IfStatement(Statement):
 
     def eval(self, global_env, env):
         if self.expr.eval(global_env, env):
-            self.stmt.eval(global_env, env)
-
-        elif self.elsestmt is not None:
-            self.elsestmt.eval(global_env, env)
+            return self.stmt.eval(global_env, env)
+        elif self.elsestmt:
+            return self.elsestmt.eval(global_env, env)
+        return None
 
 
 class AssignmentStatement(Statement):
@@ -469,7 +432,7 @@ class AssignmentStatement(Statement):
                 raise SLUCTypeError("ERROR: type is wrong")
             else:
                 result = self.right.eval(global_env, env)
-                print("type result",type(result))
+
                 if type(result)==bool:
                     env.update({str(self.left): (t, result)})
                 else:
@@ -512,8 +475,7 @@ class ReturnStatement(Statement):
         return "{}return {};\n".format(self.tabs, str(self.left))
 
     def eval(self , global_env , env):
-
-            return self.left.eval(global_env, env)
+        return self.left.eval(global_env, env)
 
 
 class UnaryOp(Expr):
@@ -613,13 +575,13 @@ class FuncCExpr(Expr):
         return "{}({})".format(self.f_id, str(self.left))
 
     def eval(self, global_env, env):
-        func_stack=[]
+
         if self.right:
             args = [self.left.eval(global_env, env)]
             for a in self.right:
                 args.append(a.eval(global_env, env))
-            func_stack.append(env)
             return global_env[str(self.f_id)].eval(global_env, {"arg": args})
+
         else:
             return global_env[str(self.f_id)].eval(global_env, {"arg": [self.left.eval(global_env, env)]})
 
