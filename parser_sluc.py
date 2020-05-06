@@ -294,7 +294,6 @@ class Parser:
         """
         Expr  →  Term { + Term }
         """
-
         left = self.term()
 
         while self.currtok.kind in {"plus", "minus"}:
@@ -320,12 +319,13 @@ class Parser:
             self.currtok = next(self.tg)
             left = FuncCExpr(f_id, left, args)
             return left
-
+        print(self.currtok.kind)
         raise SLUCSyntaxError("ERROR: Invalid function call on line {}".format(self.currtok.loc))
 
     def farg(self) -> Farg:
         """
-        Farg → id | intlit | float | epsilon | FuncC
+        Farg → expression | epsilon
+        """
         """
         if self.currtok.kind == "ID":
             tmp = self.currtok
@@ -348,8 +348,12 @@ class Parser:
                 return Farg(FloatLitExpr(tmp.name))
             if self.currtok.kind == "right-paren":
                 self.currtok = next(self.tg)
-                return Farg(StrLitExpr(""))
-        raise SLUCSyntaxError("ERROR: Invalid function argument {} on line {} ".format(self.currtok.name, self.currtok.loc))
+                return Farg(StrLitExpr("")) 
+            """
+        if self.currtok.kind == "right-paren":
+            return Farg(StrLitExpr(""))
+        return Farg(self.expression())
+        # raise SLUCSyntaxError("ERROR: Invalid function argument {} on line {} ".format(self.currtok.name, self.currtok.loc))
 
     def term(self) -> Expr:
         """

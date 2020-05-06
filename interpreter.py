@@ -6,9 +6,9 @@ if __name__ == '__main__':
     else:
         p = Parser("simple.c")
 
-    try:
+    #try:
         t = p.program()
         t.eval()
-    except SLUCSyntaxError as e:
-        print(str(e))
-        sys.exit()
+    #except SLUCSyntaxError as e:
+     #   print(str(e))
+      #  sys.exit()

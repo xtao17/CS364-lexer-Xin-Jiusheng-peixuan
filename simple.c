@@ -2,6 +2,10 @@ int f(int x) {
     return x*x;
 }
 
+int exp() {
+    return 99;
+}
+
 int main() {
    int x;
    float y;
@@ -15,7 +19,7 @@ int main() {
    x = 3.14;      // convert to an int by truncating
 
 
-   print(true && 5);   // type error
+   print(exp());
 
 
 
