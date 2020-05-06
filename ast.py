@@ -221,16 +221,11 @@ class MultExpr(BinaryExpr):
 
         # If we checked type when running eval we have a "dynamically typed"
         # language
-        if type(self.left) == IDExpr:
-            left = self.left.eval(global_env, env)
-        else:
-            left = self.left.eval()
-        if type(self.right) == IDExpr:
-            right = self.right.eval(global_env, env)
-        elif type(self.right) == IntLitExpr:
-            right = self.right.eval()
-        else:
-            right = self.right.eval(global_env, env)
+
+        left = self.left.eval(global_env, env)
+        print("left:",left)
+        right = self.right.eval(global_env, env)
+        print(right)
         if(self.op=="*"):
             return left * right
         if (self.op == "/"):
@@ -517,6 +512,7 @@ class ReturnStatement(Statement):
         return "{}return {};\n".format(self.tabs, str(self.left))
 
     def eval(self , global_env , env):
+
             return self.left.eval(global_env, env)
 
 
@@ -617,10 +613,12 @@ class FuncCExpr(Expr):
         return "{}({})".format(self.f_id, str(self.left))
 
     def eval(self, global_env, env):
+        func_stack=[]
         if self.right:
             args = [self.left.eval(global_env, env)]
             for a in self.right:
                 args.append(a.eval(global_env, env))
+            func_stack.append(env)
             return global_env[str(self.f_id)].eval(global_env, {"arg": args})
         else:
             return global_env[str(self.f_id)].eval(global_env, {"arg": [self.left.eval(global_env, env)]})
