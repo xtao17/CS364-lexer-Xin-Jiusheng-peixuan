@@ -1,20 +1,23 @@
-int a(int x, int y){
-    return x+y;
+int f(int x) {
+    return x*x;
 }
+
 int main() {
-    int x;
-    bool y;
-    bool z;
-    z=true;
-    x=1;
-    x=1+2%3+4;
-    print(x)
-    y=true && false;
-    print(y);
-    if(y){
-        print("牛逼")
-    }
-    else{
-        print("菜")
-    }
+   int x;
+   float y;
+   bool z;
+   x = f(33);  // <-- Need to add function call syntax
+
+   // It is not hard to add function call syntax. It is just an identifier
+   // followed by zero or more expressions separated by commas.
+
+   y = x * 3.14;  // type checking. int * float is a float
+   x = 3.14;      // convert to an int by truncating
+
+
+   print(true || false);   // type error
+
+   // Type error but the grammar disallows this
+
+   print(f(33));   // function composition should work
 }

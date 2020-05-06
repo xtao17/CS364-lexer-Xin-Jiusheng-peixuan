@@ -316,15 +316,25 @@ class ConjExpr(BinaryExpr):
 
     def eval(self, global_env, env) -> Union[int, bool, float]:
         left_eval = self.left.eval(global_env, env)
-        print(left_eval)
+        if type(left_eval) == bool:
+            left = left_eval
+        else:
+            if left_eval == "true":
+                left = True
+            else:
+                left = False
+
         if self.right:
             right_eval = self.right.eval(global_env, env)
-            print(type(self.right))
-            left_eval = left_eval and right_eval
-            print("type lefteval",type(left_eval))
-            print("left_eval:",left_eval)
-        return left_eval
 
+            if right_eval=="true":
+                right=True
+            else:
+                right=False
+
+            left = left and right
+
+        return left
 
     def typeof(self) -> Union[int, bool, float]:
         if self.left.typeof() == BoolType and self.right.typeof() == BoolType:
@@ -477,14 +487,15 @@ class AssignmentStatement(Statement):
         if t=="bool":
             if type(self.right) == BoolExpr:
                 env.update({str(self.left): (t, str(self.right))})
-            elif type(self.right) == IntLitExpr or type(self.right) == FloatLitExpr or type(self.right) == StrLitExpr:
+            elif type(self.right) == IntLitExpr \
+                    or type(self.right) == FloatLitExpr \
+                    or type(self.right) == StrLitExpr:
                 raise SLUCTypeError("ERROR: type is wrong")
             else:
                 result = self.right.eval(global_env, env)
-                if result=="true":
-                    env.update({str(self.left): (t, True)})
-                elif result=="false":
-                    env.update({str(self.left): (t, False)})
+                print("type result",type(result))
+                if type(result)==bool:
+                    env.update({str(self.left): (t, result)})
                 else:
                     raise SLUCTypeError("ERROR: type is wrong")
         if t=="str":
