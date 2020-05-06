@@ -10,7 +10,7 @@ Interpreter Pattern
 design patterns - catalog of best practices in software design
 """
 from typing import Sequence, Union, Optional
-
+import math
 
 # Expr, Statements, FunctionDef,Pram
 class Expr:
@@ -183,7 +183,6 @@ class SLUCTypeError(Exception):
     def __init__(self, message: str):
         Exception.__init__(self)
         self.message = message
-
     def __str__(self):
         return self.message
 
@@ -317,11 +316,15 @@ class ConjExpr(BinaryExpr):
 
     def eval(self, global_env, env) -> Union[int, bool, float]:
         left_eval = self.left.eval(global_env, env)
+        print(left_eval)
         if self.right:
-            for ele in self.right:
-                right_eval = ele.eval()
-                left_eval = left_eval and right_eval
+            right_eval = self.right.eval(global_env, env)
+            print(type(self.right))
+            left_eval = left_eval and right_eval
+            print("type lefteval",type(left_eval))
+            print("left_eval:",left_eval)
         return left_eval
+
 
     def typeof(self) -> Union[int, bool, float]:
         if self.left.typeof() == BoolType and self.right.typeof() == BoolType:
@@ -451,7 +454,47 @@ class AssignmentStatement(Statement):
 
     def eval(self, global_env, env):
         t = env[str(self.left)][0]
+        if t == "int":
+            if type(self.right) == IntLitExpr:
+                env.update({str(self.left): (t, int(str(self.right)))})
+            elif type(self.right) == FloatLitExpr:
+                env.update({str(self.left): (t, int(float(str(self.right))))})
+            elif type(self.right) == StrLitExpr or type(self.right) == BoolExpr:
+                raise SLUCTypeError("ERROR: type is wrong")
+            else:
+                result=self.right.eval(global_env, env)
+                env.update({str(self.left): (str(type(result)), int(result))})
 
+        if t=="float":
+            if type(self.right) == IntLitExpr or type(self.right) == FloatLitExpr:
+                env.update({str(self.left): (t, (float(str(self.right))))})
+            elif type(self.right) == StrLitExpr or type(self.right) == BoolExpr:
+                raise SLUCTypeError("ERROR: type is wrong")
+
+            else:
+                result = self.right.eval(global_env, env)
+                env.update({str(self.left): (str(type(result)), float(result))})
+        if t=="bool":
+            if type(self.right) == BoolExpr:
+                env.update({str(self.left): (t, str(self.right))})
+            elif type(self.right) == IntLitExpr or type(self.right) == FloatLitExpr or type(self.right) == StrLitExpr:
+                raise SLUCTypeError("ERROR: type is wrong")
+            else:
+                result = self.right.eval(global_env, env)
+                if result=="true":
+                    env.update({str(self.left): (t, True)})
+                elif result=="false":
+                    env.update({str(self.left): (t, False)})
+                else:
+                    raise SLUCTypeError("ERROR: type is wrong")
+        if t=="str":
+            if type(self.right) == StrLitExpr:
+                env.update({str(self.left): (t, str(self.right.eval(global_env, env)))})
+            else:
+                raise SLUCTypeError("ERROR: type is wrong")
+
+
+        '''
         if type(self.right) == IntLitExpr:
             env.update({str(self.left): (t, int(str(self.right)))})
         elif type(self.right) == StrLitExpr:
@@ -462,8 +505,7 @@ class AssignmentStatement(Statement):
             env.update({str(self.left): (t, str(self.right))})
         else:
             env.update({str(self.left): (t, self.right.eval(global_env,env))})
-
-
+        '''
         #print(env)
 
 
@@ -496,7 +538,7 @@ class ReturnStatement(Statement):
         return "{}return {};\n".format(self.tabs, str(self.left))
 
     def eval(self , global_env , env):
-        return self.left.eval(global_env, env)
+            return self.left.eval(global_env, env)
 
 
 class UnaryOp(Expr):
@@ -527,11 +569,12 @@ class IDExpr(Expr):
         # env is a dictionary
         return env[self.id][1]
 
-    def typeof(self, decls) -> Type:
+    # env key: id, tuple[0] type, tuple[1] value
+    def typeof(self, decls, env) -> Type:
         # TODO type decls appropriately as a dictionary type
         # look up the variable type in the declaration dictoinary
         # from the function definition (FunctionDef)
-        pass
+        return env[decls][0]
 
 
 class IntLitExpr(Expr):
@@ -548,7 +591,6 @@ class IntLitExpr(Expr):
     # def typeof(self) -> Type:
     # representing SLU-C types using Python types
     def typeof(self) -> type:
-        # return IntegerType
         return int
 
 
@@ -562,7 +604,8 @@ class StrLitExpr(Expr):
 
     def eval(self,global_env={}, env={}):
         return self.strlit   # base case
-
+    def typeof(self) -> type:
+        return str
 
 class FloatLitExpr(Expr):
     def __init__(self, floatlit: str):
@@ -573,7 +616,8 @@ class FloatLitExpr(Expr):
 
     def eval(self, global_env={}, env={}) -> float:
         return self.floatlit   # base case
-
+    def typeof(self) -> type:
+        return float
 
 class BoolExpr(Expr):
     def __init__(self, bool: str):
@@ -585,6 +629,8 @@ class BoolExpr(Expr):
     def eval(self,global_env={}, env={}) -> bool:
         return self.bool
 
+    def typeof(self) -> type:
+        return bool
 
 class FuncCExpr(Expr):
     def __init__(self, f_id: str, left: Expr, right: Sequence[Expr]):

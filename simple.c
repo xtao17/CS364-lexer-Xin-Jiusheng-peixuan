@@ -3,16 +3,18 @@ int a(int x, int y){
 }
 int main() {
     int x;
-    int y;
-
-
-    x = 55;
-    y = x * 8;
-
-    print(a(1, 2));
-    while (x > 0) {
-        if (x % 2 == 0)
-            print(x);
-        x = x - 1;
+    bool y;
+    bool z;
+    z=true;
+    x=1;
+    x=1+2%3+4;
+    print(x)
+    y=true && false;
+    print(y);
+    if(y){
+        print("牛逼")
+    }
+    else{
+        print("菜")
     }
 }
