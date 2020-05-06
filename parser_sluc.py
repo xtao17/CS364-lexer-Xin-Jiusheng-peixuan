@@ -325,13 +325,16 @@ class Parser:
 
     def farg(self) -> Farg:
         """
-        Farg → id | intlit | float | epsilon
+        Farg → id | intlit | float | epsilon | FuncC
         """
         if self.currtok.kind == "ID":
-            if self.check_id_exist(self.currtok.name, self.var_id):
-                tmp = self.currtok
-                self.currtok = next(self.tg)
+            tmp = self.currtok
+            self.currtok = next(self.tg)
+            if self.check_id_exist(tmp.name, self.var_id):
                 return Farg(IDExpr(tmp.name))
+            elif self.currtok.kind == "left-paren":
+                self.currtok = next(self.tg)
+                return Farg(self.funcC(tmp.name))
             else:
                 raise SLUCSyntaxError("ERROR: Variable {} undefined on line {} ".format(self.currtok.name, self.currtok.loc))
         else:
