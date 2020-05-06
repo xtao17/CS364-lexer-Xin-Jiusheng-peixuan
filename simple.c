@@ -14,7 +14,7 @@ int main() {
    float y;
    bool z;
    x = 55;
-   y = 5;
+   y = true;
    while (x > 0) {
         if (x % 2 == 0){
             print(x);
