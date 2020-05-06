@@ -31,7 +31,7 @@ class Expr:
                 left = True
             else:
                 left = False
-
+        print("right t",type(self.right))
         if self.right:
             right_eval = self.right.eval(global_env, env)
 

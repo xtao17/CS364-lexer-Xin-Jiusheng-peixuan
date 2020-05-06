@@ -5,5 +5,10 @@ if __name__ == '__main__':
         p = Parser(sys.argv[1])
     else:
         p = Parser("simple.c")
-    t = p.program()
-    t.eval()
+
+    try:
+        t = p.program()
+        t.eval()
+    except SLUCSyntaxError as e:
+        print(str(e))
+        sys.exit()

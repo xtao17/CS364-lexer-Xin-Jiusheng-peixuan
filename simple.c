@@ -16,6 +16,6 @@ int main() {
 
 
    // Type error but the grammar disallows this
-
+   print(false||true||false&&true)
    print(f(f(f(33))));   // function composition should work
 }
