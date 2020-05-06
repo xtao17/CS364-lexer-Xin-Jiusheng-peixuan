@@ -15,7 +15,9 @@ int main() {
    x = 3.14;      // convert to an int by truncating
 
 
-   // Type error but the grammar disallows this
-   print(false||true||false&&true)
-   print(f(f(f(33))));   // function composition should work
+   print(true && 5);   // type error
+
+
+
+   print(f(f(33)));   // function composition should work
 }

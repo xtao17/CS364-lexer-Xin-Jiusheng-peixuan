@@ -31,14 +31,17 @@ class Expr:
                 left = True
             else:
                 left = False
-        print("right t",type(self.right))
+
         if self.right:
             right_eval = self.right.eval(global_env, env)
 
-            if right_eval == True:
-                right = True
+            if type(right_eval) == bool:
+                right = right_eval
             else:
-                right = False
+                if right_eval == "true":
+                    right = True
+                else:
+                    right = False
 
             left = left or right
 
@@ -351,11 +354,13 @@ class ConjExpr(BinaryExpr):
         if self.right:
             right_eval = self.right.eval(global_env, env)
 
-            if right_eval=="true":
-                right=True
+            if type(right_eval) == bool:
+                right = right_eval
             else:
-                right=False
-
+                if right_eval == "true":
+                    right = True
+                else:
+                    right = False
             left = left and right
 
         return left
