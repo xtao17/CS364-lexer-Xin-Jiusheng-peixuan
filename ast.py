@@ -601,11 +601,11 @@ class FuncCExpr(Expr):
         return global_env[str(self.f_id)].eval(global_env, {"param": self.left})
 
 class Farg:
-    def __init__(self, arg: str):
+    def __init__(self, arg: Expr):
         self.farg = arg
 
     def __str__(self):
-        return "{}".format(self.farg)
+        return "{}".format(str(self.farg))
 
     def eval(self,global_env,env):
         return self.farg.eval(global_env,env)
