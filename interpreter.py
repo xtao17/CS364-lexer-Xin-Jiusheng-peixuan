@@ -1,5 +1,3 @@
-import sys
-
 from parser_sluc import *
 
 if __name__ == '__main__':
