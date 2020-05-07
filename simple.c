@@ -3,12 +3,18 @@ int f(int x) {
 }
 
 int exp(int x, int y) {
-    if (y == 0)
+    if (y < 0)
         return 1;
     else
-        return x*exp(x,y-1);
+        return y+a(x,y);
 }
 
+int a(int x, int y) {
+    if(y < 0)
+        return 1;
+    else
+        return y+exp(x,y-1);
+}
 int main() {
    int x;
    float y;
@@ -16,7 +22,6 @@ int main() {
    x = 55;
    y = 5/2;
    x = 5/2;
-   print(y);
-   print(x)
+   print(exp(3,2));
 
 }

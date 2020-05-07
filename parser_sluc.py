@@ -400,13 +400,11 @@ class Parser:
             tmp = self.currtok
             self.currtok=next(self.tg)
             if self.currtok.kind=="left-paren":
-                if self.check_id_exist(func_name, self.func_id):
-                    self.currtok=next(self.tg)
-                    return self.funcC(tmp.name)
-                else:
-                    raise SLUCSyntaxError("ERROR: Function {} not defined on line {}".format(tmp.name, tmp.loc) )
+                self.currtok=next(self.tg)
+                return self.funcC(tmp.name)
+
             elif tmp.name in self.var_id:
-                    return IDExpr(tmp.name)
+                return IDExpr(tmp.name)
             else:
                 raise SLUCSyntaxError("ERROR: Variable {} undefined on line {}".format(tmp.name, tmp.loc))
 
