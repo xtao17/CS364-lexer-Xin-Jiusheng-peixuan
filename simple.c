@@ -3,17 +3,17 @@ int f(int x) {
 }
 
 int exp(int x, int y) {
-    if (y < 0)
+    if (y == 0)
         return 1;
     else
-        return y+a(x,y);
+        return x*exp(x,y-1);
 }
 
 int a(int x, int y) {
-    if(y < 0)
+    if(y == 0)
         return 1;
     else
-        return y+exp(x,y-1);
+        return x*exp(x,y-1);
 }
 int main() {
    int x;

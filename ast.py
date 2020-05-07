@@ -150,7 +150,7 @@ class FunctionDef:
                 s.eval(global_env, env)
 
         else:
-            global_env[str(self.id)] = FunctionDef(self.type, self.id, self.params, self.decls, self.stmts)
+            global_env[str(self.id)] = (self.type, FunctionDef(self.type, self.id, self.params, self.decls, self.stmts))
 
 
 class Program:
@@ -580,10 +580,10 @@ class FuncCExpr(Expr):
             args = [self.left.eval(global_env, env)]
             for a in self.right:
                 args.append(a.eval(global_env, env))
-            return global_env[str(self.f_id)].eval(global_env, {"arg": args})
+            return global_env[str(self.f_id)][1].eval(global_env, {"arg": args})
 
         else:
-            return global_env[str(self.f_id)].eval(global_env, {"arg": [self.left.eval(global_env, env)]})
+            return global_env[str(self.f_id)][1].eval(global_env, {"arg": [self.left.eval(global_env, env)]})
 
 
 class Farg:
