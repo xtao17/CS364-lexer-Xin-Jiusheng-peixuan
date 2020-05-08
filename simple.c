@@ -1,10 +1,5 @@
-int f(int x) {
-    print(1);
-    return x*x;
-}
-
 int exp(int x, int y) {
-
+    print(y);
     if (y == 0)
         return 1;
     else
@@ -12,11 +7,9 @@ int exp(int x, int y) {
 }
 
 int main() {
-   int x;
-   float y;
-   bool z;
-   z=true;
-   print(z+1);
-   // It is not hard to add function call syntax. It is just an identifier
-   // followed by zero or more expressions separated by commas.
+   int y=33;
+   int x = y * 99;
+
+   print(exp(2, 10));
+
 }

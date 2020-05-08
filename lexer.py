@@ -120,7 +120,7 @@ class Lexer:
             sys.exit(1)  # can't go on
 
     # method for generate tokens
-    def token_generator(self) -> Generator[Tuple[str, str, int], None, None]:
+    def token_generator(self) -> Generator[Token, None, None]:
         split_patt = re.compile(
             r"""             # Split on 
               ("(?:[^\\\"]|\\.)*")|   #string

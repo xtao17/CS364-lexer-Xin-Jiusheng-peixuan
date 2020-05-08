@@ -99,11 +99,65 @@ class Param:
             env[str(self.right)] = ("int", (alist[0]))
 
 
+class AssignmentStatement(Statement):
+    def __init__(self, left: Expr, right: Expr, tabs=""):
+        self.left = left    # id
+        self.right = right  # value
+        self.tabs = tabs
+
+    def __str__(self):
+        return "{0}{1} = {2};\n".format(self.tabs, str(self.left), str(self.right))
+
+    def eval(self, global_env, env):
+        t = env[str(self.left)][0]
+
+        if t == "int":
+            if type(self.right) == IntLitExpr:
+                env.update({str(self.left): (t, int(str(self.right)))})
+            elif type(self.right) == FloatLitExpr:
+                env.update({str(self.left): (t, int(float(str(self.right))))})
+            elif type(self.right) == StrLitExpr or type(self.right) == BoolExpr:
+                raise SLUCTypeError("ERROR: Variable {} incorrect assignment type".format(self.left))
+            else:
+                result = self.right.eval(global_env, env)
+                env.update({str(self.left): (t, int(result))})
+
+        if t == "float":
+            if type(self.right) == IntLitExpr or type(self.right) == FloatLitExpr:
+                env.update({str(self.left): (t, (float(str(self.right))))})
+            elif type(self.right) == StrLitExpr or type(self.right) == BoolExpr:
+                raise SLUCTypeError("ERROR: Variable {} incorrect assignment type".format(self.left))
+            else:
+                result = self.right.eval(global_env, env)
+                env.update({str(self.left): (t, float(result))})
+
+        if t == "bool":
+            if type(self.right) == BoolExpr:
+                env.update({str(self.left): (t, self.right.eval(global_env, env))})
+            elif type(self.right) == IntLitExpr \
+                    or type(self.right) == FloatLitExpr \
+                    or type(self.right) == StrLitExpr:
+                raise SLUCTypeError("ERROR: Variable {} incorrect assignment type".format(self.left))
+            else:
+                result = self.right.eval(global_env, env)
+
+                if type(result) == bool:
+                    env.update({str(self.left): (t, result)})
+                else:
+                    raise SLUCTypeError("ERROR: Variable {} incorrect assignment type".format(self.left))
+
+        if t == "str":
+            if type(self.right) == StrLitExpr:
+                env.update({str(self.left): (t, str(self.right.eval(global_env, env)))})
+            else:
+                raise SLUCTypeError("ERROR: Variable {} incorrect assignment type".format(self.left))
+
+
 class Declaration:
     """
     Declaration
     """
-    def __init__(self, left: str, right: Expr, tabs=""):
+    def __init__(self, left: str, right: Union[Expr, Statement], tabs=""):
         self.left = left    # type
         self.right = right  # id | assignment
         self.tabs = tabs
@@ -142,7 +196,7 @@ class FunctionDef:
                 stmtstr += str(self.stmts[i])
         return "{0} {1} ({2}) {{\n{3}{4}}}".format(self.type, str(self.id), str(self.params), declstr, stmtstr)
 
-    def eval(self, global_env, env={}) -> Union[int, float, bool]:
+    def eval(self, global_env, env={}) -> Union[None, int, float, bool]:
         # an environment maps identifiers to values
         # parameters or local variables
         # to evaluate a function you evaluate all of the statements
@@ -172,6 +226,7 @@ class FunctionDef:
 
         else:
             global_env[str(self.id)] = (self.type, FunctionDef(self.type, self.id, self.params, self.decls, self.stmts))
+        return None
 
 
 class Program:
@@ -243,9 +298,9 @@ class MultExpr(BinaryExpr):
         right = self.right.eval(global_env, env)
         if self.op == "*":
             return left * right
-        if self.op == "/":
+        elif self.op == "/":
             return left / right
-        if self.op == "%":
+        else:
             return left % right
 
 
@@ -404,62 +459,8 @@ class IfStatement(Statement):
         return None
 
 
-class AssignmentStatement(Statement):
-    def __init__(self, left: Expr, right: Expr, tabs=""):
-        self.left = left    # id
-        self.right = right  # value
-        self.tabs = tabs
-
-    def __str__(self):
-        return "{0}{1} = {2};\n".format(self.tabs, str(self.left), str(self.right))
-
-    def eval(self, global_env, env):
-        t = env[str(self.left)][0]
-
-        if t == "int":
-            if type(self.right) == IntLitExpr:
-                env.update({str(self.left): (t, int(str(self.right)))})
-            elif type(self.right) == FloatLitExpr:
-                env.update({str(self.left): (t, int(float(str(self.right))))})
-            elif type(self.right) == StrLitExpr or type(self.right) == BoolExpr:
-                raise SLUCTypeError("ERROR: Variable {} incorrect assignment type".format(self.left))
-            else:
-                result = self.right.eval(global_env, env)
-                env.update({str(self.left): (t, int(result))})
-
-        if t == "float":
-            if type(self.right) == IntLitExpr or type(self.right) == FloatLitExpr:
-                env.update({str(self.left): (t, (float(str(self.right))))})
-            elif type(self.right) == StrLitExpr or type(self.right) == BoolExpr:
-                raise SLUCTypeError("ERROR: Variable {} incorrect assignment type".format(self.left))
-            else:
-                result = self.right.eval(global_env, env)
-                env.update({str(self.left): (t, float(result))})
-
-        if t == "bool":
-            if type(self.right) == BoolExpr:
-                env.update({str(self.left): (t, self.right.eval(global_env, env))})
-            elif type(self.right) == IntLitExpr \
-                    or type(self.right) == FloatLitExpr \
-                    or type(self.right) == StrLitExpr:
-                raise SLUCTypeError("ERROR: Variable {} incorrect assignment type".format(self.left))
-            else:
-                result = self.right.eval(global_env, env)
-
-                if type(result) == bool:
-                    env.update({str(self.left): (t, result)})
-                else:
-                    raise SLUCTypeError("ERROR: Variable {} incorrect assignment type".format(self.left))
-
-        if t == "str":
-            if type(self.right) == StrLitExpr:
-                env.update({str(self.left): (t, str(self.right.eval(global_env, env)))})
-            else:
-                raise SLUCTypeError("ERROR: Variable {} incorrect assignment type".format(self.left))
-
-
 class BlockStatement(Statement):
-    def __init__(self, stmt: Statement, args: Statement, tabs=""):
+    def __init__(self, stmt: Statement, args: Sequence[Statement], tabs=""):
         self.left = stmt
         self.right = args
         self.tabs = tabs
@@ -532,7 +533,7 @@ class IntLitExpr(Expr):
 
 class StrLitExpr(Expr):
 
-    def __init__(self, strlit: [str, Expr]):
+    def __init__(self, strlit: str):
         self.strlit = strlit
 
     def __str__(self):
@@ -596,7 +597,7 @@ class FuncCExpr(Expr):
             return global_env[str(self.f_id)][1].eval(global_env, {"arg": [self.left.eval(global_env, env)]})
 
 
-class Farg:
+class Farg(Expr):
     """
     Represents function arguments
     """

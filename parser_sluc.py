@@ -5,7 +5,7 @@ Xin, Jiusheng, Peixuan
 from lexer import Lexer
 from ast import *
 import sys
-
+from typing import List
 
 class Parser:
     """
@@ -13,9 +13,9 @@ class Parser:
     """
     def __init__(self, fn: str):
         #  list for checking variable id and function id
-        self.var_id = []
-        self.func_id = []
-        self.funccs = []
+        self.var_id: List[str] = []
+        self.func_id: List[str] = []
+        self.funccs: List[str] = []
         self.level = 0
         self.lex = Lexer(fn)
         self.tg = self.lex.token_generator()
@@ -98,7 +98,7 @@ class Parser:
         raise SLUCSyntaxError("ERROR: Invalid function definition on line {}".format(currentline))
 
     def params(self) -> Param:
-        args =[]
+        args: List[Union[IDExpr, str]] = []
         if self.currtok.kind == "Keyword" and self.currtok.name in{"int", "bool", "float"}:
             left = self.currtok.name
             self.currtok = next(self.tg)
@@ -121,7 +121,7 @@ class Parser:
 
         elif self.currtok.kind == "right-paren":
             self.currtok = next(self.tg)
-            return Param("", "")
+            return Param("", StrLitExpr(""))
 
         raise SLUCSyntaxError("ERROR: Invalid param on line {}".format(self.currtok.loc))
 
@@ -129,6 +129,7 @@ class Parser:
         """
         Declaration -> type id | assignment
         """
+
         if self.currtok.kind == "Keyword" and self.currtok.name in {"int", "bool", "float"}:
             left = self.currtok.name
             self.currtok = next(self.tg)
@@ -136,7 +137,7 @@ class Parser:
                 #  add id
                 if not self.check_id_exist(self.currtok.name, self.var_id):
                     self.var_id.append(self.currtok.name)
-                    right = IDExpr(self.currtok.name)
+                    right: IDExpr = IDExpr(self.currtok.name)
                     self.currtok = next(self.tg)
                 else:
                     raise SLUCSyntaxError("ERROR: ID {} duplicated on line {}".format(self.currtok.name, self.currtok.loc))
@@ -146,8 +147,8 @@ class Parser:
                 self.currtok = next(self.tg)
                 return Declaration(left, right, self.formctrl())
             elif self.currtok.kind == "assignment":
-                right = self.assignment(right)
-                return Declaration(left, right, self.formctrl())
+                assign: Statement = self.assignment(right)
+                return Declaration(left, assign, self.formctrl())
         raise SLUCSyntaxError("ERROR: Invalid declaration on line {}".format(self.currtok.loc))
 
     def statement(self) -> Statement:
@@ -186,7 +187,7 @@ class Parser:
         self.currtok = next(self.tg)
         return BlockStatement(stmt, stmts, self.formctrl())
 
-    def assignment(self, id: Expr=None) -> Statement:
+    def assignment(self, id: Expr = None) -> Statement:
         currentline = self.currtok.loc
         if id:
             if self.currtok.kind == "assignment":
@@ -339,8 +340,8 @@ class Parser:
             args.append(self.farg())
         if self.currtok.kind == "right-paren":
             self.currtok = next(self.tg)
-            left = FuncCExpr(f_id, left, args)
-            return left
+            f = FuncCExpr(f_id, left, args)
+            return f
         print(self.currtok.kind)
         raise SLUCSyntaxError("ERROR: Invalid function call on line {}".format(self.currtok.loc))
 
