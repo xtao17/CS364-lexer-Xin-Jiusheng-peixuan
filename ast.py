@@ -311,7 +311,7 @@ class EqExpr(BinaryExpr):
     def __str__(self):
         return "({0} {1} {2})".format(str(self.left), str(self.Eqlop), str(self.right))
 
-    def eval(self,global_env,env) -> Union[int, bool, float]:
+    def eval(self, global_env, env) -> Union[int, bool, float]:
         if self.Eqlop == "==":
             return self.left.eval(global_env, env) == self.right.eval(global_env, env)
         else:
@@ -359,7 +359,7 @@ class PrintStatement(Statement):
         if self.prtargs:
             print(self.prtarg.eval(global_env, env), end=" ")
             for i in range(0, len(self.prtargs)):
-                if i == len(self.prtargs) -1:
+                if i == len(self.prtargs) - 1:
                     print(self.prtargs[i].eval(global_env, env))
                 else:
                     print(self.prtargs[i].eval(global_env, env), end=" ")
@@ -485,7 +485,7 @@ class ReturnStatement(Statement):
     def __str__(self):
         return "{}return {};\n".format(self.tabs, str(self.left))
 
-    def eval(self, global_env , env):
+    def eval(self, global_env, env):
         return self.left.eval(global_env, env)
 
 
@@ -497,7 +497,7 @@ class UnaryOp(Expr):
     def __str__(self):
         return "{}({})".format(self.op, str(self.tree))
 
-    def eval(self,global_env, env):
+    def eval(self, global_env, env):
         if self.op == "-":
             return -self.tree.eval(global_env, env)
         else:
@@ -524,7 +524,7 @@ class IntLitExpr(Expr):
     def __str__(self):
         return str(self.intlit)
 
-    def eval(self,global_env={}, env={}) -> int:
+    def eval(self, global_env={}, env={}) -> int:
         return self.intlit   # base case
 
 
@@ -536,7 +536,7 @@ class StrLitExpr(Expr):
     def __str__(self):
         return str(self.strlit)
 
-    def eval(self,global_env={}, env={}) -> str:
+    def eval(self, global_env={}, env={}) -> str:
         return self.strlit   # base case
 
 
@@ -558,7 +558,7 @@ class BoolExpr(Expr):
     def __str__(self):
         return "{}".format(self.bool)
 
-    def eval(self,global_env={}, env={}) -> bool:
+    def eval(self, global_env={}, env={}) -> bool:
         if self.bool == "true":
             return True
         else:
@@ -615,7 +615,7 @@ if __name__ == '__main__':
     """
     globalenv = {"b": ("int", 2)}
     env = {"a": ("int", 1)}
-    expr = AddExpr(IDExpr("a"), IntLitExpr(2))
-    assignment = AssignmentStatement(IDExpr("c"), IntLitExpr(3))
+    expr = AddExpr(IDExpr("a"), IntLitExpr("2"))
+    assignment = AssignmentStatement(IDExpr("c"), IntLitExpr("3"))
     print(assignment.eval({}, {"c": ("int", None)}))
     print(expr.eval({}, env))
