@@ -14,6 +14,9 @@ from typing import Sequence, Union, Optional
 
 # Expr, Statements, FunctionDef,Pram
 class Expr:
+    """
+    Base class for expression
+    """
     def __init__(self, left, right):
         self.left = left
         self.right = right
@@ -31,7 +34,6 @@ class Expr:
 
         if self.right:
             right_eval = self.right.eval(global_env, env)
-
             if type(right_eval) == bool:
                 right = right_eval
             else:
@@ -42,6 +44,9 @@ class Expr:
 
 
 class Statement:
+    """
+    Base class for statement
+    """
     def __init__(self, stmt, tabs=""):
         self.left = stmt
         self.tabs = tabs
@@ -56,6 +61,9 @@ class Statement:
 
 
 class Param:
+    """
+    Parameter
+    """
     def __init__(self, left: str, right: Expr, args=None):
         self.left = left    # type
         self.right = right  # id
@@ -92,6 +100,9 @@ class Param:
 
 
 class Declaration:
+    """
+    Declaration
+    """
     def __init__(self, left: str, right: Expr, tabs=""):
         self.left = left    # type
         self.right = right  # id | assignment
@@ -142,12 +153,15 @@ class FunctionDef:
             self.params.eval(global_env, env)   # get the value of a param
             for d in self.decls:
                 d.eval(global_env, env)
-            for s in self.stmts:
 
-                if str(type(s.eval(global_env, env)).__name__) == self.type:
-                    return s.eval(global_env, env)
+            for s in self.stmts:
+                if type(s) in {ReturnStatement, IfStatement}:
+                    if str(type(s.eval(global_env, env)).__name__) == self.type:
+                        return s.eval(global_env, env)
+                    else:
+                        raise SLUCTypeError("ERROR: type error")
                 else:
-                    raise SLUCTypeError("ERROR: type error")
+                    s.eval(global_env, env)
 
         elif str(self.id) == "main":
             env = {}
@@ -510,7 +524,6 @@ class IDExpr(Expr):
 
     def eval(self, global_env, env):  # a + 7
         return env[self.id][1]
-
 
 
 class IntLitExpr(Expr):
