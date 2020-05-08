@@ -19,10 +19,11 @@ int main() {
    int x=5;
    float y;
    bool z;
-   x = 55;
+
    y = 5/2;
-   x = 5/2;
+
    print(a(3,2));
+   print(x)
    print("hello");
    print("hi", a(4, 5));
    print(3**2**3*2+4-5*2/2);

@@ -93,8 +93,8 @@ class Param:
 
 class Declaration:
     def __init__(self, left: str, right: Expr, tabs=""):
-        self.left = left
-        self.right = right
+        self.left = left    # type
+        self.right = right  # id | assignment
         self.tabs = tabs
 
     def __str__(self):
@@ -103,7 +103,12 @@ class Declaration:
         return "{0}{1} {2};\n".format(self.tabs, self.left, str(self.right))
 
     def eval(self, global_env, env):
-        env[str(self.right)] = (self.left, None)  # ID: (type, value)
+        if type(self.right) == AssignmentStatement:
+            id = str(self.right)[0]
+            env[id] = (self.left, None)
+            self.right.eval(global_env, env)
+        else:
+            env[str(self.right)] = (self.left, None)  # ID: (type, value)
 
 
 class FunctionDef:
