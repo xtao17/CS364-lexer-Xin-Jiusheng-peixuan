@@ -237,13 +237,6 @@ class MultExpr(BinaryExpr):
         return "({0} {1} {2})".format(str(self.left), self.op, str(self.right))
 
     def eval(self, global_env, env) -> Union[int, float]:
-        # TODO environment
-        # Implementing SLU-C multiplication using Python's multiplication
-        # implmented * using mul instruction
-
-        # If we checked type when running eval we have a "dynamically typed"
-        # language
-
         left = self.left.eval(global_env, env)
         right = self.right.eval(global_env, env)
         if self.op == "*":
@@ -255,6 +248,9 @@ class MultExpr(BinaryExpr):
 
 
 class ExpoExpr(BinaryExpr):
+    """
+    Represents exponential operation
+    """
     def __init__(self, left: Expr, right: Expr):
         self.left = left
         self.right = right
@@ -331,13 +327,6 @@ class RelatExpr(BinaryExpr):
     def __str__(self):
         return "({0} {1} {2})".format(str(self.left), str(self.relop), str(self.right))
 
-    def scheme(self) -> str:
-        """
-        Return a string that represents the expression in Scheme syntax.
-        e.g.,  (a + b)   -> (+ a b)
-        """
-        return "(+ {0} {1})".format(self.left.scheme(), self.right.scheme())
-
     def eval(self, global_env, env) -> Union[int, float]:
         # TODO environment
         if self.right:
@@ -350,6 +339,7 @@ class RelatExpr(BinaryExpr):
             elif self.relop == ">=":
                 return self.left.eval(global_env, env) >= self.right.eval(global_env, env)
         return self.left.eval(global_env, env)
+
 
 class PrintStatement(Statement):
     def __init__(self, prtarg: Expr, prtargs: Sequence[Expr], tabs=""):
@@ -605,6 +595,9 @@ class FuncCExpr(Expr):
 
 
 class Farg:
+    """
+    Represents function arguments
+    """
     def __init__(self, arg: Expr):
         self.farg = arg
 
@@ -623,6 +616,6 @@ if __name__ == '__main__':
     globalenv = {"b": ("int", 2)}
     env = {"a": ("int", 1)}
     expr = AddExpr(IDExpr("a"), IntLitExpr(2))
-    assignment = AssignmentStatement(IDExpr("c"), 3)
+    assignment = AssignmentStatement(IDExpr("c"), IntLitExpr(3))
     print(assignment.eval({}, {"c": ("int", None)}))
     print(expr.eval({}, env))
