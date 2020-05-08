@@ -36,8 +36,8 @@ class Expr:
                 right = right_eval
             else:
                 raise SLUCTypeError("ERROR: type error")
-
             left = left or right
+
         return left
 
 
@@ -98,6 +98,8 @@ class Declaration:
         self.tabs = tabs
 
     def __str__(self):
+        if type(self.right) == AssignmentStatement:
+            return "{0}{1} {2}".format(self.tabs, self.left, str(self.right))
         return "{0}{1} {2};\n".format(self.tabs, self.left, str(self.right))
 
     def eval(self, global_env, env):
@@ -105,8 +107,8 @@ class Declaration:
 
 
 class FunctionDef:
-    def __init__(self, type: str, id: Expr, params: Param, decls: Sequence[Declaration], stmts: Sequence[Statement]):
-        self.type = type
+    def __init__(self, ftype: str, id: Expr, params: Param, decls: Sequence[Declaration], stmts: Sequence[Statement]):
+        self.type = ftype
         self.id = id
         self.params = params
         self.decls = decls
@@ -366,7 +368,7 @@ class WhileStatement(Statement):
         return "{}while {} {}".format(self.tabs, str(self.left), str(self.right))
 
     def eval(self, global_env, env):
-        while self.left.eval(global_env,env):
+        while self.left.eval(global_env, env):
             self.right.eval(global_env, env)
 
 
@@ -411,7 +413,7 @@ class AssignmentStatement(Statement):
             elif type(self.right) == StrLitExpr or type(self.right) == BoolExpr:
                 raise SLUCTypeError("ERROR: type is wrong")
             else:
-                result=self.right.eval(global_env, env)
+                result = self.right.eval(global_env, env)
                 env.update({str(self.left): (t, int(result))})
 
         if t == "float":
@@ -433,7 +435,7 @@ class AssignmentStatement(Statement):
             else:
                 result = self.right.eval(global_env, env)
 
-                if type(result)==bool:
+                if type(result) == bool:
                     env.update({str(self.left): (t, result)})
                 else:
                     raise SLUCTypeError("ERROR: type is wrong")
@@ -461,7 +463,7 @@ class BlockStatement(Statement):
         return "{1}{{\n{0}{1}}}\n".format(str(self.left), self.tabs)
 
     def eval(self, global_env, env):
-        self.left.eval(global_env,env)
+        self.left.eval(global_env, env)
         for argument in self.right:
             argument.eval(global_env, env)
 
@@ -474,7 +476,7 @@ class ReturnStatement(Statement):
     def __str__(self):
         return "{}return {};\n".format(self.tabs, str(self.left))
 
-    def eval(self , global_env , env):
+    def eval(self, global_env , env):
         return self.left.eval(global_env, env)
 
 
@@ -502,8 +504,6 @@ class IDExpr(Expr):
         return self.id
 
     def eval(self, global_env, env):  # a + 7
-        # lookup the value of self.id. Look up where?
-        # env is a dictionary
         return env[self.id][1]
 
 
@@ -516,7 +516,7 @@ class IntLitExpr(Expr):
     def __str__(self):
         return str(self.intlit)
 
-    def eval(self,global_env={}, env={}):
+    def eval(self,global_env={}, env={}) -> int:
         return self.intlit   # base case
 
 
@@ -528,7 +528,7 @@ class StrLitExpr(Expr):
     def __str__(self):
         return str(self.strlit)
 
-    def eval(self,global_env={}, env={}):
+    def eval(self,global_env={}, env={}) -> str:
         return self.strlit   # base case
 
 
@@ -574,7 +574,7 @@ class FuncCExpr(Expr):
             return "{}({}{})".format(self.f_id, str(self.left), args)
         return "{}({})".format(self.f_id, str(self.left))
 
-    def eval(self, global_env, env):
+    def eval(self, global_env, env) -> Union[int, float, bool]:
 
         if self.right:
             args = [self.left.eval(global_env, env)]
@@ -593,7 +593,7 @@ class Farg:
     def __str__(self):
         return "{}".format(str(self.farg))
 
-    def eval(self, global_env, env):
+    def eval(self, global_env, env) -> Union[int, float, bool]:
         return self.farg.eval(global_env, env)
 
 

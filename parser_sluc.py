@@ -126,6 +126,9 @@ class Parser:
         raise SLUCSyntaxError("ERROR: Invalid param on line {}".format(self.currtok.loc))
 
     def declaration(self) -> Declaration:
+        """
+        Declaration -> type id | assignment
+        """
         if self.currtok.kind == "Keyword" and self.currtok.name in {"int", "bool", "float"}:
             left = self.currtok.name
             self.currtok = next(self.tg)
@@ -139,8 +142,11 @@ class Parser:
                     raise SLUCSyntaxError("ERROR: ID {} duplicated on line {}".format(self.currtok.name, self.currtok.loc))
             else:
                 raise SLUCSyntaxError("ERROR: Invalid declaration on line {}".format(self.currtok))
-            if self.currtok.kind=="semicolon":
+            if self.currtok.kind == "semicolon":
                 self.currtok = next(self.tg)
+                return Declaration(left, right, self.formctrl())
+            elif self.currtok.kind == "assignment":
+                right = self.assignment(right)
                 return Declaration(left, right, self.formctrl())
         raise SLUCSyntaxError("ERROR: Invalid declaration on line {}".format(self.currtok.loc))
 
@@ -180,20 +186,29 @@ class Parser:
         self.currtok = next(self.tg)
         return BlockStatement(stmt, stmts, self.formctrl())
 
-    def assignment(self) -> Statement:
+    def assignment(self, id: Expr=None) -> Statement:
         currentline = self.currtok.loc
-        if self.check_id_exist(self.currtok.name,self.var_id):
-            id = IDExpr(self.currtok.name)
-        else:
-            raise SLUCSyntaxError("ERROR: Variable {} not defined on line {}".format(self.currtok.name, self.currtok.loc))
-        self.currtok = next(self.tg)
-        if self.currtok.kind == "assignment":
-            self.currtok = next(self.tg)
-            expr = self.expression()
-            if self.currtok.kind == "semicolon":
+        if id:
+            if self.currtok.kind == "assignment":
                 self.currtok = next(self.tg)
-                assign = AssignmentStatement(id, expr, self.formctrl())
-                return assign
+                expr = self.expression()
+                if self.currtok.kind == "semicolon":
+                    self.currtok = next(self.tg)
+                    assign = AssignmentStatement(id, expr)
+                    return assign
+        else:
+            if self.check_id_exist(self.currtok.name,self.var_id):
+                id = IDExpr(self.currtok.name)
+            else:
+                raise SLUCSyntaxError("ERROR: Variable {} not defined on line {}".format(self.currtok.name, self.currtok.loc))
+            self.currtok = next(self.tg)
+            if self.currtok.kind == "assignment":
+                self.currtok = next(self.tg)
+                expr = self.expression()
+                if self.currtok.kind == "semicolon":
+                    self.currtok = next(self.tg)
+                    assign = AssignmentStatement(id, expr, self.formctrl())
+                    return assign
         raise SLUCSyntaxError("ERROR: Invalid Assignment on line {}".format(currentline))
 
     def ifstatement(self) -> Statement:

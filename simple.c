@@ -9,19 +9,22 @@ int exp(int x, int y) {
         return x*exp(x,y-1);
 }
 
-float a(int x, int y) {
+int a(int x, int y) {
     if(y == 0)
         return 1;
     else
-        return x*b(x,y-1);
+        return x*a(x,y-1);
 }
 int main() {
-   int x;
+   int x=5;
    float y;
    bool z;
    x = 55;
    y = 5/2;
    x = 5/2;
    print(a(3,2));
+   print("hello");
+   print("hi", a(4, 5));
+   print(3**2**3*2+4-5*2/2);
 
 }
