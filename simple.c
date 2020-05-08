@@ -9,7 +9,7 @@ int exp(int x, int y) {
         return x*exp(x,y-1);
 }
 
-int a(int x, int y) {
+float a(int x, int y) {
     if(y == 0)
         return 1;
     else
@@ -22,6 +22,6 @@ int main() {
    x = 55;
    y = 5/2;
    x = 5/2;
-   print(exp(3,2));
+   print(a(3,2));
 
 }

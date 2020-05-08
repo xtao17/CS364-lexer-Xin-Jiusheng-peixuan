@@ -136,11 +136,11 @@ class FunctionDef:
             for d in self.decls:
                 d.eval(global_env, env)
             for s in self.stmts:
-                """if type(s) == ReturnStatement:
+
+                if str(type(s.eval(global_env, env)).__name__) == self.type:
                     return s.eval(global_env, env)
                 else:
-                    return s.eval(global_env, env)"""
-                return s.eval(global_env, env)
+                    raise SLUCTypeError("ERROR: type error")
 
         elif str(self.id) == "main":
             env = {}
