@@ -15,16 +15,20 @@ class Parser:
         #  list for checking variable id and function id
         self.var_id = []
         self.func_id = []
+        self.funccs = []
         self.level = 0
         self.lex = Lexer(fn)
         self.tg = self.lex.token_generator()
         self.currtok = next(self.tg)
+
         #  expression dictionary for DRY rule
         self.ex_dict = {
             "real": (lambda x: FloatLitExpr(x)),
             "int": (lambda x: IntLitExpr(x))
         }
+
         #  Statement dictionary for DRY rule
+
         self.stmt_dict = {
             "if": (lambda x: self.ifstatement()),
             "while": (lambda x: self.whilestatement()),
@@ -48,7 +52,9 @@ class Parser:
         #   append functions until the end of file
         while self.currtok and self.currtok.name != "EOF":
             funcdefs.append(self.functiondef())
-
+        for f in self.funccs:
+            if not self.check_id_exist(f, self.func_id):
+                raise SLUCSyntaxError("ERROR: Function {} undefined".format(f))
         return Program(funcdefs)
 
     def functiondef(self) -> FunctionDef:
@@ -311,6 +317,7 @@ class Parser:
         FuncC → id (farg {, farg})
          """
         left = self.farg()
+        self.funccs.append(f_id)
         args = []
         while self.currtok.kind == "comma":
             self.currtok = next(self.tg)

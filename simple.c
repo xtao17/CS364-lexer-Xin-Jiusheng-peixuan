@@ -13,7 +13,7 @@ float a(int x, int y) {
     if(y == 0)
         return 1;
     else
-        return x*exp(x,y-1);
+        return x*b(x,y-1);
 }
 int main() {
    int x;
