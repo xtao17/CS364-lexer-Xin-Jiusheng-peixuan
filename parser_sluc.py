@@ -7,6 +7,7 @@ from ast import *
 import sys
 from typing import List
 
+
 class Parser:
     """
      Parser class is used to implement SLUC grammar
